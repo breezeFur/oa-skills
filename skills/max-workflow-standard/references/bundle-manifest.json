@@ -213,8 +213,8 @@
     },
     {
       "path": "references/provenance.md",
-      "bytes": 3764,
-      "sha256": "2ebf72000300aab6e80ef45a9dcb559657b80a900c2f7d0aa8fde73b72cd730b"
+      "bytes": 3930,
+      "sha256": "78e2dff958b7abd88106ea5d3309e08617edd64507e912d7db72585bb224ec5e"
     },
     {
       "path": "references/screenshots.md",
@@ -267,5 +267,5 @@
       "sha256": "1fabdbb149c4cc4926b1f04959107d2da68645e258bf588e311c44d97b5fd6f2"
     }
   ],
-  "updated_on": "2026-10-16"
+  "updated_on": "2026-10-23"
 }

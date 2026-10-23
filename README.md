@@ -1,6 +1,6 @@
 # OA Skills
 
-泛微 E10 / E-Builder 的技能与配套资源。仓库为私有，包含 MAX 公司规范原件及历史参考资料。
+泛微 E10 / E-Builder 的技能与配套资源。仓库按用户 2026-10-23 的明确要求公开，包含 MAX 公司规范原件及历史参考资料。
 
 ## 收录范围
 
@@ -19,13 +19,13 @@
 - 报表 CLI 源码在 skills/oa-skill/weaver-e10-edcreport/edc-report，依赖相邻 scripts 目录。Node.js 要求 >=18；使用前按技能与 CLI 的说明准备外部依赖。
 - weaver-e10-login 认证技能未包含在此次收录范围。e10-login 是外部认证 CLI，需要单独安装并在本机登录。克隆本仓库不会迁移登录态。
 - Python 脚本按各技能的依赖说明使用；MAX 完整性校验只需 Python 标准库。
-- 账号、密码、Token、Cookie、私钥及服务配置保留在本机。公司原件与历史附件仅在私有仓库维护。
+- 账号、密码、Token、Cookie、私钥及服务配置保留在本机。当前收录的公司原件与历史附件随本仓库公开；后续新增资料须确认其公开范围。
 
 ## 克隆与安装
 
 ### Windows / PowerShell
 
-先确认当前 GitHub 账号有该私有仓库的访问权限：
+公开仓库可直接克隆：
 
 ```powershell
 git clone https://github.com/breezeFur/oa-skills.git D:\develop\oa-skills
