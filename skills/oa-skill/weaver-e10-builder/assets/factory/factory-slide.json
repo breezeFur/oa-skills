@@ -1,0 +1,164 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "b80364c69d4e4834b7af2d6211ab5a9d",
+        "type": "Slide",
+        "package": "@weapp/ebdbasecoms",
+        "category": "2",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "c530d67633774dffa1d2bdb3c52de826",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "幻灯片",
+          "type": "Slide",
+          "title": "标题",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "pics": [],
+          "imageMode": "stretch",
+          "switchEffect": "fade",
+          "intervalTime": {
+            "type": -1,
+            "value": -1
+          },
+          "speed": 500,
+          "lazyLoad": false,
+          "imgSourceType": "manual",
+          "dataset": "",
+          "picField": {
+            "text": "请选择",
+            "id": "DEFAULT"
+          },
+          "titleField": {
+            "text": "请选择",
+            "id": "DEFAULT"
+          },
+          "describeField": {
+            "text": "请选择",
+            "id": "DEFAULT"
+          },
+          "linkField": {
+            "text": "请选择",
+            "id": "DEFAULT"
+          },
+          "eventGroup": [],
+          "filter": [],
+          "showNum": 5,
+          "showPicTitle": true,
+          "layout": {
+            "i": "cf619ffb77294bc5a848dca5e07b462e",
+            "x": 1,
+            "y": 0,
+            "w": 4,
+            "h": 29,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 61
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,8",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,SlideStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdbasecoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "c530d67633774dffa1d2bdb3c52de826",
+        "type": "Slide",
+        "package": "@weapp/ebdbasecoms",
+        "category": "2",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "b80364c69d4e4834b7af2d6211ab5a9d",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "幻灯片",
+          "type": "Slide",
+          "title": "标题",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "pics": [],
+          "imageMode": "stretch",
+          "switchEffect": "fade",
+          "intervalTime": {
+            "type": -1,
+            "value": -1
+          },
+          "speed": 500,
+          "lazyLoad": false,
+          "imgSourceType": "manual",
+          "dataset": "",
+          "picField": {
+            "text": "请选择",
+            "id": "DEFAULT"
+          },
+          "titleField": {
+            "text": "请选择",
+            "id": "DEFAULT"
+          },
+          "describeField": {
+            "text": "请选择",
+            "id": "DEFAULT"
+          },
+          "linkField": {
+            "text": "请选择",
+            "id": "DEFAULT"
+          },
+          "eventGroup": [],
+          "filter": [],
+          "showNum": 5,
+          "showPicTitle": true,
+          "layout": {
+            "i": "a4cf121068324221890fe77357c065a1",
+            "adaptive": false,
+            "h": 29,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": []
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,8",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,SlideStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdbasecoms"
+      }
+    ]
+  }
+]

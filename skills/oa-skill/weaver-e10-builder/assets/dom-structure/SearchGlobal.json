@@ -1,0 +1,628 @@
+{
+  "component": "search-global 全局搜索框（weapp-ebdothercoms/src/components/search-global，引擎类型 SearchGlobal → 外壳类名 ebcom-searchglobal）",
+  "usage": "PC 与移动端的组件源码是两套（View→common/ViewContent，移动端 View→common/MViewContent），DOM 几乎完全不同，先按 pickTree 选树。共同点只有一个：两侧都是『一个搜索框 + 一个搜索/历史浮层』。用户说『搜索框』时 PC 指 div.ebcoms-searchglobal-bar 里的 div.ui-searchAdvanced；移动端顶栏指 div.ui-m-searchbar，而移动端搜索面板里还有第二个 ui-m-searchbar（同名陷阱）。用户说『历史记录/常用筛选标签』时直接看 shared.panelDetail 与 shared.historyBlock，PC 弹层与移动端面板用的是同一套 ebcoms-searchglobal-panel-* 类名。",
+  "legend": {
+    "[cls]": "条件class，满足业务条件才挂载",
+    "{a|b}": "多选一class（同一位置按配置换成其中一个）",
+    "a > b": "父子层级压缩写法，冒号左边是右边的父级",
+    "ref": "引用 shared 里的复用片段，写成 ref:shared.xxx",
+    "uncontrolled": "第三方渲染（设计器拖拽层、MPageView 子页面、Portal 容器），内部结构不可控，只给挂载点",
+    "<comId>": "组件实例 id；引擎外壳的 id 与组件根上的 data-id 都是它，组件源码里叫 props.id",
+    "ebcoms-": "组件自己写的类名前缀（clsPrefix='ebcoms'，less 里写作 @prefix）",
+    "ebcom-": "引擎/框架层的类名前缀（ebcomPrefix='ebcom'，less 里写作 @ebcomPrefix），search-global 源码里搜不到",
+    "ui-": "@weapp/ui 的类名（PC 与移动端共用 ui 前缀，移动端只有部分组件用 ui-m-）"
+  },
+  "pickTree": "两步。① 端：page.client==='MOBILE' 走移动端树（源码 view-m→common/MViewContent，外壳多 ebcom-m + 布局类 ebcom-mgl），否则 PC 树（common/ViewContent）。② 运行态还是设计态：外壳含 ebcom-view 是页面运行态，含 ebcom-design 是设计器设计态 —— 但注意：search-global 的 Design/View 渲染的是同一个 ViewContent（组件内部没有 isDesign 分支），所以组件自身的 DOM 完全一样，设计态只多几个外壳类（mask、设计器包裹类），面板里也没有拖拽层。另有旧分支：config.searchType==='GLOBAL' 时走 search-weeso 组件（源码注释『目前这里已经废弃』），DOM 属于 search-weeso（ebcoms-searchweeso-*），不在本文件展开。",
+  "root": {
+    "tag": "div",
+    "id": "<comId>",
+    "class": [
+      "ebcom",
+      "ebcom-searchglobal",
+      "{ebcom-grid|ebcom-flow|ebcom-excel|ebcom-mgl}",
+      "[ebcom-m]",
+      "{ebcom-view|ebcom-design}",
+      "[mask]",
+      "[has-no-header]",
+      "[event-action-click]",
+      "<布局/设计器追加的类名>"
+    ],
+    "desc": "引擎外壳，由 weapp-ebdcoms 的 createView.renderView（运行态）/ createDesign.renderDesign（设计态）生成，不在本组件源码里。类型名拼成 ebcom-searchglobal（type.toLowerCase()），布局拼成 ebcom-grid/ebcom-flow/ebcom-excel，移动端是 ebcom-mgl 且多一个 ebcom-m。",
+    "tips": [
+      "has-no-header 基本常驻：Design/MDesign.defaultProps 里 titleEnabled:false，且组件没有 renderHeader，所以标题栏不存在、外壳带 has-no-header",
+      "设计态多一个 mask：Design.defaultOpts.mask===true（运行态不会有），less 里 .ebcom.mask > *{pointer-events:none} 作用在这层",
+      "event-action-click 只在页面里给组件配了「点击」事件动作时出现",
+      "不会出现的类名：standalone、content-no-padding（组件没声明 render.standalone / padding）",
+      "本组件没有样式生成器（源码里没有 getSearchGlobalStyles 之类），不要指望存在 #<comId> 下的专属样式类；但写选择器仍建议用 #<comId> 限域，PC/移动端同名类太多"
+    ],
+    "children": [
+      {
+        "tag": "div",
+        "class": [
+          "header"
+        ],
+        "when": "titleEnabled===true 才有；组件默认 false，通常看不到",
+        "children": [
+          {
+            "tag": "div",
+            "class": [
+              "ebcom-title"
+            ],
+            "desc": "引擎渲染的组件标题（有 {xx} 动态语法时换成 TransformContent 的 div，类名同样是 ebcom-title）"
+          },
+          {
+            "tag": "div",
+            "class": [
+              "ebcoms-header-btns"
+            ],
+            "desc": "标题栏操作按钮组（引擎 renderHeader 传入的 wrapClass）"
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "class": [
+          "content"
+        ],
+        "desc": "引擎内容槽（createView.renderContent / createDesign 的 renderContent），固定类名 content，里面是组件自己的根。⚠️ 组件内部另有 ebcoms-searchglobal-panel-detail 等含 content 字样的类名，common/index.less 里 .ebcom-searchglobal .content{overflow:visible!important} 指的就是这一层",
+        "children": [
+          "ref:shared.comRoot"
+        ]
+      },
+      {
+        "tag": "div",
+        "class": [
+          "footer"
+        ],
+        "when": "footerEnabled===true 才有；Design.defaultProps 里 footerEnabled:false",
+        "desc": "引擎底部按钮区"
+      }
+    ]
+  },
+  "shared": {
+    "comRoot": {
+      "tag": "div",
+      "class": [
+        "ebcoms-searchglobal-main",
+        "custom"
+      ],
+      "desc": "组件根，PC 与移动端都叫这个名字（源码里写死了 `${clsPrefix}-searchglobal-main custom`），直接放在引擎 div.content 里。运行态引擎会在这层写 data-id=<comId>。里面就是搜索框本体 + 浮层触发区。",
+      "tips": [
+        "custom 是写死的业务类名，不要单独用它做选择器（太泛），要写就写 #<comId> .ebcoms-searchglobal-main 或 .ebcoms-searchglobal-main.custom",
+        "less 已给这层 min-width:350px / height:100%（PC 的 view/index.less），且 .custom 时改成 flex + 居中、让搜索框 flex:1 —— 不要在内部再写一次布局"
+      ]
+    },
+    "pendBtns": {
+      "desc": "自定义按钮组（引擎的 OperationBtns，wrapClass=ebcoms-searchglobal-pendbtns）。配置了 config.searchBtns 才渲染，PC 按 alignType 放在搜索框左/右（见 trees），移动端当作 MSearchbar 的 prepend/append。内部按钮是引擎的 ConfigurableButton，形态随按钮配置变化（uncontrolled），只给挂载点与已有钩子。",
+      "chain": "div.ebcoms-searchglobal-pendbtns > div.ebcoms-configurable-btn{showType} > (div.ebcoms-configurable-btn-icon | div.ebcoms-configurable-btn-view > div.ebcoms-configurable-btn-view-icon) > 图标/文字",
+      "tips": [
+        "alignType 只判断 LEFT / RIGHT，配成 CENTER 时两处都不渲染 —— 页面里按钮不见了先查这个",
+        "OperationBtns 内部按左右两组渲染，DOM 里可能出现 1~2 个同 class 的 div.ebcoms-searchglobal-pendbtns",
+        "less 已有钩子：.ui-m-searchbar 与 .ebcoms-searchglobal-main 下的 .ebcoms-searchglobal-pendbtns .ebcoms-configurable-btn .ebcoms-configurable-btn-icon .ebcoms-assets-item.sm{width:30px!important;height:30px!important}（common/index.less），view-m/index.less 另给了 .ui-btn 去边框与左右 8px 内边距"
+      ]
+    },
+    "pcBar": {
+      "tag": "div",
+      "class": [
+        "ebcoms-searchglobal-bar",
+        "[ui-trigger-childrenClassName]"
+      ],
+      "id": "<uniqueCompId>",
+      "desc": "PC 搜索框外层（也是 @weapp/ui Trigger 的触发元素与弹层容器）。id 是组件运行时用 UUID() 生成的（不是 <comId>），点这一层切换历史/筛选浮层。ui-trigger-childrenClassName 是 Trigger 在传了 getPopupContainer 时追加的类（见下方 tips）。里面是 SearchAdvanced。",
+      "tips": [
+        "less 已给这层 display:flex / 居中、左圆角输入框 + 右圆角按钮、高度 calc(var(--hd)*36)，以及 >.ui-searchAdvanced{flex:1} 与隐藏 suffix 图标 —— 直接复用它，不要重写高度"
+      ],
+      "children": [
+        "ref:shared.pcAdvanced"
+      ]
+    },
+    "pcAdvanced": {
+      "desc": "@weapp/ui SearchAdvanced（PC 高级搜索），前缀 ui-searchAdvanced。⚠️ 组件固定传了 disableHistorySearch / disableCommonFilter / disableQuickSearchSetting 三个 true，SearchAdvancedTop 的 _getQuickSearchVisible() 在三个开关全关时直接 return false，所以它自带的 QuikSearchPanel（ui-searchAdvanced-quikSearchPanel）永远不会出现，不用给它写样式。",
+      "chain": "div.ui-searchAdvanced > div.ui-searchAdvanced-wrap > div[无类名]（Trigger 容器，只有 mode==='simple' 才会有 ui-searchAdvanced-wrap-simple-triger-container）",
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ui-input-wrap",
+            "ui-input-prefix-wrap",
+            "ui-input-suffix-wrap",
+            "ui-searchAdvanced-input",
+            "[is-focus]",
+            "[readonly-display-*]"
+          ],
+          "desc": "输入框外壳（className 'ui-searchAdvanced-input' 由 HightLightInput 透传给 @weapp/ui Input，InputWrap 在无 prepend/append 时把它拼到最外层）。is-focus 是聚焦态。平时没有敏感词高亮时这一层就是搜索框本体；高亮激活时外面会多包一层 div.ui-sensitive-word-scan-container.ui-sensitive-word-scan-container-input（见 notes）。",
+          "children": [
+            {
+              "tag": "span",
+              "class": [
+                "ui-input-prefix"
+              ],
+              "children": [
+                {
+                  "tag": "span",
+                  "class": [
+                    "ui-icon",
+                    "ui-icon-wrapper",
+                    "ui-searchAdvanced-input-icon",
+                    "[mirror-text]"
+                  ],
+                  "desc": "搜索放大镜图标（Icon-search，size='xs'）。⚠️ 同一个 ui-searchAdvanced-input-icon 类名在这个输入框里出现两次：这里的（前缀）与 suffix 里的简易搜索图标",
+                  "children": [
+                    {
+                      "tag": "svg",
+                      "class": [
+                        "ui-icon-xs",
+                        "ui-icon-svg"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "tag": "input",
+              "class": [
+                "ui-input"
+              ],
+              "desc": "真正的输入元素。回车搜索、清空都在这里触发；组件通过 searchAdvancedStore 受控其值"
+            },
+            {
+              "tag": "span",
+              "class": [
+                "ui-input-suffix"
+              ],
+              "children": [
+                {
+                  "tag": "span",
+                  "class": [
+                    "ui-input-clear"
+                  ],
+                  "when": "allowClear 且输入框有值、非 disabled/readOnly 时才有（@weapp/ui InputWrap 生成），内含 Icon-cancel",
+                  "desc": "清空按钮"
+                },
+                {
+                  "tag": "span",
+                  "class": [
+                    "ui-searchAdvanced-input-suffix",
+                    "[hide]"
+                  ],
+                  "desc": "suffix 容器；hide 是 showPressEnterIcon 为假时（未聚焦、无值、浮层没开）加的类",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "class": [
+                        "ui-icon",
+                        "ui-icon-wrapper",
+                        "ui-searchAdvanced-input-icon",
+                        "[ui-searchAdvanced-input-icon-active]"
+                      ],
+                      "when": "showPressEnterIcon 为真时才有（图标 Icon-enter）",
+                      "desc": "回车图标，点击等同回车搜索"
+                    },
+                    {
+                      "tag": "span",
+                      "class": [
+                        "ui-icon",
+                        "ui-icon-wrapper",
+                        "ui-searchAdvanced-input-icon",
+                        "[ui-searchAdvanced-input-icon-active]"
+                      ],
+                      "desc": "简易模式入口图标（SimpleSearch，name 按 conditionId 是否存在二选一：Icon-Advanced-search / Icon-Advanced-search-selected）；-active 在浮层打开或条件有变化时挂上。less 已把它 display:none 隐藏",
+                      "children": [
+                        {
+                          "tag": "svg",
+                          "class": [
+                            "ui-icon-xs",
+                            "ui-icon-svg"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "span",
+                      "class": [
+                        "ui-searchAdvanced-errorTip"
+                      ],
+                      "when": "校验失败时才有",
+                      "desc": "错误提示浮层，通常不出现"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "class": [
+            "ui-searchAdvanced-setting",
+            "ui-searchAdvanced-setting-hsSetting"
+          ],
+          "desc": "快捷搜索字段设置区（hSSetting=true 时只有一个未打开的 Dialog，destroyOnClose 所以标题、按钮等一律不渲染）。视觉上是搜索框右侧的一个空 div —— 想给「搜索框右侧留白/图标位」写样式时它就是那个占位元素。",
+          "tips": "不要照 ui-searchAdvanced-setting 去写图标样式：hSSetting=true 时源码里那个 Icon-set-up-o 分支（!hSSetting）不走，这里没有图标"
+        }
+      ]
+    },
+    "popupPC": {
+      "when": "PC 运行态才有。点击 div.ebcoms-searchglobal-bar 且 (config.showHistory || searchConditions.commonFilters 有值) 才渲染；Trigger 没传 destroyOnClose，所以首次打开后节点常驻（关闭时只是加 ui-trigger-popupInner-visNone/-hidden）",
+      "mount": "弹层由 Trigger 的 Portal 渲染到新建的容器里，位置二选一：① 组件不在某个父组件内部时 getPopupContainer 返回搜索框 div#<uniqueCompId> 本身 → 弹层 DOM 挂在搜索框内部（less 里 .ebcoms-searchglobal-bar .ui-trigger-popupInner{width:100%} 就是为此写的）；② 组件有父组件（如 Tab）时改传 followScroll:true → 挂到 document.body。写后代选择器时要同时考虑这两处",
+      "chain": "div.ui-trigger-popupInter-container > div.ui-trigger-popupInner.ebcoms-searchglobal-popup[.ui-trigger-popupInner-{bottomRight|bottomLeft}][.ui-trigger-popupInner-visible][.ui-trigger-popupInner-visNone][.ui-trigger-popupInner-hidden] > div.ui-trigger-popupInner-childrenDiv > div.ebcoms-searchglobal-panel-detail.in-popup",
+      "children": [
+        "ref:shared.panelDetail",
+        "ref:shared.historyBlock"
+      ],
+      "tips": "ebcoms-searchglobal-popup 是组件传的 popupClassName（拼在 ui-trigger-popupInner 上），less 里给它 z-index:990；行内还有 popupStyle 写死的 width=搜索框宽度、minWidth:392px —— 改宽度要覆盖 style 或 min-width，别只写 width"
+    },
+    "panelDetail": {
+      "desc": "搜索面板内容区（PC 是 div.ebcoms-searchglobal-panel-detail.in-popup 里的第一个子块；移动端面板里是 div.ebcoms-searchglobal-panel-detail（没有 in-popup））。里面逐条渲染 config.searchConditions.commonFilters。",
+      "tips": [
+        "in-popup 只用于 PC 弹层，less 里 &-detail.in-popup 给了弹层专属的白底/边框/内边距/字号，移动端那份不要套",
+        "less 里 .ebcoms-searchglobal-panel-detail 给了 overflow-y:auto 与 padding:0 15px 15px",
+        "每个筛选条件块是否渲染取决于标签是否算得出来：SearchPanelDetail 只在 tags.length>0 时渲染（否则整块什么都不出现），tags 来源按 componentKey 分四支（fieldId==='-1' 用 listFilterDefaultSets.listGroupSets、DateComponent 用 getPrimaryAry、NumberComponent/Money 用 listFilterSets、其余用 filter.options）"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ebcoms-searchglobal-panel-title"
+          ],
+          "desc": "一个筛选条件的标题行（每个 commonFilter 一组，与下面的 tags 成对出现）",
+          "children": [
+            {
+              "tag": "span",
+              "class": [],
+              "desc": "条件名（filter.fieldShowName，经 getLocaleValue 处理）"
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "class": [
+            "ebcoms-searchglobal-panel-tags"
+          ],
+          "children": [
+            "ref:shared.tag"
+          ]
+        }
+      ]
+    },
+    "historyBlock": {
+      "when": "config.showHistory 为 true 时才有（默认 true）",
+      "chain": "div.ebcoms-searchglobal-panel-title + div.ebcoms-searchglobal-panel-tags",
+      "desc": "历史搜索块，PC 弹层与移动端面板用的是同一套类名。标题行里第一个 span 是文案『历史搜索』，第二个 span 是清空图标；tags 行里要么是空态文案、要么是历史标签。",
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ebcoms-searchglobal-panel-title"
+          ],
+          "desc": "less 挂钩子就是靠这里的 span:first-child / span:last-child（span:last-child 是绝对定位到右上角的清空按钮），所以 ⚠️ 清空图标必须是 span 才生效",
+          "children": [
+            {
+              "tag": "span",
+              "class": [],
+              "desc": "文案『历史搜索』（less 已给 font-size:var(--font-size-14)）"
+            },
+            {
+              "tag": "span",
+              "class": [
+                "ui-icon",
+                "ui-icon-wrapper",
+                "[mirror-text]"
+              ],
+              "when": "searchHistory.length>0 时才有",
+              "desc": "清空历史图标（引擎 IconFont 传 name='Icon-delete'、size='sm' → 实际渲染的就是 @weapp/ui Icon，即 span.ui-icon.ui-icon-wrapper，不是 span.ebcoms-assets-*），点击清空全部历史",
+              "children": [
+                {
+                  "tag": "svg",
+                  "class": [
+                    "ui-icon-sm",
+                    "ui-icon-svg"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "class": [
+            "ebcoms-searchglobal-panel-tags"
+          ],
+          "children": [
+            {
+              "tag": "span",
+              "class": [
+                "ebcoms-searchglobal-panel-tips"
+              ],
+              "when": "searchHistory.length===0 时（与下面的标签列表二选一）",
+              "desc": "空态文案『暂无历史搜索记录』。less 已给 display:flex / 居中 / font-size:14px / margin-top:24px / color:var(--secondary-fc)"
+            },
+            {
+              "ref": "shared.tag",
+              "when": "searchHistory.length>0 时，每条历史一个"
+            }
+          ]
+        }
+      ]
+    },
+    "tag": {
+      "tag": "span",
+      "class": [
+        "ui-m-tag",
+        "ui-m-tag-large",
+        "ui-m-tag-default",
+        "[ui-m-tag-default-large-checked]",
+        "[ui-m-tag-disabled]"
+      ],
+      "desc": "@weapp/ui 的 MTag（组件里一直从 @weapp/ui 取 MTag，而 @weapp/ui 的 MTag 固定用 ui-m-tag 前缀，PC 弹层里也是 ui-m-tag，不要写成 ui-tag）。size='large'、type 默认 'default'，选中时加 ui-m-tag-default-large-checked。点标签本体触发选择（PC 弹层的常用筛选/历史都是 onCheck；移动端历史是 onCheck、常用筛选是 onCheck+按多选切换）。",
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ui-m-tag-close"
+          ],
+          "when": "closable 时才有（只有 PC 弹层里的历史标签传了 closable，移动端面板的历史标签没有）",
+          "desc": "右上角删除图标容器（里面是 div.ui-m-tag-close-icon > span.ui-icon.ui-icon-wrapper > svg，图标 Icon-error01）"
+        },
+        {
+          "tag": "div",
+          "class": [
+            "ui-m-tag-text"
+          ],
+          "desc": "标签文字（历史记录原文 / 条件选项名，经 getLocaleValue）"
+        }
+      ],
+      "tips": [
+        "less 已有钩子：.ebcoms-searchglobal-panel-tags .ui-m-tag（cursor/inline-block/底色 var(--label-bc)/颜色 var(--regular-fc)/内边距/右间距/圆角/禁止选中）与 .ebcoms-searchglobal-panel-tags .ui-m-tag-default-large-checked（白字 + var(--primary) 底）—— 只要写这类名即可，不要再去写 ui-tag"
+      ]
+    },
+    "mobileTop": {
+      "desc": "移动端顶栏搜索框（@weapp/ui MSearchbar，前缀 ui-m-searchbar）。整条是只读输入框（inputReadOnly），点击/聚焦会 push 路由打开搜索面板弹层，输入本身不会在这里发生。",
+      "chain": "div.ui-m-searchbar > (div.ui-m-searchbar-prepend|div.ui-m-searchbar-append)? + div.ui-m-searchbar-input > div.ui-input-wrap.ui-input-prefix-wrap.ui-input-suffix-wrap",
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ui-m-searchbar-prepend"
+          ],
+          "when": "config.searchBtns.alignType==='LEFT' 时（装自定义按钮组）",
+          "children": [
+            "ref:shared.pendBtns"
+          ]
+        },
+        {
+          "tag": "div",
+          "class": [
+            "ui-m-searchbar-append"
+          ],
+          "when": "config.searchBtns.alignType==='RIGHT' 时（装自定义按钮组）；MSearchbar 的 append/prepend 槽只装自定义按钮，不是『取消』",
+          "children": [
+            "ref:shared.pendBtns"
+          ]
+        },
+        {
+          "tag": "div",
+          "class": [
+            "ui-m-searchbar-input"
+          ],
+          "desc": "输入框容器（less 已给圆角、边框、min-height，以及内部 .ui-icon 的颜色）",
+          "children": [
+            {
+              "tag": "div",
+              "class": [
+                "ui-input-wrap",
+                "ui-input-prefix-wrap",
+                "ui-input-suffix-wrap"
+              ],
+              "children": [
+                {
+                  "tag": "span",
+                  "class": [
+                    "ui-input-prefix"
+                  ],
+                  "desc": "搜索图标 Icon-global-search（span.ui-icon.ui-icon-wrapper > svg.ui-icon-sm.ui-icon-svg）"
+                },
+                {
+                  "tag": "input",
+                  "class": [
+                    "ui-input"
+                  ],
+                  "desc": "只读输入框（inputReadOnly），值来自 searchKey"
+                },
+                {
+                  "tag": "span",
+                  "class": [
+                    "ui-input-suffix"
+                  ],
+                  "desc": "清空按钮（有值时）+ 扫码图标（scanInput 为 true 时）",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "class": [
+                        "ui-input-clear"
+                      ],
+                      "when": "有值与 allowClear 时才有"
+                    },
+                    {
+                      "tag": "span",
+                      "class": [
+                        "ui-icon",
+                        "ui-icon-wrapper"
+                      ],
+                      "when": "config.scanInput!==false 时才有",
+                      "desc": "扫码图标 Icon-Scan-code，点击调 weappSDK.scanQRCode 后 push 路由"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "tips": "⚠️ 移动端 DOM 里 ui-m-searchbar 会出现两次（这里 + 搜索面板内部），less 里 .ebcoms-searchglobal-panel .ui-m-searchbar 那套只命中面板里的那个，改顶栏要限定 .ebcoms-searchglobal-main 或 #<comId>"
+    },
+    "mobilePanel": {
+      "when": "移动端点击顶栏搜索框（或扫码成功）后 push 路由打开；组件用两个 MDialog（isRouteLayout + path）承载，内容通过 Portal 渲染到一个新建的无 class div 里，rc-queue-anim 再包一层动画容器（uncontrolled），所以它不在组件自己的 DOM 位置，写后代选择器只能从 div.ui-m-dialog-routeLayout 往下写",
+      "chain": "body > div（Portal 容器，无类名）> 动画容器（rc-queue-anim）> div.ui-m-dialog-routeLayout.ebcoms-searchglobal-panel",
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ui-m-searchbar"
+          ],
+          "desc": "面板内的搜索框（与顶栏同名类，但这里是可输入的：allowCancel，输入框 autofocus、受 inputVal 控制）",
+          "children": [
+            {
+              "tag": "div",
+              "class": [
+                "ui-m-searchbar-input"
+              ],
+              "desc": "内部 Input（div.ui-input-wrap …），带扫码 suffix（scanInput 时）"
+            },
+            {
+              "tag": "div",
+              "class": [
+                "ui-m-searchbar-cancel"
+              ],
+              "desc": "右侧按钮，文案按 showSearchBtn 在『搜索』/『取消』间切换（commonFilters 多于 1 个且有勾选时是『搜索』）。点击等于回车搜索",
+              "tips": "less 已给 color:var(--input-group-addon-color)"
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "class": [
+            "ebcoms-searchglobal-panel-detail"
+          ],
+          "desc": "面板内容区（⚠️ 这里没有 in-popup，PC 弹层才有）。结构与 PC 弹层一致：常用筛选（每个条件一组 panel-title + panel-tags）+ 历史搜索块",
+          "children": [
+            "ref:shared.panelDetail",
+            "ref:shared.historyBlock"
+          ]
+        }
+      ],
+      "tips": "ebcoms-searchglobal-panel 这个类落在 div.ui-m-dialog-routeLayout 上（DialogContainer 的 routeLayoutCls），less 里 .ebcoms-searchglobal-panel 后代规则（白底、竖排、ui-m-searchbar 间距、-detail 内边距）都从这层往下写 → 见 common/index.less"
+    },
+    "mobileListDialog": {
+      "when": "移动端在面板里执行搜索后，会再 push 一个路由打开子页面弹层（path=`${parentPath}/search${id}_${searchPage}`）",
+      "chain": "body > div（Portal 容器，无类名）> div.ui-m-dialog-routeLayout > 子页面（CorsComponent MPageView，uncontrolled）",
+      "desc": "第二个 MDialog 没有传 className，所以这层的 routeLayout 只有 ui-m-dialog-routeLayout，没有 ebcoms-searchglobal-panel；里面是 @weapp/ebdpage 的 MPageView（搜索结果页），内部结构不可控，只给挂载点。",
+      "tips": "要改『搜索结果页』的外观要找 ebdpage/目标页面，不是本组件"
+    },
+    "state": {
+      "desc": "运行期动态变化（初始 render 里没有），写样式时按「可能出现」对待",
+      "list": [
+        {
+          "condition": "PC：点击搜索框（Trigger action=['click'] 且受控 popupVisible）",
+          "targetSelector": "div.ui-trigger-popupInner.ebcoms-searchglobal-popup",
+          "addClass": "首次打开时新增整棵弹层；关闭切到 ui-trigger-popupInner-visNone / -hidden，节点保留",
+          "note": "弹层内容只在 config.showHistory 或 searchConditions.commonFilters 有值时才生成"
+        },
+        {
+          "condition": "PC：输入框聚焦 / 有值 / 弹层打开",
+          "targetSelector": "div.ui-searchAdvanced-input",
+          "addClass": "is-focus（外层 wrapper）+ 清空按钮 span.ui-input-clear 出现 + 回车图标出现（suffix 上的 hide 类移除）"
+        },
+        {
+          "condition": "移动端：点击顶栏搜索框或扫码成功",
+          "targetSelector": "body",
+          "addClass": "（Portal 新增 div.ui-m-dialog-routeLayout.ebcoms-searchglobal-panel，路由变化）"
+        },
+        {
+          "condition": "勾选/取消常用筛选标签（PC 弹层里 commonFilters.length===1 时勾选即搜索）",
+          "targetSelector": "span.ui-m-tag",
+          "addClass": "ui-m-tag-default-large-checked",
+          "note": "点击后会把焦点还给搜索框 input.ui-input（PC）"
+        },
+        {
+          "condition": "历史记录增删（每次搜索后写入，最多 20 条）",
+          "targetSelector": "div.ebcoms-searchglobal-panel-tags",
+          "addClass": "（标签节点增删；清空后整块换成 span.ebcoms-searchglobal-panel-tips）"
+        },
+        {
+          "condition": "组件被事件动作隐藏",
+          "targetSelector": "引擎外壳 #<comId>",
+          "addClass": "ebcom-display-none",
+          "note": "同时写 style.display='none'"
+        }
+      ]
+    }
+  },
+  "view-pc": {
+    "when": "页面运行态（外壳含 ebcom-view）且 page.client!=='MOBILE'；源码 view/View.tsx → common/ViewContent.tsx",
+    "tree": [
+      "div#<comId>.ebcom.ebcom-searchglobal.{ebcom-grid|ebcom-flow|ebcom-excel}.ebcom-view[.event-action-click][.has-no-header]（引擎外壳）",
+      "div.content（引擎内容槽）",
+      "ref:shared.comRoot → div.ebcoms-searchglobal-main.custom",
+      "div.ebcoms-searchglobal-pendbtns（仅 alignType==='LEFT'）",
+      "ref:shared.pcBar → div.ebcoms-searchglobal-bar#<uniqueCompId>",
+      "ref:shared.pcAdvanced → div.ui-searchAdvanced",
+      "div.ebcoms-searchglobal-pendbtns（仅 alignType==='RIGHT'）",
+      "点击搜索框后：ref:shared.popupPC + ref:shared.panelDetail + ref:shared.historyBlock"
+    ],
+    "diffs": [
+      "按钮组在搜索框左右两侧平级（left 在 Trigger 前、right 在 Trigger 后），搜索框本体居中；只有 .custom 这一层是 flex 居中",
+      "浮层是历史 + 常用筛选（没有搜索结果列表：结果是跳到 searchPage 页面看，view/index.less 里 ebcoms-searchglobal-search-content / weapp-esearch-pc-result 那套规则是历史遗留，当前 DOM 里没有这些类）"
+    ]
+  },
+  "view-mobile": {
+    "when": "页面运行态且 page.client==='MOBILE'；源码 view-m/View.tsx → common/MViewContent.tsx",
+    "tree": [
+      "div#<comId>.ebcom.ebcom-searchglobal.ebcom-m.ebcom-mgl.ebcom-view[.event-action-click][.has-no-header]（引擎外壳）",
+      "div.content（引擎内容槽，与 PC 相同）",
+      "ref:shared.comRoot → div.ebcoms-searchglobal-main.custom",
+      "ref:shared.mobileTop → div.ui-m-searchbar（顶栏搜索框，点击 push 路由）",
+      "点击顶栏后：ref:shared.mobilePanel → body 下的 div.ui-m-dialog-routeLayout.ebcoms-searchglobal-panel（内含第二个 div.ui-m-searchbar + div.ebcoms-searchglobal-panel-detail）",
+      "面板里搜索后：ref:shared.mobileListDialog → body 下的 div.ui-m-dialog-routeLayout（MPageView 子页面，uncontrolled）"
+    ],
+    "diffs": [
+      "整棵 PC 的搜索框 + Trigger 弹层在移动端完全不存在（源码走的是另一个文件 MViewContent）",
+      "移动端没有 history 的独立浮层，历史与常用筛选都在面板（MDialog 路由层）里",
+      "移动端历史标签没有 closable（不能单条删除，只能整块清空）",
+      "外壳多 ebcom-m 与 ebcom-mgl；less 里 view-m/index.less 的规则挂在 .ebcom-searchglobal.ebcom-searchglobal 上，只管 .ebcoms-searchglobal-pendbtns 的 .ui-btn"
+    ]
+  },
+  "design-pc": {
+    "when": "设计器设计态且 page.client!=='MOBILE'；源码 design/Design.tsx → common/ViewContent.tsx（同一个 ViewContent）",
+    "tree": [
+      "引擎外壳 div#<comId>.ebcom.ebcom-searchglobal.ebcom-grid.ebcom-design.mask[.has-no-header]（createDesign.renderDesign，设计器还会追加自己的类）",
+      "div.content（引擎内容槽，与运行态同一套包装）",
+      "ref:shared.comRoot → div.ebcoms-searchglobal-main.custom",
+      "ref:shared.pcBar → div.ebcoms-searchglobal-bar#<uniqueCompId>",
+      "ref:shared.pcAdvanced → div.ui-searchAdvanced",
+      "点搜索框后同样会有 ref:shared.popupPC（设计态也能打开浮层，因为没有交互屏蔽）"
+    ],
+    "diffs": [
+      "外壳是 ebcom-design 且多 mask（Design.defaultOpts.mask===true）",
+      "面板里没有拖拽层、没有 droppable 包裹（组件不是容器类组件，defaultOpts 里也没有 container）",
+      "组件自身 DOM 与运行态完全一致：Design/View 都用 common/ViewContent，源码里没有 isDesign 分支，所以不要指望设计态有专属结构"
+    ]
+  },
+  "design-mobile": {
+    "when": "设计器设计态且 page.client==='MOBILE'；源码 design-m/Design.tsx → common/MViewContent.tsx",
+    "tree": [
+      "引擎外壳 div#<comId>.ebcom.ebcom-searchglobal.ebcom-m.ebcom-mgl.ebcom-design.mask（class 里的布局段按实际布局）",
+      "div.content",
+      "ref:shared.comRoot → div.ebcoms-searchglobal-main.custom",
+      "ref:shared.mobileTop → div.ui-m-searchbar"
+    ],
+    "diffs": [
+      "把 design-pc 与 view-mobile 的差异叠加：ebcom-m/ebcom-mgl/ebcom-design/mask + MSearchbar 顶栏",
+      "设计态点顶栏会真的 push 路由打开 MDialog 面板（源码没有屏蔽），所以设计器里也可能看到 body 下的 ui-m-dialog-routeLayout 层"
+    ]
+  },
+  "notes": [
+    "三类前缀要分清：ebcoms-* 是组件自己写的（less 里写作 @prefix，值为 ebcoms）；ebcom-* 是引擎外壳（本组件源码里搜不到，less 里写作 @ebcomPrefix）；ui-* 来自 @weapp/ui（SearchAdvanced / Input / Trigger / MSearchbar / MDialog / MTag / Icon）。",
+    "最常踩的定位错误是『搜索框』三个字：PC 是 div.ebcoms-searchglobal-bar 里的 div.ui-searchAdvanced；移动端顶栏是 div.ui-m-searchbar（在组件内）；移动端搜索面板里还有第二个 div.ui-m-searchbar（在 body 的 MDialog 路由层里）。同名类名出现两次，写选择器必须带 #<comId> 或 .ebcoms-searchglobal-panel 之类的限定。",
+    "另一个同名陷阱是 content：引擎内容槽是 div.content（外壳的兄弟层级），弹层里是 div.ui-trigger-popupInner-childrenDiv，组件自己的面板里才是 ebcoms-searchglobal-panel-detail / -panel-tags。common/index.less 里 .ebcom-searchglobal .content{overflow:visible!important} 说的是引擎那一层。",
+    "less 里的死钩子：view/index.less 除了 .ebcoms-searchglobal-bar / -main / -main-content 外，还留着 .ebcoms-searchglobal-hot-spot*（搜索热点）、.ebcoms-searchglobal-search-content 与 .weapp-esearch-pc-result 一套规则 —— 这些是从 search-weeso 拷过来的，当前 search-global 的 DOM 里没有这些类名，别照着写，也别以为它们会生效。另外 .ebcom-searchglobal.ebcom-searchglobal 是双写类名（提高权重），不是两个不同类。",
+    "PC 弹层的挂载位置是二选一的：组件没有父组件时 getPopupContainer 返回搜索框 div#<uniqueCompId>，弹层 DOM 会嵌在搜索框内部（这解释了 less 里 .ebcoms-searchglobal-bar .ui-trigger-popupInner{width:100%}）；有父组件（Tab 等）时改传 followScroll:true，弹层挂到 body。写『弹层相对搜索框定位』的样式前先确认走的是哪条。",
+    "PC 的 SearchAdvanced 自带浮层（ui-searchAdvanced-quikSearchPanel）永远不出现：组件固定传了 disableHistorySearch / disableCommonFilter / disableQuickSearchSetting，三个开关全关时 _getQuickSearchVisible() 直接返回 false。历史/常用筛选是组件自己用 popupContent 渲染的，不是 SearchAdvanced 的功能。",
+    "敏感词高亮态会临时改变输入框层级：当 HighLight 处于高亮态（visible 且有关键词）时，输入框会被包进 div.ui-sensitive-word-scan-container.ui-sensitive-word-scan-container-input > div + div.ui-sensitive-word-scan-origin > (原 div.ui-input-wrap)。常态（无高亮）没有这层。改输入框样式时以常态链为准。",
+    "config.searchBtns.alignType 只判断 LEFT / RIGHT：配成 CENTER 时左右两处都不渲染（源码里只有 ===AlignType.LEFT / ===AlignType.RIGHT 两个分支）。",
+    "已有 less 钩子不要重复写：PC 搜索框 flex 布局与左右圆角、高度 calc(var(--hd)*36)、隐藏 suffix 的 ui-searchAdvanced-input-icon、.ui-searchAdvanced{flex:1}、.ebcoms-searchglobal-main 的 min-width/height、.custom 的 flex 居中、pendbtns 里图标 30px 尺寸与 .ui-btn 去边框、panel-detail 的滚动与内边距、panel-detail.in-popup 的弹层外观、panel-title 的两个 span（文案 14px / 右侧绝对定位清空图标）、panel-tags 的 ui-m-tag 与选中态、panel-tips 空态、.ebcoms-searchglobal-popup 的 z-index:990、以及 .ebcom-searchglobal{overflow:visible!important} 与其 .content 的 overflow 修复。",
+    "旧分支：config.searchType==='GLOBAL' 时 Design/View 都改渲染 search-weeso 的 ViewContent（源码注释『目前这里已经废弃』），DOM 属于 search-weeso（ebcoms-searchweeso-* 前缀），本文件不覆盖；排查时先确认配置里有没有 searchType。",
+    "反查源码：外壳与内容槽在 weapp-ebdcoms/src/components/core/view/createView.tsx（renderView/renderContent/getContainerClass）与 design/createDesign.tsx（renderDesign/renderContent/getContainerClass，mask 在 L410-412）；引擎类名拼装在 core/utils/comp.ts 的 getClassName（ebcom + ebcom-<type.toLowerCase()> + [ebcom-m] + ebcom-<layout> + ebcom-view|design）。PC 组件源码在 common/ViewContent.tsx（搜索框 + Trigger + 弹层触发）；移动端在 common/MViewContent.tsx（MSearchbar + 两个 MDialog）；PC 弹层内容在 common/popupContent.tsx、移动端面板在 common/SearchPanel.tsx；筛选条件块在 common/SearchPanelDetail.tsx；已有样式在 view/index.less、view-m/index.less、common/index.less、config/index.less（config 那份只管设计器右侧配置面板 .ebcoms-config-SearchGlobal，与本组件页面 DOM 无关）。第三方 DOM：weapp-ui/src/components/search-advanced/{SearchAdvanced.tsx,top/Top.tsx,top/HightLightInput.tsx}、input/InputWrap.tsx、trigger/{Trigger.tsx,popup/PopupInner.tsx}、search-bar/Searchbar.tsx、dialog/{MDialog.tsx,public/DialogContainer.tsx}、tag/Tag.tsx、icon/Icon.tsx。"
+  ]
+}

@@ -1,0 +1,338 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "e1469ec069a24a53a5269957473114be",
+        "type": "NavPanel",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "a02127adfe2e42a6bea97464fbf1a6bb",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "导航面板",
+          "type": "NavPanel",
+          "title": "导航面板",
+          "titleEnabled": true,
+          "showTopOperatBtnConfig": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "d5b699",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#Icon-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "QUICKSEARCH",
+                  "value": "",
+                  "customRenderConfig": "快捷搜索"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "ab5fe4",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 2
+              }
+            ]
+          },
+          "column": 3,
+          "pageColumn": 2,
+          "paginationDisplay": false,
+          "customizeOuter": false,
+          "customizeOuterBtn": "1",
+          "showMoreOuter": false,
+          "showMoreOuterBtn": "1",
+          "moreCoving": false,
+          "customizeBtn": "1",
+          "enableGroup": false,
+          "menuConfig": [],
+          "heightFixed": true,
+          "showEmptyColumns": false,
+          "menuSourceType": "DEFAULT",
+          "showEmptyGroup": true,
+          "collapseEnable": false,
+          "externalDataInterfaceSetting": {
+            "url": "",
+            "strParam": ""
+          },
+          "actionTemplateStr": "",
+          "showSearch": false,
+          "showSearchGroup": true,
+          "commonMenuSwitch": false,
+          "commonMenuNumber": 3,
+          "commonMenuTitle": "常用菜单",
+          "commonMenu": {
+            "commonMenuIcon": {
+              "iconStyle": {
+                "backgroundColor": "transparent",
+                "color": "#999"
+              },
+              "path": ""
+            }
+          },
+          "showCommonMenuGroup": false,
+          "showItemDesc": false,
+          "groupMode": "vertical",
+          "showMoreOuterMode": "middle",
+          "showMoreDialogMaskClosable": true,
+          "customizeOuterMode": "middle",
+          "customizeDialogMaskClosable": true,
+          "selfDefineOuterMode": "middle",
+          "selfDefineDialogMaskClosable": true,
+          "selfDefineDialogPageWidth": "800px",
+          "showMoreDialogPageWidth": "800px",
+          "customizeDialogPageWidth": "800px",
+          "groupBrowser": [],
+          "menuBrowser": [],
+          "menuDisplayRange": "all",
+          "openIcon": {
+            "path": "#Icon-drop-down-menu",
+            "iconDisplayType": "line",
+            "style": {
+              "fontSize": "36",
+              "bgColor": "transparent",
+              "color": "#999999",
+              "radius": "3px"
+            }
+          },
+          "closeIcon": {
+            "path": "#Icon-collapse-menu",
+            "iconDisplayType": "line",
+            "style": {
+              "fontSize": "36",
+              "bgColor": "transparent",
+              "color": "#999999",
+              "radius": "3px"
+            }
+          },
+          "showMoreInDialog": true,
+          "showCustomInDialog": true,
+          "customIcon": {
+            "path": "#Icon-edit02",
+            "iconDisplayType": "line",
+            "style": {
+              "fontSize": "36",
+              "bgColor": "transparent",
+              "color": "#999999",
+              "radius": "3px"
+            }
+          },
+          "menuSourceContent": "DEFAULT",
+          "disableAppPortal": true,
+          "gridLayout": true,
+          "userSource": "currentUser",
+          "openType": "current",
+          "showEmpty": true,
+          "layout": {
+            "i": "ce26b76767244bcbad41d878445f7887",
+            "x": 5,
+            "y": 0,
+            "w": 5,
+            "h": 15,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 61
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,4",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,NavStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdnavcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "a02127adfe2e42a6bea97464fbf1a6bb",
+        "type": "NavPanel",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "e1469ec069a24a53a5269957473114be",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "导航面板",
+          "type": "NavPanel",
+          "title": "导航面板",
+          "titleEnabled": true,
+          "showTopOperatBtnConfig": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "e3ae5d",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#Icon-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "QUICKSEARCH",
+                  "value": "",
+                  "customRenderConfig": "快捷搜索"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "b55d1f",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 2
+              }
+            ]
+          },
+          "column": 3,
+          "pageColumn": 2,
+          "paginationDisplay": false,
+          "customizeBtn": "1",
+          "enableGroup": false,
+          "showMoreOuter": false,
+          "showMoreOuterBtn": "1",
+          "customizeOuter": false,
+          "customizeOuterBtn": "1",
+          "menuConfig": [],
+          "menuSourceType": "DEFAULT",
+          "externalDataInterfaceSetting": {
+            "url": "",
+            "strParam": ""
+          },
+          "actionTemplateStr": "",
+          "showSearch": false,
+          "showSearchGroup": true,
+          "commonMenuSwitch": false,
+          "commonMenuNumber": 3,
+          "commonMenuTitle": "常用菜单",
+          "groupMode": "vertical",
+          "showEmptyGroup": true,
+          "collapseEnable": false,
+          "groupBrowser": [],
+          "menuBrowser": [],
+          "menuSourceContent": "DEFAULT",
+          "menuDisplayRange": "all",
+          "openIcon": {
+            "path": "#Icon-drop-down-menu",
+            "iconDisplayType": "line"
+          },
+          "closeIcon": {
+            "path": "#Icon-collapse-menu",
+            "iconDisplayType": "line"
+          },
+          "showMoreInDialog": true,
+          "showCustomInDialog": true,
+          "customIcon": {
+            "path": "#Icon-edit02",
+            "iconDisplayType": "line"
+          },
+          "disableAppPortal": true,
+          "userSource": "currentUser",
+          "openType": "current",
+          "showEmpty": true,
+          "layout": {
+            "i": "b34602cdbaa5486485c270503b3a6507",
+            "adaptive": true,
+            "h": 15,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": []
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,4",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,NavStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdnavcoms"
+      }
+    ]
+  }
+]

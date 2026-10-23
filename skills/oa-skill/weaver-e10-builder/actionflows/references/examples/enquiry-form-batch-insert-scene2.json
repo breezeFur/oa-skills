@@ -1,0 +1,1043 @@
+{
+ "code": 200,
+ "msg": "接口返回成功",
+ "status": true,
+ "data": {
+  "appId": "1308307399938777090",
+  "sceneId": "1308307399938777091",
+  "event": {
+   "id": "1308307399938777157",
+   "name": "流程触发",
+   "nameMultilang": "流程触发",
+   "type": "ApproveTrigger",
+   "attr": {
+    "icon": "Icon-Approval-process",
+    "iconColor": "#68a5ff"
+   },
+   "wId": "1308307399938777157",
+   "data": {
+    "workflowPath": [
+     {
+      "name": "项目立项流程",
+      "id": "1307938217409748993",
+      "workflowtype": "-1"
+     }
+    ],
+    "module": "workflow",
+    "fromCopy": false,
+    "actionId": "1308307399938777090",
+    "id": "1308307404300853250",
+    "triggerType": "singleApprove",
+    "currWorkflowCanEdit": true,
+    "approveListFormOpen": false
+   },
+   "triggerType": "WorkflowTrigger",
+   "dataId": "1308307399938777090",
+   "costTime": 41,
+   "canDelete": true,
+   "canEdit": true,
+   "canSwitch": true,
+   "componentName": "流程触发",
+   "componentDesc": "流程中的指定节点与时机触发动作,例如流程提交后、审批后、归档后等",
+   "componentNameLabel": 131942,
+   "componentDescLabel": 236889
+  },
+  "actions": [
+   {
+    "id": "880708547766259713",
+    "wId": "880708547766259713",
+    "name": "查询项目表数据ID",
+    "nameMultilang": "查询项目表数据ID",
+    "type": "EnquiryForm",
+    "typeName": "数据源查询",
+    "attr": {
+     "icon": "Icon-Data-preprocessing"
+    },
+    "data": {
+     "nodataFlag": true,
+     "countFlag": false,
+     "queryFields": [
+      {
+       "formId": "1307937856590553088",
+       "parseMark": false,
+       "id": "id",
+       "fieldGroup": {
+        "name": "项目信息表",
+        "id": "1307937856590553088"
+       },
+       "content": "数据ID"
+      }
+     ],
+     "authorityFlag": "0",
+     "versionNum": "3",
+     "person": {
+      "formulaType": "string",
+      "name": "",
+      "businessId": "1308307807960670291",
+      "id": "1308308237381902343",
+      "type": "8",
+      "applicationId": "1308307399938777090",
+      "value": "textarea#880708556305862656#",
+      "childs": [
+       {
+        "formulaType": "string",
+        "name": "{userid}",
+        "businessId": "1308307807960670292",
+        "id": "1308308237381902344",
+        "position": "880708556305862656",
+        "type": "9",
+        "value": "{userid}",
+        "childs": [],
+        "config": {
+         "paramType": "string",
+         "formulaVersion": "V1"
+        },
+        "parentId": "1308308237381902343"
+       }
+      ],
+      "config": {
+       "paramType": "string",
+       "switchType": "assign",
+       "formulaVersion": "V1"
+      },
+      "parentId": "0"
+     },
+     "opType": "list",
+     "parseMark": false,
+     "id": "1308307803783143449",
+     "dataSource": {
+      "sourceId": "1307937856590553088",
+      "isPhysical": true,
+      "peratorId": "1308308237381902342",
+      "authorityFlag": "0",
+      "groupId": "weaver-ebuilder-form-service",
+      "opType": "list",
+      "type": "LOGIC",
+      "opText": "{\"isNewFilter\":true,\"filterIsNull\":false,\"isParent\":true,\"datas\":[{\"isParent\":false,\"fieldName\":\"field_1307938157364092931\",\"formInfo\":{\"formId\":\"1307937856590553091\",\"module\":\"ebuilderform\",\"layoutId\":\"1307937856590553199\",\"fieldId\":\"1307938157364092931\"},\"mainField\":true,\"module\":\"ebuilderform\",\"subTableId\":\"\",\"parentNode\":\"1787814115608\",\"type\":\"condition\",\"refObjId\":\"1307937963956346881\",\"optionType\":\"\",\"compType\":\"Workflow\",\"objId\":\"1307937856590553088\",\"dbFieldType\":\"STRING\",\"id\":\"1307938157364092931\",\"text\":\"关联流程\",\"conditions\":{\"func\":\"eq\",\"isEsb\":true,\"text\":\"流程ID\",\"esbAssign\":{\"wId\":\"880708547766259713\",\"textarea\":false,\"withoutDftNum\":true},\"value\":{\"frontId\":\"3\",\"formulaType\":\"string\",\"businessId\":\"880708687348502529\",\"name\":\"流程ID\",\"source\":\"1308307399938777157\",\"id\":\"880708687348502530\",\"type\":\"3\",\"applicationId\":\"1308307399938777090\",\"value\":\"ApprovalData.1307938217409748993.requestId\",\"config\":{\"paramKey\":\"1307938217409748993.requestId\",\"isMultCom\":false,\"comType\":\"ApproveTrigger\",\"parentComId\":0,\"fieldInfo\":{\"paramKey\":\"1307938217409748993.requestId\",\"tablePrimaryKey\":\"ApprovalData\"},\"tableName\":\"流程数据\",\"paramType\":\"string\",\"parentName\":\"项目立项流程.流程ID\",\"multName\":\"\",\"multKey\":\"\",\"multTypeObj\":{\"allName\":\"项目立项流程.流程ID\",\"currentName\":\"项目立项流程.流程ID\",\"currentParamKey\":\"ApprovalData.1307938217409748993.requestId\",\"allParamKey\":\"ApprovalData.1307938217409748993.requestId\"},\"comId\":\"1308307399938777157\",\"newParentName\":\"项目立项流程.流程ID\"}}},\"originBrowserType\":\"browser\",\"fieldType\":\"Workflow\",\"config\":{\"sformId\":\"1307937963956346881\",\"fieldId\":\"1307938157364092931\"},\"sformId\":\"1307937963956346881\",\"key\":\"1787814115708\",\"multiSelect\":\"true\"}],\"parentNode\":\"\",\"relationship\":\"1\",\"version\":1,\"rootStr\":\"( 关联流程 等于 '流程ID' )\",\"key\":\"1787814115608\"}",
+      "appId": "1307937598917681152",
+      "id": "1307937856590553088",
+      "enquiryId": "1308307803783143449",
+      "text": "项目信息表(uf_xmxxb_2464)",
+      "physical": true,
+      "enableFlag": "3"
+     },
+     "filterInput": {
+      "isNewFilter": true,
+      "filterIsNull": false,
+      "isParent": true,
+      "datas": [
+       {
+        "isParent": false,
+        "fieldName": "1307938157364092931",
+        "formInfo": {
+         "formId": "1307937856590553091",
+         "layoutId": "1307937856590553199",
+         "fieldId": "1307938157364092931"
+        },
+        "mainField": true,
+        "module": "",
+        "subTableId": "",
+        "parentNode": "1787814115608",
+        "type": "condition",
+        "optionType": "",
+        "compType": "Workflow",
+        "objId": "1307937856590553088",
+        "dbFieldType": "STRING",
+        "id": "1307938157364092931",
+        "text": "关联流程",
+        "conditions": {
+         "func": "eq",
+         "isEsb": true,
+         "text": "流程ID",
+         "esbAssign": {
+          "wId": "880708547766259713",
+          "textarea": false,
+          "withoutDftNum": true
+         },
+         "value": {
+          "frontId": "3",
+          "formulaType": "string",
+          "businessId": "880708687348502529",
+          "name": "流程ID",
+          "source": "1308307399938777157",
+          "id": "880708687348502530",
+          "type": "3",
+          "applicationId": "1308307399938777090",
+          "value": "ApprovalData.1307938217409748993.requestId",
+          "config": {
+           "paramKey": "1307938217409748993.requestId",
+           "isMultCom": false,
+           "comType": "ApproveTrigger",
+           "parentComId": 0,
+           "fieldInfo": {
+            "paramKey": "1307938217409748993.requestId",
+            "tablePrimaryKey": "ApprovalData"
+           },
+           "tableName": "流程数据",
+           "paramType": "string",
+           "parentName": "项目立项流程.流程ID",
+           "multName": "",
+           "multKey": "",
+           "multTypeObj": {
+            "allName": "项目立项流程.流程ID",
+            "currentName": "项目立项流程.流程ID",
+            "currentParamKey": "ApprovalData.1307938217409748993.requestId",
+            "allParamKey": "ApprovalData.1307938217409748993.requestId"
+           },
+           "comId": "1308307399938777157",
+           "newParentName": "项目立项流程.流程ID"
+          }
+         }
+        },
+        "originBrowserType": "",
+        "fieldType": "String",
+        "config": {
+         "fieldId": "1307938157364092931"
+        },
+        "sformId": "1307937963956346881",
+        "key": "1787814115708",
+        "multiSelect": "true"
+       }
+      ],
+      "parentNode": "",
+      "relationship": "1",
+      "version": 1,
+      "rootStr": "( 关联流程 等于 '流程ID' )",
+      "key": "1787814115608"
+     }
+    },
+    "canDelete": true,
+    "canEdit": true,
+    "fields": [
+     "nodataFlag",
+     "countFlag",
+     "queryFields",
+     "authorityFlag",
+     "versionNum",
+     "person",
+     "opType",
+     "parseMark",
+     "id",
+     "dataSource",
+     "filterInput"
+    ],
+    "designerResult": {
+     "designResultEnum": "GET_SUCCESS",
+     "msg": "获取成功",
+     "label": 268960,
+     "success": true,
+     "placeholders": [],
+     "fromComponent": false,
+     "contactDefault": false,
+     "path": "",
+     "outErrorCode": {
+      "errorLineNum": 0,
+      "show": false
+     },
+     "costTime": 565
+    },
+    "componentName": "数据源查询",
+    "componentDesc": "查询指定数据源下面的数据",
+    "componentNameLabel": 240694,
+    "componentDescLabel": 240695,
+    "isOpen": false
+   },
+   {
+    "id": "1308307399938777158",
+    "wId": "1308307399938777158",
+    "name": "新建表单数据",
+    "nameMultilang": "新建表单数据",
+    "type": "ActionEbAdd",
+    "typeName": "新建表单数据",
+    "sources": [
+     {
+      "id": "1308308237381902359",
+      "wId": "880708547766259713",
+      "status": []
+     }
+    ],
+    "attr": {
+     "icon": "Icon-e-builder03"
+    },
+    "data": {
+     "ebActionId": "1308307404300853292",
+     "basisValueFormula": {
+      "frontId": "1307937963956347224",
+      "formulaType": "json",
+      "name": "任务明细",
+      "businessId": "1308307399938777163",
+      "id": "1308307404300853291",
+      "source": "1308307399938777157",
+      "type": "3",
+      "value": "FormData.1307938217409748993.1307937963956347224[]",
+      "childs": [],
+      "config": {
+       "paramKey": "1307938217409748993.1307937963956347224[]",
+       "isMultCom": false,
+       "comType": "ApproveTrigger",
+       "switchType": "assign",
+       "parentComId": 0,
+       "formulaVersion": "V1",
+       "fieldInfo": {
+        "paramKey": "1307938217409748993.1307937963956347224[]",
+        "tablePrimaryKey": "FormData"
+       },
+       "tableName": "表单数据",
+       "paramType": "json",
+       "parentName": "项目立项流程.任务明细[]",
+       "multName": "",
+       "multKey": "",
+       "multTypeObj": {
+        "allName": "项目立项流程.任务明细[]",
+        "currentName": "项目立项流程.任务明细[]",
+        "currentParamKey": "FormData.1307938217409748993.1307937963956347224[]",
+        "allParamKey": "FormData.1307938217409748993.1307937963956347224[]"
+       },
+       "comId": "1308307399938777157",
+       "newParentName": "项目立项流程.任务明细[]"
+      },
+      "parentId": "0"
+     },
+     "opType": "batchInsert",
+     "targetForm": {
+      "groupName": "rly测试0826",
+      "groupId": "1307937598917681152",
+      "id": "1307938105765765121",
+      "text": "项目任务表",
+      "type": "FORM"
+     },
+     "setting": {
+      "bassisValueId": "1308307404300853290",
+      "bassisValue": {
+       "frontId": "1307937963956347224",
+       "formulaType": "json",
+       "name": "任务明细",
+       "businessId": "1308307399938777163",
+       "id": "1308307404300853291",
+       "source": "1308307399938777157",
+       "type": "3",
+       "value": "FormData.1307938217409748993.1307937963956347224[]",
+       "childs": [],
+       "config": {
+        "paramKey": "1307938217409748993.1307937963956347224[]",
+        "isMultCom": false,
+        "comType": "ApproveTrigger",
+        "switchType": "assign",
+        "parentComId": 0,
+        "formulaVersion": "V1",
+        "fieldInfo": {
+         "paramKey": "1307938217409748993.1307937963956347224[]",
+         "tablePrimaryKey": "FormData"
+        },
+        "tableName": "表单数据",
+        "paramType": "json",
+        "parentName": "项目立项流程.任务明细[]",
+        "multName": "",
+        "multKey": "",
+        "multTypeObj": {
+         "allName": "项目立项流程.任务明细[]",
+         "currentName": "项目立项流程.任务明细[]",
+         "currentParamKey": "FormData.1307938217409748993.1307937963956347224[]",
+         "allParamKey": "FormData.1307938217409748993.1307937963956347224[]"
+        },
+        "comId": "1308307399938777157",
+        "newParentName": "项目立项流程.任务明细[]"
+       },
+       "parentId": "0"
+      },
+      "opType": "batchInsert",
+      "dataDrWithCalc": false,
+      "main": {
+       "1307938105765765453": {
+        "formFieldKey": "1308307404300853294",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "switchType": "assign",
+         "fieldKey": "1307938105765765453",
+         "fieldSet": {},
+         "assignType": "",
+         "id": "1308307404300853294",
+         "primaryId": "1308307404300853294",
+         "fieldType": "Ebuilder",
+         "assignId": "1308307803783143569",
+         "assign": {
+          "frontId": "1308307743628435459",
+          "formulaType": "string",
+          "name": "数据ID",
+          "businessId": "880708810526822403",
+          "id": "1308308237381902349",
+          "source": "880708547766259713",
+          "type": "3",
+          "applicationId": "1308307399938777090",
+          "value": "FormData.1307937856590553088[880708810526822401].id",
+          "childs": [
+           {
+            "formulaType": "string",
+            "name": "0",
+            "id": "1308308237381902350",
+            "position": "880708810526822401",
+            "type": "1",
+            "value": "0",
+            "childs": [],
+            "config": {
+             "tempFormulaId": "1308307803783143569",
+             "tempId": "1308307803783143571",
+             "formulaVersion": "V1"
+            },
+            "parentId": "1308308237381902349"
+           }
+          ],
+          "config": {
+           "paramKey": "1307937856590553088[].id",
+           "isMultCom": false,
+           "comType": "EnquiryForm",
+           "switchType": "assign",
+           "parentComId": 0,
+           "formulaVersion": "V1",
+           "fieldInfo": {
+            "paramKey": "1307937856590553088[].id",
+            "tablePrimaryKey": "FormData"
+           },
+           "tableName": "表单数据",
+           "paramType": "string",
+           "parentName": "项目信息表(uf_xmxxb_2464)[].数据ID",
+           "multName": "",
+           "multKey": "",
+           "multTypeObj": {
+            "allName": "项目信息表(uf_xmxxb_2464)[].数据ID",
+            "currentName": "项目信息表(uf_xmxxb_2464)[].数据ID",
+            "currentParamKey": "FormData.1307937856590553088[].id",
+            "allParamKey": "FormData.1307937856590553088[].id"
+           },
+           "comId": "880708547766259713",
+           "newParentName": "项目信息表(uf_xmxxb_2464)[].数据ID"
+          },
+          "parentId": "0"
+         },
+         "multiSelect": false
+        }
+       },
+       "1307938105765765454": {
+        "formFieldKey": "1308307404300853297",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "switchType": "sub",
+         "fieldKey": "1307938105765765454",
+         "fieldSet": {},
+         "assignType": "",
+         "id": "1308307404300853297",
+         "primaryId": "1308307404300853297",
+         "fieldType": "string",
+         "assignId": "1308307404300853295",
+         "assign": {
+          "formulaType": "string",
+          "name": "任务编号",
+          "businessId": "1308307399938777167",
+          "id": "1308308237381902351",
+          "type": "10",
+          "applicationId": "1308307399938777090",
+          "value": "1307937963956347226",
+          "childs": [],
+          "config": {
+           "paramKey": "1307938217409748993.1307937963956347224[].1307937963956347226",
+           "basisType": "formSetting",
+           "switchType": "sub",
+           "level": 1,
+           "id": "1307937963956347226",
+           "source": "1308307399938777157",
+           "formulaVersion": "V1",
+           "value": "FormData.1307938217409748993.1307937963956347224[]",
+           "config": {
+            "paramKey": "1307938217409748993.1307937963956347224[]",
+            "isMultCom": false,
+            "comType": "ApproveTrigger",
+            "switchType": "assign",
+            "parentComId": 0,
+            "fieldInfo": {
+             "paramKey": "1307938217409748993.1307937963956347224[]",
+             "tablePrimaryKey": "FormData"
+            },
+            "tableName": "表单数据",
+            "paramType": "string",
+            "parentName": "项目立项流程.任务编号[]",
+            "multName": "",
+            "multKey": "",
+            "multTypeObj": {
+             "allName": "项目立项流程.任务明细[]",
+             "currentName": "项目立项流程.任务编号",
+             "currentParamKey": "FormData.1307938217409748993.1307937963956347224[].1307937963956347226",
+             "allParamKey": "FormData.1307938217409748993.1307937963956347224[]"
+            },
+            "comId": "1308307399938777157",
+            "newParentName": "项目立项流程.任务编号[]"
+           },
+           "originValue": "1307937963956347226",
+           "content": "任务编号"
+          },
+          "parentId": "0"
+         },
+         "multiSelect": false
+        }
+       },
+       "1307938105765765455": {
+        "formFieldKey": "1308307404300853300",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "switchType": "sub",
+         "fieldKey": "1307938105765765455",
+         "fieldSet": {},
+         "assignType": "",
+         "id": "1308307404300853300",
+         "primaryId": "1308307404300853300",
+         "fieldType": "string",
+         "assignId": "1308307404300853298",
+         "assign": {
+          "formulaType": "string",
+          "name": "任务名称",
+          "businessId": "1308307399938777169",
+          "id": "1308308237381902352",
+          "type": "10",
+          "applicationId": "1308307399938777090",
+          "value": "1307937963956347227",
+          "childs": [],
+          "config": {
+           "paramKey": "1307938217409748993.1307937963956347224[].1307937963956347227",
+           "basisType": "formSetting",
+           "switchType": "sub",
+           "level": 1,
+           "id": "1307937963956347227",
+           "source": "1308307399938777157",
+           "formulaVersion": "V1",
+           "value": "FormData.1307938217409748993.1307937963956347224[]",
+           "config": {
+            "paramKey": "1307938217409748993.1307937963956347224[]",
+            "isMultCom": false,
+            "comType": "ApproveTrigger",
+            "switchType": "assign",
+            "parentComId": 0,
+            "fieldInfo": {
+             "paramKey": "1307938217409748993.1307937963956347224[]",
+             "tablePrimaryKey": "FormData"
+            },
+            "tableName": "表单数据",
+            "paramType": "string",
+            "parentName": "项目立项流程.任务名称[]",
+            "multName": "",
+            "multKey": "",
+            "multTypeObj": {
+             "allName": "项目立项流程.任务明细[]",
+             "currentName": "项目立项流程.任务名称",
+             "currentParamKey": "FormData.1307938217409748993.1307937963956347224[].1307937963956347227",
+             "allParamKey": "FormData.1307938217409748993.1307937963956347224[]"
+            },
+            "comId": "1308307399938777157",
+            "newParentName": "项目立项流程.任务名称[]"
+           },
+           "originValue": "1307937963956347227",
+           "content": "任务名称"
+          },
+          "parentId": "0"
+         },
+         "multiSelect": false
+        }
+       },
+       "1307938105765765456": {
+        "formFieldKey": "1308307404300853303",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "switchType": "sub",
+         "fieldKey": "1307938105765765456",
+         "fieldSet": {},
+         "assignType": "",
+         "id": "1308307404300853303",
+         "primaryId": "1308307404300853303",
+         "fieldType": "string",
+         "assignId": "1308307404300853301",
+         "assign": {
+          "formulaType": "string",
+          "name": "任务负责人",
+          "businessId": "1308307399938777171",
+          "id": "1308308237381902353",
+          "type": "10",
+          "applicationId": "1308307399938777090",
+          "value": "1307937963956347228",
+          "childs": [],
+          "config": {
+           "paramKey": "1307938217409748993.1307937963956347224[].1307937963956347228[]",
+           "basisType": "formSetting",
+           "switchType": "sub",
+           "level": 1,
+           "id": "1307937963956347228",
+           "source": "1308307399938777157",
+           "formulaVersion": "V1",
+           "value": "FormData.1307938217409748993.1307937963956347224[]",
+           "config": {
+            "paramKey": "1307938217409748993.1307937963956347224[]",
+            "isMultCom": false,
+            "comType": "ApproveTrigger",
+            "switchType": "assign",
+            "parentComId": 0,
+            "fieldInfo": {
+             "paramKey": "1307938217409748993.1307937963956347224[]",
+             "tablePrimaryKey": "FormData"
+            },
+            "tableName": "表单数据",
+            "paramType": "string",
+            "parentName": "项目立项流程.任务负责人[]",
+            "multName": "",
+            "multKey": "",
+            "multTypeObj": {
+             "allName": "项目立项流程.任务明细[]",
+             "currentName": "项目立项流程.任务负责人",
+             "currentParamKey": "FormData.1307938217409748993.1307937963956347224[].1307937963956347228[]",
+             "allParamKey": "FormData.1307938217409748993.1307937963956347224[]"
+            },
+            "comId": "1308307399938777157",
+            "newParentName": "项目立项流程.任务负责人[]"
+           },
+           "originValue": "1307937963956347228",
+           "content": "任务负责人"
+          },
+          "parentId": "0"
+         },
+         "multiSelect": false
+        }
+       },
+       "1307938105765765457": {
+        "formFieldKey": "1308307404300853306",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "switchType": "sub",
+         "fieldKey": "1307938105765765457",
+         "fieldSet": {},
+         "assignType": "",
+         "id": "1308307404300853306",
+         "primaryId": "1308307404300853306",
+         "fieldType": "string",
+         "assignId": "1308307404300853304",
+         "assign": {
+          "formulaType": "string",
+          "name": "任务类型",
+          "businessId": "1308307399938777173",
+          "id": "1308308237381902354",
+          "type": "10",
+          "applicationId": "1308307399938777090",
+          "value": "1307937963956347229",
+          "childs": [],
+          "config": {
+           "paramKey": "1307938217409748993.1307937963956347224[].1307937963956347229",
+           "basisType": "formSetting",
+           "switchType": "sub",
+           "level": 1,
+           "id": "1307937963956347229",
+           "source": "1308307399938777157",
+           "formulaVersion": "V1",
+           "value": "FormData.1307938217409748993.1307937963956347224[]",
+           "config": {
+            "paramKey": "1307938217409748993.1307937963956347224[]",
+            "isMultCom": false,
+            "comType": "ApproveTrigger",
+            "switchType": "assign",
+            "parentComId": 0,
+            "fieldInfo": {
+             "paramKey": "1307938217409748993.1307937963956347224[]",
+             "tablePrimaryKey": "FormData"
+            },
+            "tableName": "表单数据",
+            "paramType": "string",
+            "parentName": "项目立项流程.任务类型[]",
+            "multName": "",
+            "multKey": "",
+            "multTypeObj": {
+             "allName": "项目立项流程.任务明细[]",
+             "currentName": "项目立项流程.任务类型",
+             "currentParamKey": "FormData.1307938217409748993.1307937963956347224[].1307937963956347229",
+             "allParamKey": "FormData.1307938217409748993.1307937963956347224[]"
+            },
+            "comId": "1308307399938777157",
+            "newParentName": "项目立项流程.任务类型[]"
+           },
+           "originValue": "1307937963956347229",
+           "content": "任务类型"
+          },
+          "parentId": "0"
+         },
+         "multiSelect": false
+        }
+       },
+       "1307938105765765458": {
+        "formFieldKey": "1308307404300853309",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "switchType": "sub",
+         "fieldKey": "1307938105765765458",
+         "fieldSet": {},
+         "assignType": "",
+         "id": "1308307404300853309",
+         "primaryId": "1308307404300853309",
+         "fieldType": "string",
+         "assignId": "1308307404300853307",
+         "assign": {
+          "formulaType": "string",
+          "name": "任务说明",
+          "businessId": "1308307399938777175",
+          "id": "1308308237381902355",
+          "type": "10",
+          "applicationId": "1308307399938777090",
+          "value": "1307937963956347230",
+          "childs": [],
+          "config": {
+           "paramKey": "1307938217409748993.1307937963956347224[].1307937963956347230",
+           "basisType": "formSetting",
+           "switchType": "sub",
+           "level": 1,
+           "id": "1307937963956347230",
+           "source": "1308307399938777157",
+           "formulaVersion": "V1",
+           "value": "FormData.1307938217409748993.1307937963956347224[]",
+           "config": {
+            "paramKey": "1307938217409748993.1307937963956347224[]",
+            "isMultCom": false,
+            "comType": "ApproveTrigger",
+            "switchType": "assign",
+            "parentComId": 0,
+            "fieldInfo": {
+             "paramKey": "1307938217409748993.1307937963956347224[]",
+             "tablePrimaryKey": "FormData"
+            },
+            "tableName": "表单数据",
+            "paramType": "string",
+            "parentName": "项目立项流程.任务说明[]",
+            "multName": "",
+            "multKey": "",
+            "multTypeObj": {
+             "allName": "项目立项流程.任务明细[]",
+             "currentName": "项目立项流程.任务说明",
+             "currentParamKey": "FormData.1307938217409748993.1307937963956347224[].1307937963956347230",
+             "allParamKey": "FormData.1307938217409748993.1307937963956347224[]"
+            },
+            "comId": "1308307399938777157",
+            "newParentName": "项目立项流程.任务说明[]"
+           },
+           "originValue": "1307937963956347230",
+           "content": "任务说明"
+          },
+          "parentId": "0"
+         },
+         "multiSelect": false
+        }
+       },
+       "1307938105765765459": {
+        "formFieldKey": "1308307404300853312",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "switchType": "sub",
+         "fieldKey": "1307938105765765459",
+         "fieldSet": {},
+         "assignType": "",
+         "id": "1308307404300853312",
+         "primaryId": "1308307404300853312",
+         "fieldType": "datetime",
+         "assignId": "1308307404300853310",
+         "assign": {
+          "formulaType": "datetime",
+          "name": "预计完成日期",
+          "businessId": "1308307399938777177",
+          "id": "1308308237381902356",
+          "type": "10",
+          "applicationId": "1308307399938777090",
+          "value": "1307937963956347231",
+          "childs": [],
+          "config": {
+           "paramKey": "1307938217409748993.1307937963956347224[].1307937963956347231",
+           "basisType": "formSetting",
+           "switchType": "sub",
+           "level": 1,
+           "id": "1307937963956347231",
+           "source": "1308307399938777157",
+           "formulaVersion": "V1",
+           "value": "FormData.1307938217409748993.1307937963956347224[]",
+           "config": {
+            "paramKey": "1307938217409748993.1307937963956347224[]",
+            "isMultCom": false,
+            "comType": "ApproveTrigger",
+            "switchType": "assign",
+            "parentComId": 0,
+            "fieldInfo": {
+             "paramKey": "1307938217409748993.1307937963956347224[]",
+             "tablePrimaryKey": "FormData"
+            },
+            "tableName": "表单数据",
+            "paramType": "datetime",
+            "parentName": "项目立项流程.预计完成日期[]",
+            "multName": "",
+            "multKey": "",
+            "multTypeObj": {
+             "allName": "项目立项流程.任务明细[]",
+             "currentName": "项目立项流程.预计完成日期",
+             "currentParamKey": "FormData.1307938217409748993.1307937963956347224[].1307937963956347231",
+             "allParamKey": "FormData.1307938217409748993.1307937963956347224[]"
+            },
+            "comId": "1308307399938777157",
+            "newParentName": "项目立项流程.预计完成日期[]"
+           },
+           "originValue": "1307937963956347231",
+           "content": "预计完成日期"
+          },
+          "parentId": "0"
+         },
+         "multiSelect": false
+        }
+       },
+       "1307938105765765460": {
+        "formFieldKey": "1308307404300853314",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "fieldKey": "1307938105765765460",
+         "fieldSet": {},
+         "id": "1308307404300853314",
+         "primaryId": "1308307404300853314",
+         "multiSelect": false
+        }
+       },
+       "1307938105765765461": {
+        "formFieldKey": "1308307404300853317",
+        "value": {
+         "original": false,
+         "operate": "OPERATE_EQUAL",
+         "switchType": "fixvalue",
+         "fieldKey": "1307938105765765461",
+         "fieldSet": {},
+         "assignType": "",
+         "id": "1308307404300853317",
+         "primaryId": "1308307404300853317",
+         "fieldType": "Select",
+         "assignId": "1308307404300853315",
+         "assign": {
+          "formulaType": "Select",
+          "name": "任务状态草稿",
+          "businessId": "1308307399938777179",
+          "id": "1308308237381902357",
+          "type": "1",
+          "applicationId": "1308307399938777090",
+          "value": "1307938118583558166",
+          "childs": [],
+          "config": {
+           "switchType": "fixvalue",
+           "formulaVersion": "V1",
+           "originValue": "1307938118583558166"
+          },
+          "parentId": "0"
+         },
+         "multiSelect": false
+        }
+       }
+      },
+      "detail": [],
+      "updateFieldCondition": {
+       "updateField": []
+      }
+     },
+     "tableType": [
+      {
+       "name": "项目任务表",
+       "id": "1307938105765765121"
+      }
+     ],
+     "basisValue": "1308307404300853290",
+     "appType": [
+      {
+       "pcUrl": "/ebdapp/view/1307937598917681152",
+       "name": "rly测试0826",
+       "id": "1307937598917681152"
+      }
+     ],
+     "person": {
+      "formulaType": "string",
+      "name": "978765721923977216",
+      "businessId": "1308307399938777161",
+      "id": "1308307404300853289",
+      "position": "880643584074846211",
+      "type": "1",
+      "applicationId": "1308307399938777090",
+      "value": "978765721923977216",
+      "childs": [],
+      "config": {
+       "switchType": "fixvalue",
+       "formulaVersion": "V1",
+       "originValue": [
+        {
+         "templateType": "default",
+         "stopDepartment": false,
+         "departmentId": "",
+         "mobile": "",
+         "pid": "",
+         "avatar": {
+          "name": "闫宇",
+          "appPreviewPath": "/api/app/file/preview?type=redirect&fileId=",
+          "previewPath": "/api/file/preview?type=redirect&fileId=",
+          "userId": "978765721923977216"
+         },
+         "title": "闫宇",
+         "contentDesc": "闫宇",
+         "leaf": true,
+         "userid": "978765721923977216",
+         "isLeaf": true,
+         "content": "闫宇",
+         "name": "闫宇",
+         "id": "978765721923977216",
+         "position": "",
+         "department": "",
+         "mainId": "978765721923977216",
+         "cid": "",
+         "statusCode": "normal"
+        }
+       ]
+      },
+      "parentId": "0"
+     },
+     "appId": "1307937598917681152",
+     "workflowFields": "",
+     "objId": "1307938105765765121",
+     "personId": "1308307404300853288",
+     "id": "1308307404300853292",
+     "syncType": "0",
+     "workflowModule": "workflow",
+     "workflowId": "1307938217409748993"
+    },
+    "canDelete": true,
+    "canEdit": true,
+    "fields": [
+     "ebActionId",
+     "basisValueFormula",
+     "opType",
+     "targetForm",
+     "setting",
+     "tableType",
+     "basisValue",
+     "appType",
+     "person",
+     "appId",
+     "workflowFields",
+     "objId",
+     "personId",
+     "id",
+     "syncType",
+     "workflowModule",
+     "workflowId"
+    ],
+    "designerResult": {
+     "designResultEnum": "GET_SUCCESS",
+     "msg": "获取成功",
+     "label": 268960,
+     "success": true,
+     "placeholders": [],
+     "fromComponent": false,
+     "contactDefault": false,
+     "path": "",
+     "outErrorCode": {
+      "errorLineNum": 0,
+      "show": false
+     },
+     "costTime": 34
+    },
+    "componentName": "新建表单数据",
+    "componentDesc": "新增指定e-builder应用下的表单数据",
+    "componentNameLabel": 221793,
+    "componentDescLabel": 221245,
+    "isOpen": false
+   },
+   {
+    "id": "1308307399938777159",
+    "wId": "1308307399938777159",
+    "name": "终止",
+    "nameMultilang": "终止",
+    "type": "Output",
+    "typeName": "终止",
+    "sources": [
+     {
+      "id": "1308308237381902364",
+      "wId": "1308307399938777158",
+      "status": []
+     }
+    ],
+    "attr": {
+     "icon": "Icon-termination-1",
+     "iconColor": "var(--danger)"
+    },
+    "data": {
+     "outputStatus": "1",
+     "creator": "978765721923977216",
+     "reminder": "0",
+     "tenantKey": "ti8her7lat",
+     "needTriggerFlag": 0,
+     "createTime": "2026-08-26 15:00:55",
+     "triggerFlag": false,
+     "pageAction": "0",
+     "updateTime": "2026-08-27 07:04:10",
+     "nextAction": false,
+     "id": "1308307404300853328",
+     "conditionEnable": false
+    },
+    "canDelete": true,
+    "canEdit": true,
+    "fields": [
+     "outputStatus",
+     "creator",
+     "reminder",
+     "tenantKey",
+     "needTriggerFlag",
+     "createTime",
+     "triggerFlag",
+     "pageAction",
+     "updateTime",
+     "nextAction",
+     "id",
+     "conditionEnable"
+    ],
+    "designerResult": {
+     "designResultEnum": "GET_SUCCESS",
+     "msg": "获取成功",
+     "label": 268960,
+     "success": true,
+     "placeholders": [],
+     "fromComponent": false,
+     "contactDefault": false,
+     "path": "",
+     "outErrorCode": {
+      "errorLineNum": 0,
+      "show": false
+     },
+     "costTime": 8
+    },
+    "componentName": "终止",
+    "componentDesc": "终止执行动作流",
+    "componentNameLabel": 244710,
+    "componentDescLabel": 288303,
+    "isOpen": false
+   }
+  ],
+  "version": 1,
+  "secretKey": "REPLACE_WITH_RUNTIME_SECRET",
+  "checkReport": {
+   "msgs": ""
+  },
+  "assistLayer": "{\"nodes\":[],\"layout\":{}}",
+  "versionConfig": "{}",
+  "designSimplifyFlag": "0",
+  "showSaveTemplate": "1",
+  "isKeepDiary": 0,
+  "tenantKey": "ti8her7lat",
+  "id": "1308307399938777091",
+  "eventId": "1308307399938777157"
+ },
+ "fail": false
+}

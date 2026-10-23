@@ -1,0 +1,755 @@
+{
+	"component": "count-down 倒计时（weapp-ebdothercoms/src/components/count-down，引擎类型 CountDown → 外壳类名 ebcom-countdown）",
+	"usage": "先按 pickTree 用 comRoot 上的样式类判断落在哪棵树（FlipClockNew 是默认），再在树里按语义找节点。用户说「改倒计时数字」时先确认样式：翻牌式=div.ebcoms-countDown-flipper-new 里的 div.digital，环形式=svg 里的 text.circle-timingText，卡片式=div.ebcoms-count-down-card-item-time，日历式=div.ebcoms-count-down-calendar-style-time-single-num，横条式=div.ebcoms-horizontal-bar-single-num span，旧翻牌式=div.ebcoms-count-down-fliper 的 .digital。用户说「标题」时分三种：引擎组件标题 div.ebcom-title（外壳 header 里）、样式自带名称（各树第一个节点）、单位名（天/时/分/秒，各树末尾节点）。",
+	"legend": {
+		"[cls]": "条件 class，满足业务条件才挂载",
+		"{a|b}": "多选一 class（同一位置按配置或端换成其中一个）",
+		"a > b": "父子层级压缩写法，冒号左边是右边的父级",
+		"ref": "引用 shared 里的复用片段，写成 ref:shared.xxx",
+		"uncontrolled": "第三方渲染（@weapp/ui 组件、设计器层），内部结构不可控，只给挂载点",
+		"<comId>": "组件实例 id；引擎外壳的 id 与组件根上的 data-id 都是它，官方样式作用域写成 #<comId>.ebcom",
+		"ebcoms-": "组件自己写的类名前缀（clsPrefix='ebcoms'）",
+		"ebcom-": "引擎/框架层的类名前缀（ebcomPrefix='ebcom'），本组件源码里搜不到",
+		"ui-": "@weapp/ui 的类名前缀（Icon / Switch 等第三方组件）"
+	},
+	"pickTree": "两步。① 判断样式：看 div.ebcoms-count-down-com 上的第二个类 —— FlipClockNew / FlipClock / TimeCircles / CalendarStyle / HorizontalBar / CardStyle，分别对应下面同名的树。样式由 common/countDownCom.tsx 的 getStyleType 决定：优先 config.styles[0].libStyle.countDown.styleType，其次是 category==='9' 且 id ∈ 50/51/109/110/190/192 的内置样式（50=FlipClock、51=TimeCircles、109=CalendarStyle、110=HorizontalBar、190=CardStyle、192=FlipClockNew），再其次是页面主题关联样式，都没有就默认 FlipClockNew（新建组件即此样式）。② 判断端：同层第三个类是 PC 或 Mobile，各树内部的小端类名跟着变（注意大小写不一致，见 notes）。",
+	"root": {
+		"tag": "div",
+		"id": "<comId>",
+		"class": [
+			"ebcom",
+			"ebcom-countdown",
+			"{ebcom-grid|ebcom-flow|ebcom-excel}",
+			"[ebcom-m]",
+			"{ebcom-view|ebcom-design}",
+			"[mask]",
+			"[has-no-header]",
+			"[event-action-click]",
+			"<布局/设计器追加的类名>"
+		],
+		"desc": "引擎外壳，由 weapp-ebdcoms 的 createView.renderView（运行态）/ createDesign.renderDesign（设计态）生成，不在本组件源码里。类型段由 compUtils.getClassName('CountDown', client, layoutType, viewType) 拼成 ebcom-countdown，布局段拼成 ebcom-grid/ebcom-flow/ebcom-excel。官方样式作用域就是 #<comId>.ebcom（getCountDownStyles 生成的规则被它限域）。",
+		"tips": [
+			"id 与组件根上的 data-id 都是组件实例 id；组件自己的 less 不在这一层，别拿 .ebcom-countdown 当组件类名用（那是引擎拼出来的）",
+			"mask 只有设计态有：Design 与 design-m/Design 的 defaultOpts 里 mask: true，运行态外壳不带",
+			"has-no-header 在 config.titleEnabled===false 时出现；倒计时默认 titleEnabled: true（标题「倒计时」），一般看不到",
+			"ebcom-m 只在 page.client==='MOBILE' 时出现；event-action-click 只在配置了点击事件动作时出现"
+		],
+		"children": [
+			{
+				"tag": "div",
+				"class": [
+					"header"
+				],
+				"when": "config.titleEnabled===true（倒计时默认 true）才有；登录前（isPassportEbpage）按钮列表为空但 header 仍在",
+				"desc": "引擎标题栏，createView.renderHeader / createDesign.renderDesign 里写死的 div.header。倒计时没有 renderHeader，所以标题与按钮都走引擎默认渲染。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcom-title"
+						],
+						"desc": "引擎渲染的组件标题，内容是 config.title（默认「倒计时」）。title 里有 {xx} 动态语法时换成 TransformContent 的 div，类名同样只有 ebcom-title。标题图标（titleIcon）存在时会在这层前面多一个 ebcoms-assets-item 节点。"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-header-btns"
+						],
+						"desc": "标题栏操作按钮组（引擎 OperationBtns 的 wrapClass）。倒计时只有一个默认按钮「跳过节假日」，constants.ts 的 customOperations 把 SKIPHOILDAY 映射到组件自己的 common/SkipHoliday，所以渲染出来的是组件节点 div.ebcoms-skip-holiday，不是通用按钮样式。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-skip-holiday"
+								],
+								"when": "设计态（外壳含 ebcom-design）只要 titleEnabled 就渲染；运行态还要 topOperatBtns.btns[n].isOpen===true（引擎 hasOpenOperatBtn 判定），默认 isOpen:false 时运行态没有这一层",
+								"desc": "跳过节假日开关（组件源码 common/SkipHoliday/index.tsx），结构是 span(文案) + @weapp/ui Switch。less 已给 cursor:pointer / color:var(--secondary-fc) / font-size 12 / flex 居中，以及 & > span{margin-right:3px;font-weight:400}。",
+								"tips": [
+									"开关在引擎 header 里，不在 .ebcoms-count-down-content 里 —— 想在运行态给它写样式，得先把配置里这个按钮打开，否则选择器永远命不中",
+									"开关状态由 window.TEAMS.userConfig 的 element.countDown.<comId>.<userId>.skipHoilday 控制，点击后才写入，初始值来自组件 userConfig"
+								],
+								"children": [
+									{
+										"tag": "span",
+										"desc": "按钮文案（defaultBtns 的 showContent，默认「跳过节假日」，多语言取值后渲染）"
+									},
+									{
+										"tag": "ui-switch",
+										"class": [
+											"ui-switch",
+											"ui-switch-sm",
+											"[ui-switch-disabled]",
+											"[ui-switch-readOnly]",
+											"[mirror-text]"
+										],
+										"desc": "@weapp/ui Switch（第三方，uncontrolled，只给挂载点）。组件只传了 size='sm' / onChange / value；内部还有 button.ui-switch-btn、div.ui-switch-handle、span.ui-switch-inner 等，别抄这些内部类名。"
+									}
+								]
+							}
+						]
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"ref": "shared.contentWrap",
+				"desc": "引擎内容槽，组件所有可见内容都在这一层之下"
+			},
+			{
+				"tag": "div",
+				"class": [
+					"footer"
+				],
+				"when": "footerEnabled===true 才有；倒计时 Design/View 的 defaultProps 里 footerEnabled: false",
+				"desc": "引擎底部按钮区（createView.renderFooter），倒计时默认不渲染"
+			}
+		]
+	},
+	"shared": {
+		"contentWrap": {
+			"tag": "div",
+			"class": [
+				"ebcoms-count-down-content",
+				"{PC|Mobile}",
+				"content"
+			],
+			"desc": "内容槽本体。class 由引擎拼接：contentClass（View/View.tsx 与 Design/Design.tsx 的 defaultOpts.render.contentClass = ebcoms-count-down-content + PC 或 Mobile）后面再拼引擎固定的 content。运行态由 createView.renderContent 生成，设计态由 createDesign.renderContent 经 view/Content.tsx 生成，两者最终 DOM 完全一样。组件大部分自带 less 都挂在这个类下（common/index.less、horizontalBar/index.less 都有 .ebcoms-count-down-content 规则）。",
+			"tips": [
+				"这里的 content 是引擎固定类名，最容易和「组件自己的 xxx-content 类」混。写选择器用 #<comId> .ebcoms-count-down-content，别只写 .content",
+				"端串是大写 PC（跟随引擎 contentClass），和树内部的小写 Pc 不同",
+				"CommonConfigData 若声明 padding=false 会多 content-no-padding，倒计时没声明"
+			],
+			"children": [
+				"ref:shared.comRoot"
+			]
+		},
+		"comRoot": {
+			"tag": "div",
+			"class": [
+				"ebcoms-count-down-com",
+				"{FlipClockNew|FlipClock|TimeCircles|CalendarStyle|HorizontalBar|CardStyle}",
+				"{PC|Mobile}",
+				"[countDownCentre]",
+				"[ebcoms-count-down-not-single]"
+			],
+			"desc": "组件根（common/countDownCom.tsx render 最外层，classnames 拼接；style 上还会写 width:100%）。第二个类是当前样式类型，第三个是端；countDownCentre 在 CalendarStyle 与 FlipClock 上恒挂（types.ts 的 CentreStyle），ebcoms-count-down-not-single 在 countDownSettings 长度 > 1 时挂上。",
+			"tips": [
+				"countDownCentre 是裸 camelCase 类名、没有 ebcoms- 前缀，别写成 .ebcoms-countDownCentre；less 已用它做 flex 居中",
+				"同一页面里不同样式的实例，公共祖先只有 #<comId> 和 .ebcoms-count-down-content，区分只能靠这一层的样式类",
+				"ebcoms-count-down-not-single 已被 less 使用（日历式多条时左对齐、datas 宽度 max-content）"
+			],
+			"children": [
+				"ref:shared.datasWrap"
+			]
+		},
+		"datasWrap": {
+			"tag": "div",
+			"class": [
+				"ebcoms-count-down-com-datas",
+				"[ebcoms-count-down-com-horizontal-bar]"
+			],
+			"desc": "数据容器。config.countDownSettings 每条渲染一个 CountDownSingle（common/countDownCom.tsx 里 map），顺序与配置一致；没有配置时用 defaultData 兜底成一条。horizontal-bar 类只在 HorizontalBar 样式下挂上，它是横条渐变底色的承载层。",
+			"tips": [
+				"CountDownSingle 的 render 返回 Fragment，不会额外产生 item 包裹 div —— 样式组件的根节点直接是这一层的子元素，中间没有「一条数据一层」的节点",
+				"同一实例的多个倒计时共享同一套 state（日期由各自的 CountDownSingle 计时），样式上只有顺序差异",
+				"stylePre + mockData 时（设计器改样式时）会用 mock 数据渲染，DOM 结构不变"
+			]
+		},
+		"single": {
+			"desc": "CountDownSingle（common/CountDownSingle.tsx）本身不产出 DOM，只按 props.styleTypeCurrent 分派到六种样式组件之一，并把 day/hour/minute/second/tType/isMobile/name 传下去。name 会先过 getLocaleValue 做多语言。",
+			"tips": [
+				"单位是否渲染由 timingType 决定（types.ts 的 hasDay/hasHour/hasMinute/hasSecond 白名单），顺序恒为 天 → 时 → 分 → 秒",
+				"数字补位规则在各样式里不一致：旧 FlipClock 会把数值按位拆成多个牌，其余样式一个单位一个整体；日历式与横条式对天数截断到 999",
+				"计时类样式（日历/横条/环形式）的 number 只做 floor 不补零，翻牌两式才补零（新版直接给原值，靠 numberN 的 CSS content 出字）"
+			]
+		},
+		"state": {
+			"desc": "运行期动态变化（初始 render 里没有），写样式时按「可能出现」对待",
+			"list": [
+				{
+					"condition": "翻牌动画进行中（约 500ms）",
+					"targetSelector": "div.ebcoms-countDown-flipper-new / div.ebcoms-count-down-fliper",
+					"addClass": "go",
+					"note": "同时 down/up 是翻页方向类（恒有，非动画态也在），配合 go 触发 keyframes"
+				},
+				{
+					"condition": "倒计时归零或未到 beginTime 静置",
+					"targetSelector": "各样式数字节点",
+					"addClass": "（文本变 0，无类名变化）",
+					"note": "归零后 clearInterval，DOM 保留，只是不再刷新"
+				},
+				{
+					"condition": "点击跳过节假日开关 / 收到 skipHoilday.skip|noSkip 事件",
+					"targetSelector": "div.ebcoms-skip-holiday 内的 Switch",
+					"addClass": "ui-switch-btn-checked / checked 相关类（@weapp/ui 内部处理）",
+					"note": "同时会改变倒计时是否按节假日停走，不产生额外节点"
+				},
+				{
+					"condition": "组件被事件动作隐藏",
+					"targetSelector": "引擎外壳 #<comId>",
+					"addClass": "ebcom-display-none",
+					"note": "同时写 style.display='none'"
+				},
+				{
+					"condition": "数字超过 60（新版翻牌式）",
+					"targetSelector": "document.head 下新注入的 <style id=\"count-down-number-content\">",
+					"addClass": "（无，注入的是样式规则）",
+					"note": "见 flipclocknew 树的 tips，别在样式文件里重复这些数字规则"
+				}
+			]
+		}
+	},
+	"flipclocknew": {
+		"when": "comRoot 上样式类为 FlipClockNew（内置样式 192，无样式配置时的默认值；设计器新建组件即此样式）",
+		"prefixChain": "div.ebcoms-count-down-content.{PC|Mobile}.content > div.ebcoms-count-down-com.FlipClockNew.{PC|Mobile} > div.ebcoms-count-down-com-datas > 本树根",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-countDown-flip-clock-new-all"
+				],
+				"desc": "新版翻牌式的根。注意类是驼峰 countDown + 连字符 flip-clock-new，和旧版、和其余样式的命名习惯都不同。less 已给 display:flex / flex-wrap:wrap / justify-content:center（规则写在 .ebcoms-count-down-com.FlipClockNew .ebcoms-countDown-flip-clock-new-all 下）。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-countDown-flip-clock-new-name"
+						],
+						"when": "data.name 非空时才有",
+						"desc": "整组倒计时的名称行，里面是 div.name[title=<多语言后的名称>]。less 已给 width:100% / margin-top:10px / font-size 14 / color #666 / font-weight 600，以及 .name 的 ellipsis 三件套与 margin-bottom:8px；Mobile 下 less 把宽度收成 calc(100% - 16px) 并清掉 .name 的 margin。",
+						"chain": "div.ebcoms-countDown-flip-clock-new-name > div.name"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-countDown-flip-clock-new",
+							"{Pc|Mobile}"
+						],
+						"desc": "时钟主体，display:flex / flex-wrap:wrap / justify-content:center。Mobile 时时额外有 margin-bottom:8px（less）。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-countDown-flippers-new"
+								],
+								"when": "每个时间单位一个（天/时/分/秒按 timingType 决定，最多 4 个）",
+								"desc": "一个单位的牌组。Pc 下 less 给 margin:10px 12px 0，Mobile 下 margin:10px 3px 0，且 display:inline-block。",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-countDown-flipper-new",
+											"{down|up}",
+											"[go]",
+											"{Pc|Mobile}"
+										],
+										"desc": "一张完整的翻牌（一个单位的整个数值一起翻，不按数字位拆）。flipType 恒为 down（翻新牌只用 flipDown），up 只有源码里未调用的 flipUp 会用到；go 只在 500ms 动画期间出现。里面靠两个 .digital 的 ::before/::after 出字，数字类是 number{N}。",
+										"children": [
+											{
+												"tag": "div",
+												"class": [
+													"digital",
+													"front",
+													"number{N}"
+												],
+												"desc": "前牌，里面有一个 span 直接显示当前数字文本（span 无类名）。数字类由 _textClass 拼成 number + 原值，可能是一位（number5）也可能是两位（number05/00），最长 number60；数字 > 60 时源码会在 render 里往 document.head 注入 <style id=\"count-down-number-content\">，动态补 .number{N}:before/:after{content:'N'}。"
+											},
+											{
+												"tag": "div",
+												"class": [
+													"digital",
+													"back",
+													"number{N}"
+												],
+												"desc": "后牌，空元素，靠 CSS content 出字（less 预置 number0、number00 到 number60）。"
+											}
+										]
+									},
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-countDown-flipper-new-name"
+										],
+										"desc": "单位名（天/时/分/秒，来自 timeTypeGroup 的 name，已在组件初始化时多语言化）。less 已给 margin-top:8px / font-weight 400 / font-size 12 / color #666。"
+									}
+								]
+							}
+						]
+					}
+				],
+				"tips": [
+					"类名三连最容易写错：新版是 countDown-（驼峰）+ flip-clock-new / flippers-new / flipper-new（双 p）；旧版是 count-down-（连字符）+ flip-clock / flipers / fliper（单 p）",
+					"数字宽度/高度/圆角/字号都在 flipperNew.less（Pc 76x78 圆角 10 字号 52；Mobile 52x55 圆角 5 字号 38），底色在 .digital:before/:after（less 写死 #5e8eff），系统样式的 cardColor 也会写到同一组选择器上",
+					"字号 >= 52 时 getCountDownStyles 会给 .ebcoms-countDown-flipper-new.Mobile 补 line-height:normal，>= 72 时给新版补 padding:0 12px —— 自己改字号时注意这条冲突",
+					"less 里有一条 #com_manage_50.ebcom .ebcoms-countDown-flipper-new .digital:before 的后台专属规则，只在组件管理页生效，别当成通用规则",
+					"翻页 keyframes（frontFlipDown / backFlipDown / frontFlipUp / backFlipUp）与 .go 的组合都在 flipperNew.less，不要重写"
+				]
+			}
+		]
+	},
+	"flipclock": {
+		"when": "comRoot 上样式类为 FlipClock（内置样式 50，即旧版翻牌式）",
+		"prefixChain": "div.ebcoms-count-down-content.{PC|Mobile}.content > div.ebcoms-count-down-com.FlipClock.{PC|Mobile} > div.ebcoms-count-down-com-datas > 本树根",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-count-down-flip-clock-all"
+				],
+				"desc": "旧版翻牌式的根。less 已给 display:flex / flex-wrap:wrap / justify-content:center。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-count-down-flip-clock-name"
+						],
+						"when": "data.name 非空时才有",
+						"desc": "名称行，里面是 div.name[title]。less 已给 width:100% / margin-top:10px / font-size 14 / font-weight bold，.name 用 ellipsis 三件套；Mobile 下 less 把宽度收成 calc(100% - 16px)。",
+						"chain": "div.ebcoms-count-down-flip-clock-name > div.name"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-count-down-flip-clock",
+							"{Pc|Mobile}"
+						],
+						"desc": "时钟主体（display:flex / flex-wrap:wrap / min-width:100%）。Mobile 时 justify-content:center。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-count-down-flipers"
+								],
+								"when": "每个时间单位一个",
+								"desc": "一个单位的牌组。Pc 下 less 给 padding-right:15px / margin:0 auto，Mobile 下 margin-right:8px。",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-count-down-fliper",
+											"{down|up}",
+											"[go]",
+											"{Pc|Mobile}"
+										],
+										"desc": "单张牌，按数值的每一位拆一个：String(min(num,999)).split('')，所以「12」是两个 fliper、「365」是三个（与新版一位一整套不同）。flipType 实际恒为 down。",
+										"children": [
+											{
+												"tag": "div",
+												"class": [
+													"digital",
+													"front",
+													"number{N}"
+												]
+											},
+											{
+												"tag": "div",
+												"class": [
+													"digital",
+													"back",
+													"number{N}"
+												]
+											}
+										],
+										"tips": "两位数字在旧版是拆开的，因此 number 类只可能是 number0 到 number9（flipper.less 预置），没有 number00 这类两位数写法；两个 .digital 都没有子节点，字体全靠 CSS content"
+									},
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-count-down-flipers-name"
+										],
+										"desc": "单位名（天/时/分/秒）。less 已给 font-weight bolder / font-size 14 / color #555。"
+									}
+								]
+							}
+						]
+					}
+				],
+				"tips": [
+					"与新版差异：类名是连字符 count-down + flipers / fliper（单 p，无 -new）；数值按位拆分；flipper.less 把 .digital:before/:after 底色写成 #000（新版是 #5e8eff），尺寸 60x100/圆角 10/字号 66（Mobile 24x40/圆角 5/字号 37）",
+					"系统样式的 cardColor 会同时写给新旧两套选择器（.ebcoms-count-down-fliper .digital:before/:after 与 .ebcoms-countDown-flipper-new .digital:before/:after），改底色两条一起生效",
+					"common/index.less 里还有一条 .ebcoms-count-down-flip-clock-wrapper（text-align:center / width:100% / margin:1em），DOM 上并没有这个类，是遗留规则，别照着写选择器"
+				]
+			}
+		]
+	},
+	"card": {
+		"when": "comRoot 上样式类为 CardStyle（内置样式 190，卡片式）",
+		"prefixChain": "div.ebcoms-count-down-content.{PC|Mobile}.content > div.ebcoms-count-down-com.CardStyle.{PC|Mobile} > div.ebcoms-count-down-com-datas > 本树根",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-count-down-card"
+				],
+				"desc": "卡片式根（flex 竖排 / 居中 / margin-bottom:12px，less 已给）。注意这棵树没有任何端类名挂在根上，端只在 card-item 上加。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-count-down-card-name"
+						],
+						"when": "data.name 非空时才有",
+						"desc": "名称节点，带 title=name（未做多语言，直接用原值）。less 已给 ellipsis 三件套 + 居中 + font-size 14 / color #666 / font-weight 500 / margin-bottom:12px。",
+						"chain": "div.ebcoms-count-down-card-name[title]"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-count-down-card-position"
+						],
+						"desc": "外层定位容器（max-width:100% / overflow:overlay）。⚠️ less 里这条规则写的是裸类名 .ebcoms-count-down-card-position（没有父级前缀），会命中同一页面所有 CardStyle 实例。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-count-down-card-all"
+								],
+								"desc": "居中容器（margin:0 auto / flex 竖排 / width:max-content / padding-right:2px）",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-count-down-card-group"
+										],
+										"desc": "卡片横排容器（display:flex / justify-content:center / align-items:center）",
+										"children": [
+											{
+												"tag": "div",
+												"class": [
+													"ebcoms-count-down-card-item",
+													"[Mobile]"
+												],
+												"when": "每个时间单位一个（天/时/分/秒）",
+												"desc": "单张卡片。端类名只在移动端加（Mobile），PC 不加任何类。卡片之间靠 less 的 .count-down-card-item:not(:last-child) 画分隔冒号（:before content ':'，PC 字号 42 / right:-31px，Mobile 改 top:8px / right:-22px / width:20px）与间距（PC margin-right:30px、Mobile 20px）。",
+												"children": [
+													{
+														"tag": "div",
+														"class": [
+															"ebcoms-count-down-card-item-time"
+														],
+														"desc": "数字。字号走 CSS 变量 --count-down-num-size（PC 42px、Mobile 38px），min-width 用 calc(var(--count-down-num-size) * 1.58) / Mobile *1.65，padding 0 8px / Mobile 0 6px。系统样式的 cardTimingText 就写在这一层。"
+													},
+													{
+														"tag": "div",
+														"class": [
+															"ebcoms-count-down-card-item-type"
+														],
+														"desc": "单位名（天/时/分/秒）。less 已给 font-size 12 / color #666 / 居中 / padding 0 4px；系统样式的 labelText 写在这一层。"
+													}
+												]
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				],
+				"tips": [
+					"卡片底色 / 边框走系统样式（cardBackgroundColor、cardBorder），生成的选择器是 .ebcoms-count-down-card .ebcoms-count-down-card-position .ebcoms-count-down-card-all .ebcoms-count-down-card-group .ebcoms-count-down-card-item，自己写时用 .ebcoms-count-down-card-item 更省事",
+					"分隔冒号是 CSS 生成的内容，DOM 里没有元素；想隐藏就覆盖 :before 的 content",
+					"Mobile 下卡片整体 margin-top:12px、position 收成 calc(100% - 12px)（less 已写）"
+				]
+			}
+		]
+	},
+	"calendar": {
+		"when": "comRoot 上样式类为 CalendarStyle（内置样式 109，日历式；它和 FlipClock 属于 CentreStyle，comRoot 上会额外挂 countDownCentre）",
+		"prefixChain": "div.ebcoms-count-down-content.{PC|Mobile}.content > div.ebcoms-count-down-com.CalendarStyle.{PC|Mobile} > div.ebcoms-count-down-com-datas > 本树根",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-count-down-calendar-style",
+					"{PC|Mobile}"
+				],
+				"desc": "日历式根。less 已给 width:100% / background #ffffff / border-radius 20px / flex 居中 / overflow:auto。多条数据时 less 用 .ebcoms-count-down-com.CalendarStyle.ebcoms-count-down-not-single 把内容左对齐并把 datas 宽度改成 max-content。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-count-down-calendar-style-position"
+						],
+						"desc": "定位层（less 只给了 max-width:100%），它内部就是下一层 -all。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-count-down-calendar-style-all"
+								],
+								"desc": "内容层（flex 竖排 / 居中 / margin:auto）。",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-count-down-calendar-style-name"
+										],
+										"when": "data.name 非空时才有",
+										"desc": "名称行（flex / align-items:center / margin-bottom:calc(var(--hd) * 12) / padding-left:5px）。less 已有 .ui-icon-s.ui-icon-svg.Icon-time-o use{color:var(--primary)} 与 .name-content 的字号/色/字距/省略号。",
+										"children": [
+											{
+												"tag": "span",
+												"class": [
+													"ui-icon",
+													"ui-icon-wrapper",
+													"ui-icon-blue",
+													"ebcoms-count-down-calendar-style-name-icon"
+												],
+												"desc": "名称前的时钟图标，来自 @weapp/ui Icon（name='Icon-time-o'、size='s'、moduleColor='blue'；组件把 ebcoms-count-down-calendar-style-name-icon 作为 className 传进去，会拼到 wrapper 上）。",
+												"children": [
+													{
+														"tag": "svg / span",
+														"class": [
+															"ui-icon-s",
+															"ui-icon-svg",
+															"Icon-time-o"
+														],
+														"desc": "图标内层（线上形态因图标类型不同而异：CHUNK 时是 svg > use，异步未加载时是空 span）。less 里改图标色用的是 .ui-icon-s.ui-icon-svg.Icon-time-o use —— 要覆盖请照这个写法带上图标类名。"
+													}
+												],
+												"tips": "要统一控制图标盒子就用 .ebcoms-count-down-calendar-style-name-icon，别只写 .ui-icon（一个页面里有很多 ui-icon）"
+											},
+											{
+												"tag": "div",
+												"class": [
+													"ebcoms-count-down-calendar-style-name-content"
+												],
+												"desc": "名称文字容器（flex / 字号 var(--font-size-10) / color var(--primary) / 字距 0.36px / font-weight 500 / margin-left:8px / ellipsis），里面是 div.name[title]。",
+												"chain": "div.ebcoms-count-down-calendar-style-name-content > div.name"
+											}
+										]
+									},
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-count-down-calendar-style-time"
+										],
+										"desc": "时间行（display:flex / justify-content:center）。多条数据（not-single）时 less 把它改成 flex-start。",
+										"children": [
+											{
+												"tag": "div",
+												"class": [
+													"ebcoms-count-down-calendar-style-time-single"
+												],
+												"when": "每个时间单位一个",
+												"desc": "一个单位（flex 横排）。字号与间距来自 less 的 PC / Mobile 两套规则：PC 下 margin:8px 0，num 字号 calc(var(--hd) * 39) / 字距 1.38 / padding 0 8px；Mobile 下 num 字号 calc(var(--hd) * 26) / padding 0 3px，unit 字号 calc(var(--hd) * 8)。",
+												"children": [
+													{
+														"tag": "div",
+														"class": [
+															"ebcoms-count-down-calendar-style-time-single-num"
+														],
+														"desc": "数字（flex / 底部对齐 / color #333 / font-weight 500 / padding-right:10px），里面一个 span 装数字。系统样式的 timingText 写在这一层。"
+													},
+													{
+														"tag": "div",
+														"class": [
+															"ebcoms-count-down-calendar-style-time-single-unit"
+														],
+														"desc": "单位名，带 title，里面一个 span。less 已给 color #999 / 底部对齐；系统样式的 labelText 写在这一层。"
+													}
+												]
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					{
+						"tag": "div",
+						"desc": "源码里恒渲染的一个无类名空 div（CalendarStyle render 末尾的 <div />），纯占位，写样式时忽略。"
+					}
+				],
+				"tips": [
+					"comRoot 上的 countDownCentre 就是给这个样式（以及旧翻牌式）用的，less 用它做 flex 居中，不要再写一遍",
+					"源码里 common/style/calendarStyle/SingleItem.tsx 是死代码（calendarStyle/index.tsx 自己内联了 SingleItem，import 被注释掉），而且那个文件里的类名是 horizontal-bar 系列的 —— 别拿它当参考",
+					"整块白底圆角 20px 是 less 给的；改背景/圆角覆盖 .ebcoms-count-down-calendar-style 即可"
+				]
+			}
+		]
+	},
+	"horizontal": {
+		"when": "comRoot 上样式类为 HorizontalBar（内置样式 110，横条式；这个样式下 datasWrap 会多 ebcoms-count-down-com-horizontal-bar）",
+		"prefixChain": "div.ebcoms-count-down-content.{PC|Mobile}.content > div.ebcoms-count-down-com.HorizontalBar.{PC|Mobile} > div.ebcoms-count-down-com-datas.ebcoms-count-down-com-horizontal-bar > 本树根",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-horizontal-bar-all",
+					"{PC|Mobile}"
+				],
+				"desc": "横条式根。less 已给 width:100% / color #ffffff / border-radius 6px / display:flex / font-family PingFangSC-Medium，以及 :hover 时 background rgba(255,255,255,0.15)。注意这棵树的类名完全不含 count-down。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-horizontal-bar-left",
+							"{PC|Mobile}",
+							"[onlyEndTimeStr]"
+						],
+						"desc": "左侧名称与日期区。onlyEndTimeStr 只在「有结束日期且没有名称」时挂上（less 让它 display:flex）—— 此时左边只有日期。PC 下 less 给 min-width:75px。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-horizontal-bar-name"
+								],
+								"when": "data.name 非空时才有",
+								"desc": "名称，带 title。less 已给 font-size 16 / font-weight 500 / 字距 0.57px / min-width 75px / ellipsis / padding-right:10px；Mobile 下 width:0 / min-width:100%。系统样式的 titleText 写在这一层。",
+								"chain": "div.ebcoms-horizontal-bar-name[title]"
+							},
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-horizontal-bar-endTime"
+								],
+								"when": "计时类型含天（hasDay）并且 endTime 能格式化成有效日期时才有；值是 dayjs(endTime).format('YYYY-MM-DD')",
+								"desc": "截止日期，带 title。less 已给 font-size 10 / opacity 0.6 / margin:auto 0；系统样式的 dateText 写在这一层。",
+								"chain": "div.ebcoms-horizontal-bar-endTime[title]"
+							}
+						]
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-horizontal-bar-right"
+						],
+						"desc": "右侧数字区（text-align:right / display:flex / flex:1 / justify-content:flex-end / align-items:center）。这一层不带端类名，靠父级 all 上的端类名区分。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-horizontal-bar-single"
+								],
+								"when": "每个时间单位一个",
+								"desc": "一个单位（flex 居中）。less 已给 PC min-height:calc(var(--hd) * 28)；Mobile 改成竖排 flex-wrap + margin-right:10px。",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-horizontal-bar-single-num"
+										],
+										"desc": "数字外框（less 已给 background rgba(255,255,255,0.15) / border-radius 6px / flex / 居中，PC min-width:calc(var(--hd) * 46)、Mobile 45），里面一个 span 装数字（font-size 18 / margin 5px）。系统样式的 timingText 与 timingBackgroundColor 都写在这一层（timingText 会带 padding-right:0.2*字号 的斜体补偿）。",
+										"chain": "div.ebcoms-horizontal-bar-single-num > span"
+									},
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-horizontal-bar-single-unit"
+										],
+										"desc": "单位名，带 title（font-size 10 / color #ffffff / 字距 0.36px / margin 0 5px；Mobile 下 margin-top:3px）。系统样式的 labelText 写在这一层。"
+									}
+								]
+							}
+						]
+					}
+				],
+				"tips": [
+					"横条渐变底色不在本树里，而在 datasWrap 的 .ebcoms-count-down-com-horizontal-bar 上；less 把渐变写在 .ebcoms-count-down-content.PC 与 .ebcoms-count-down-content.Mobile 两个分支下（PC 圆角 20px + padding 10px，Mobile 圆角 10px），覆盖时两套端都要顾",
+					"系统样式的 backgroundColor 生成的选择器是 .ebcoms-count-down-content .ebcoms-count-down-com .ebcoms-count-down-com-horizontal-bar；传 transparent 时源码会退化成默认渐变（且缺花括号，属于已知实现细节，别依赖它）",
+					"所有类名都没有 count-down 字样，搜索定位时用 horizontal-bar",
+					"endTime 只在含天的计时类型下出现；数值截断规则同其它样式（见 shared.single）"
+				]
+			}
+		]
+	},
+	"timecircles": {
+		"when": "comRoot 上样式类为 TimeCircles（内置样式 51，环形式）",
+		"prefixChain": "div.ebcoms-count-down-content.{PC|Mobile}.content > div.ebcoms-count-down-com.TimeCircles.{PC|Mobile} > div.ebcoms-count-down-com-datas > 本树根",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-count-down-time-circles-all"
+				],
+				"desc": "环形式根（flex 居中 / flex-wrap / padding:8px 0，less 已给）。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-count-down-time-circles-name"
+						],
+						"when": "data.name 非空时才有",
+						"desc": "名称行（flex / 居中 / margin:16px 0 / font-size 14 / width:100%），里面是 div.name[title]（less 已给 ellipsis 与 padding-right:10px）；Mobile 下 less 把宽度收成 calc(100% - 16px)。",
+						"chain": "div.ebcoms-count-down-time-circles-name > div.name"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-count-down-time-circles",
+							"{Pc|Mobile}"
+						],
+						"desc": "圆环容器（flex 居中 / flex-wrap）。端类名是小写 Pc。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-count-down-time-circles-single",
+									"ebcoms-count-down-time-circles-{day|hour|minute|second}"
+								],
+								"when": "每个时间单位一个（最多 4 个）",
+								"desc": "一个单位的外框，固定 70x70（less 已给 padding:0 3px / margin:0 auto / display:inline-block）。第二个类是按单位拼出来的（day/hour/minute/second），源码里为它准备了圆环配色钩子。",
+								"children": [
+									{
+										"tag": "svg",
+										"desc": "圆形进度条本体（common/style/timeCircles/circularProgressBar.tsx），viewBox='0 0 70 70'，里面四个子节点依次是背景圆、进度圆、单位文字、数字文字。没有类名挂在 svg 上。",
+										"children": [
+											{
+												"tag": "circle",
+												"class": [
+													"circle-background"
+												],
+												"desc": "背景圆（less 已给 fill:none / stroke:#ddd）。系统样式的 circleBackgroundColor 写在这一层。"
+											},
+											{
+												"tag": "circle",
+												"class": [
+													"circle-progress"
+												],
+												"desc": "进度圆，颜色与进度用行内 style（strokeDasharray / strokeDashoffset / stroke=单位色，transform 从 12 点方向起算），less 已给 fill:none / stroke-linecap / stroke-linejoin / transition:stroke-dashoffset 1s linear。系统样式的 circleColor 通过 .ebcoms-count-down-time-circles-{单位} .circle-progress 写值（带 !important），覆盖时注意权重。"
+											},
+											{
+												"tag": "text",
+												"class": [
+													"circle-labelText"
+												],
+												"desc": "单位名（天/时/分/秒），定位用 x='50%' y='35%' dy='.3em' textAnchor='middle'。注意它是 svg text，改颜色用 fill/stroke 而不是 color；less 里这条规则重复写了两遍（内容相同）。系统样式的 labelText 会同时写文字属性与 stroke。"
+											},
+											{
+												"tag": "text",
+												"class": [
+													"circle-timingText"
+												],
+												"desc": "数字，x='50%' y='65%'。系统样式的 timingText 写在这一层（会带 stroke=color）。"
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				],
+				"tips": [
+					"circle-background / circle-progress / circle-labelText / circle-timingText 都是组件自己写的裸类名（无前缀），一个页面里若有多套主题可能互相影响，写样式建议带祖先 .ebcoms-count-down-time-circles",
+					"less 里 .container 与时间单位类（ebcoms-count-down-time-circles-day 等）没有对应规则，前者是死规则，后者只被样式生成器使用",
+					"圆环尺寸固定 70x70（出现在 less 与 svg 的 sqSize/strokeWidth 里），要改大小必须同时改 svg 的 viewBox 相关取值 —— 只改 CSS 宽高会拉伸图形"
+				]
+			}
+		]
+	},
+	"notes": [
+		"三类前缀要分清：ebcoms-* 是组件自己写的；ebcom-* 是引擎外壳与标题栏（本组件源码搜不到）；ui-* 来自 @weapp/ui（Icon / Switch）。另外还有一批裸类名：countDownCentre（组件自己写的 camelCase，无前缀）、digital / front / back / name / number{N} / circle-* / content / PC / Mobile / Pc。",
+		"命名坑合集（最容易写错）：新版翻牌式是 countDown-（驼峰）+ flip-clock-new / flippers-new / flipper-new（双 p）；旧版是 count-down-（连字符）+ flip-clock / flipers / fliper（单 p）；其余样式一律 count-down-。横条式（horizontal-bar-*）与日历式（calendar-style-*）的类名甚至完全不含 count-down。",
+		"端类名两种写法混用，必须逐个核对：content 与 comRoot、calendar-style、horizontal-bar-all / horizontal-bar-left 用大写 PC；flip-clock（新旧两式）、time-circles、fliper / flipper-new 用小写 Pc；card 只在 card-item 上挂 Mobile（PC 无类）。写跨端选择器时不要统一写 .PC 或 .Pc。",
+		"六棵子树互斥，由 comRoot 上的样式类决定（FlipClockNew 是默认值）。同一个页面可以同时存在不同样式的实例，此时公共祖先只有 #<comId> 与 .ebcoms-count-down-content，所有更深层的选择器都要带上样式类才好限定。",
+		"已有 less 钩子不要重复写：common/index.less（content 槽 flex 居中、com 与 datas 的 margin、FlipClockNew 的 100% 宽）、flipClockNew.less 与 flipClock.less（名称行、牌组间距、端类差异）、flipperNew.less 与 flipper.less（牌尺寸/圆角/底色/翻页 keyframes）、card/index.less（卡片、分隔冒号、间距）、calendarStyle/index.less（白底圆角、字号间距、图标色）、horizontalBar/index.less（渐变底、数字外框）、timeCircles/index.less（圆环与文字）、SkipHoliday/index.less（开关文案与间距）。",
+		"系统样式库（50/51/109/110/190/192）与自定义 codeSource 都走 common/getCountDownStyles.ts 生成，作用域是 #<comId>.ebcom。自定义代码里的 .ebcoms-com-countDown 与 .ebcom-countDown 这两个「作用域类」会被剥掉（源码常量 comScopeCls 与 ebcomPrefix-countDown），DOM 上并没有这两个类，别拿它们当选择器。",
+		"样式生成器写入的选择器（改色/改字优先复用，避免权重打架）：cardColor → 新旧翻牌的 .digital:before/:after；cardText → .ebcoms-count-down-fliper / .ebcoms-countDown-flipper-new（字号 >=52 给 Mobile 补 line-height:normal，>=72 给新版补 padding:0 12px）；circleColor → .ebcoms-count-down-time-circles-{单位} .circle-progress（!important）；circleBackgroundColor → .ebcoms-count-down-time-circles .circle-background；backgroundColor → datasWrap 的 .ebcoms-count-down-com-horizontal-bar；cardBackgroundColor / cardBorder / cardTimingText → .ebcoms-count-down-card-item 及其子节点；titleText → 六种样式各自的名称节点；dateText → .ebcoms-horizontal-bar-endTime；timingText / labelText / timingBackgroundColor → 各样式的数字与单位节点（环形式写的是 svg text 的 stroke）。",
+		"数据侧注意：单位是否渲染由 timingType 决定（types.ts 的 hasDay/hasHour/hasMinute/hasSecond），顺序恒为 天 → 时 → 分 → 秒；含天的计时类型里 day/hour/minute 会被 getSingleTime 做进位补位（多 1），所以页面上的数字不总是纯 floor 结果 —— 这只影响文本，不产生额外节点。",
+		"计时未到 beginTime（配置了 beginTime 且当前时间早于它）时组件会「静置」显示初始时长，此时 DOM 与正常倒计时完全一致，只是数字不刷新；归零后 clearInterval，节点保留。",
+		"运行态与设计态的 DOM 差异只有两处：外壳 class（ebcom-view vs ebcom-design，设计态还多 mask）与标题栏按钮的渲染条件（运行态要 hasOpenOperatBtn 即按钮 isOpen 才渲染「跳过节假日」，设计态 titleEnabled 即渲染）。内容槽及其下的六棵子树完全一样，所以样式可以在两个态之间复用。",
+		"设计器右侧属性面板（config/CountDownSetting 与 CountDownSettings.tsx 产生的 ebcoms-count-down-setting* 类名、排序用 react-sortable-hoc）不属于组件 DOM，不在页面里渲染，别拿它定位组件。",
+		"反查源码：外壳与内容槽在 weapp-ebdcoms/src/components/core/view/createView.tsx（renderView/renderContent）与 design/createDesign.tsx（renderDesign/renderContent）、view/Content.tsx；外壳类名在 core/utils/comp.ts 的 getClassName；组件骨架在 common/countDownCom.tsx（comRoot / datasWrap / 样式分派 getStyleType）与 common/CountDownSingle.tsx；六种样式在 common/style/ 下；跳过节假日开关在 constants.ts 与 common/SkipHoliday/index.tsx；已有样式在 common/index.less 与各 style/*.less；样式生成器在 common/getCountDownStyles.ts。"
+	]
+}

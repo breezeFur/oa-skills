@@ -1,0 +1,162 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "d825627d4f64441795767faa35e77d68",
+        "type": "ProgressChart",
+        "package": "@weapp/ebddatacoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "a3939769ccb84cd8a6b4ecfbf1ddc7cf",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "进度条",
+          "type": "ProgressChart",
+          "title": "进度条",
+          "titleEnabled": true,
+          "rangeColor": [
+            {
+              "min": {
+                "disable": false,
+                "value": 0
+              },
+              "max": 20,
+              "color": "#ff4d4f"
+            },
+            {
+              "min": {
+                "disable": true,
+                "value": 20
+              },
+              "max": 60,
+              "color": "#faad14"
+            },
+            {
+              "min": {
+                "disable": true,
+                "value": 60
+              },
+              "max": 100,
+              "color": "#5474ff"
+            }
+          ],
+          "dataset": "80",
+          "denominator": "100",
+          "showText": true,
+          "showName": false,
+          "valueType": "resultValue",
+          "layout": {
+            "i": "a977a71e973140d6960e374e3c40c181",
+            "x": 5,
+            "y": 118.9090909090909,
+            "w": 4,
+            "h": 15,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1369
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,13",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ProgressStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebddatacoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "a3939769ccb84cd8a6b4ecfbf1ddc7cf",
+        "type": "ProgressChart",
+        "package": "@weapp/ebddatacoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "d825627d4f64441795767faa35e77d68",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "进度条",
+          "type": "ProgressChart",
+          "title": "进度条",
+          "titleEnabled": true,
+          "rangeColor": [
+            {
+              "min": {
+                "disable": false,
+                "value": 0
+              },
+              "max": 20,
+              "color": "#ff4d4f"
+            },
+            {
+              "min": {
+                "disable": true,
+                "value": 20
+              },
+              "max": 60,
+              "color": "#faad14"
+            },
+            {
+              "min": {
+                "disable": true,
+                "value": 60
+              },
+              "max": 100,
+              "color": "#5474ff"
+            }
+          ],
+          "dataset": "80",
+          "denominator": "100",
+          "showText": true,
+          "showName": false,
+          "valueType": "resultValue",
+          "layout": {
+            "i": "c3df46bbead44f7485c5035042dc2c39",
+            "adaptive": true,
+            "h": 15,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": []
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,13",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ProgressStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebddatacoms"
+      }
+    ]
+  }
+]

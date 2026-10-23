@@ -1,0 +1,515 @@
+{
+  "component": {
+    "name": "calendar（日历 / 日程组件）",
+    "pkg": "@weapp/ebddatacoms · src/components/calendar",
+    "entries": "6 个入口：Config / Design / DesignM / View / MView / Engine。Design、DesignM 只是薄壳（注入 isDesign + isMobile 后渲染 view/View.tsx、view-m/View.tsx），自己不出 DOM。真正出 DOM 的是 View / MView / Engine，加引擎自带的配置面板。",
+    "prefixes": {
+      "weapp-ebddatacoms": "组件统一前缀（常量 ebddatacomsClsPrefix）",
+      "weapp-ebddatacoms-calendarv": "「日历视图」模式专用前缀（常量 calendarViewClsPrefix）",
+      "weapp-ebddatacoms-date-common": "「卡片 / 主题日历」模式的根类",
+      "ebcom- / ebcoms-": "引擎层（@weapp/ebdcoms），不在本组件源码里",
+      "ui-": "@weapp/ui（第三方）",
+      "fc-": "FullCalendar —— @weapp/ui 内置的 fork 版（第三方）"
+    }
+  },
+  "usage": "按 pickTree 选树 → 按语义找节点 → 取 id / class 写选择器。所有树都嵌在 root 的引擎外壳里，官方做法是用 #<comId> 限域。desc 已标注来源：组件层可改源码，引擎层 / 第三方只能写选择器。",
+  "legend": {
+    "[cls]": "条件类名 —— 条件成立时才出现",
+    "{a|b}": "多选一 —— 同一时刻最多出现其中一个（也可能都不出现）",
+    "a > b": "合并两层 —— 中间是无 class 的纯布局 div（b 是 a 的直接子元素）",
+    "ref": "引用 shared.<key> 里的复用片段",
+    "<comId>": "组件实例 id（引擎注入），写选择器时换成真实值，如 #com_1234",
+    "引擎层": "来自 @weapp/ebdcoms 的 createView / createDesign，不在日历源码里",
+    "组件层": "日历源码自己写的 className，可直接定位",
+    "第三方": "@weapp/ui（含其 fork 版 FullCalendar）产出。可以写选择器但改不了源码，能介入的只有传进去的 className / popupClassName",
+    "裸类名": "无前缀短类名（agendas-empty / date-selected / week-day / text / date …），也是源码写的，但极易与第三方撞名 —— 用的时候务必带祖先限域",
+    "weid": "引擎注入的自定义属性（DOM 上是小写 weid），值为「父级路径 + 源码写死的 6 位后缀」，如 weid=\"<comId>_qks4hh\"。可当锚点，但源码改行号会失效"
+  },
+  "pickTree": {
+    "1 看入口": "设计器右侧属性面板 = configPanel；设计器 / 页面里渲染组件 = View（PC）或 MView（移动）；门户里的日历视口 = engineView",
+    "2 看 config.dataset": "有 dataset = 单数据源；没有 dataset = 多数据源（新版，走 multiple）",
+    "3 看 config.calendarType": "'2'（CALENDAR 日历视图）→ viewCalendar；其余 12 个主题值 → calendarCard",
+    "组合结果": "有 dataset + '2' → viewCalendar；有 dataset + 非 '2' → calendarCard；无 dataset → multiple（内含 view / card 两块，类名高度重合，只看差异清单）",
+    "弹窗浮层": "任何分支都可能叠加 popups 里的节点（SysCreateDialog、事项 hover 卡、筛选弹窗、more 弹层）",
+    "移动端": "类名与 PC 基本一致，根上多一个 mobile 条件类；移动端没有「日历视图」分支，只有卡片模式（view-m/View.tsx 只分派卡片）",
+    "不确定时": "看根 class：.weapp-ebddatacoms-calendarv-container = viewCalendar / multiple(view)；.weapp-ebddatacoms-date-common = calendarCard / multiple(card)；.weapp-ebddatacoms-view-calendar-main = engineView"
+  },
+  "root": {
+    "desc": "引擎外壳 + 入口分派，不在日历源码里 —— 来自 @weapp/ebdcoms 的 createView.tsx（PC 运行时）与 createDesign.tsx（设计器）。写样式时用 #<comId> 限域是官方做法。",
+    "tag": "div",
+    "id": "<comId>",
+    "class": "ebcom ebcom-calendar ebcom-{grid|flow|excel} ebcom-view [has-no-header] [ebcom-m] [standalone] [content-no-padding] [event-action-click]",
+    "tips": [
+      "ebcom-<layoutType> 随页面布局变：ebcom-grid / ebcom-flow / ebcom-excel（取 page.layoutType 小写）",
+      "日历 Design 默认 titleEnabled: false、footerEnabled: false → 默认没有 .header / .footer，且外壳一定带 has-no-header",
+      "ebcom-m = 移动端页面；standalone / content-no-padding / event-action-click 是条件类，日历默认都不出现",
+      "组件外面还有设计器的一层卡片 div（class 含 weapp-ebpv-com-child，属性是 data-id / data-type，没有 id），再外面是页面层 #ebpage_<pageId> —— 这两层别用来定位组件自身"
+    ],
+    "children": [
+      {
+        "tag": "div",
+        "class": "header",
+        "desc": "引擎层，仅 titleEnabled=true 时渲染。内部的 .ebcom-title / .ebcom-title-richtext（标题）、.ebcoms-header-btns（按钮容器）、.ebcom-no-right-mask、.ebcom-display-none 也全在引擎里。",
+        "when": "titleEnabled=true"
+      },
+      {
+        "tag": "div",
+        "class": "content",
+        "desc": "引擎层，日历主体全挂这里。本层带 weid=\"<comId>_79849n_7jd0rz\"（引擎注释：兼容已有客户通过 weid 设样式）。",
+        "tips": "外壳 #<comId> 只有 id 没有 weid —— 别在它上面取 weid",
+        "children": [
+          { "desc": "↓ 这一层挂什么由入口决定：View / MView → 落到 viewCalendar / calendarCard / multiple 之一；Engine → engineView；Config → 日历只出配置 schema，DOM 由引擎面板渲染（见 configPanel）；Design / DesignM → 同 View，只是根上多 is-design" },
+          {
+            "tag": "div",
+            "class": "weapp-ebddatacoms-lazyLodingEmpty weapp-ebddatacoms-lazyLoadingEmpty",
+            "desc": "空配置兜底态，外面包一层 @weapp/ui Spin。源码同时挂了两个拼写变体：lazyLodingEmpty（少 a）与 lazyLoadingEmpty。",
+            "when": "config 为空 / isEmpty(config)"
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "class": "footer",
+        "desc": "引擎层，仅 footerEnabled=true 时渲染。内部按钮容器是 .ebcoms-footer-btns（前缀 ebcoms 不是 ebcom）。",
+        "when": "footerEnabled=true"
+      }
+    ]
+  },
+  "shared": {
+    "fcSkeleton": {
+      "desc": "第三方 · 「日历视图」的画布，来自 @weapp/ui 的 Calendar（内部是 fork 版 FullCalendar）。CalendarContent 只透传 props，DOM 全由这个库产生。",
+      "chain": "div.weapp-ebddatacoms-calendarv-content > div.ui-calendar > div#calendar-container.fc-calendar-container.ui-calendar-calendar-container > div.fc.fc-media-screen.fc-direction-ltr.fc-theme-standard > div.fc-view-harness.fc-view-harness-active > div.fc-{view}-view.fc-view",
+      "tips": [
+        "唯一真实 id：#calendar-container",
+        "view 根 div 随 mode 变：月 = fc-dayGridMonth-view、双周 = fc-doubleWeek-view、周 = fc-timeGridWeek-view、日 = fc-timeGridDay-view。前两个内层是 .fc-daygrid，后两个是 .fc-timegrid",
+        "Calendar 固定 headerToolbar: false → 永远没有 .fc-toolbar / .fc-button",
+        "不支持年视图（mode 只有 month / week / doubleWeek / day）；titlePopverVisible prop 已废弃，不产 DOM",
+        "已有 less（calendar-view/style/index.less）：.fc-timegrid .fc-event 左侧色条、.fc-daygrid-day-events a、.fc-popover-body、.fc-daygrid-more-link、.fc-dayWeek-panel-count"
+      ],
+      "children": [
+        {
+          "desc": "月 / 双周模式的表格骨架（叶子链，可整条拿来写选择器）：",
+          "chain": "div.fc-daygrid > table.fc-scrollgrid.fc-scrollgrid-liquid > thead > tr.fc-scrollgrid-section-header.fc-scrollgrid-section-sticky > td > div.fc-scroller-harness > div.fc-scroller > table.fc-col-header > thead > tr > th.fc-col-header-cell.fc-day.fc-day-{sun..sat}[.fc-day-today][.fc-day-past|.fc-day-future][.fc-day-other]",
+          "tips": [
+            "星期行单元格同时带 .fc-day 和 .fc-day-{sun..sat}，与日期格共用『今天 / 过去 / 未来 / 其他月』修饰类",
+            "内部：div.fc-scrollgrid-sync-inner > a.fc-col-header-cell-cushion[.fc-sticky] > (div.fc-col-header-cell-text | div.fc-col-header-cell-wrap > span.fc-col-header-cell-text + div.fc-day-sign-icon-wrap)",
+            "本组件固定传 renderWeekTopTitle → 一定走自定义分支，文案是「周一 9-15」这种格式"
+          ]
+        },
+        {
+          "desc": "月 / 双周模式的日期单元格（叶子链）：",
+          "chain": "table.fc-scrollgrid-sync-table > tbody > tr > td.fc-daygrid-day.fc-day.fc-day-{sun..sat}[.fc-day-today][.fc-day-other][.fc-multi-selected] > div.fc-daygrid-day-frame.fc-scrollgrid-sync-inner > div.fc-daygrid-day-top",
+          "tips": [
+            ".fc-multi-selected 是运行时用 classList.add 加在 td.fc-day 上的（多选高亮），CSS 里搜不到但真实存在",
+            "td 上有 data-date 属性，可用 [data-date=\"2026-09-17\"] 精确定位某一天"
+          ],
+          "children": [
+            { "tag": "a", "class": "fc-daygrid-day-number", "desc": "日期数字（第三方）" },
+            { "tag": "div", "class": "fc-day-sign fc-day-sign-text", "desc": "节假日「休 / 班」文字标记（第三方），带内联 style 的 color / background" },
+            { "tag": "div", "class": "fc-day-sign fc-day-sign-textBox", "desc": "休息日角标底色（第三方）" },
+            { "tag": "div", "class": "fc-day-sign-icon-wrap > svg.fc-day-sign.fc-day-sign-icon", "desc": "节假日图标（第三方，xlink:href 指向 Icon-Rest-mcolor / Icon-work-mcolor）" },
+            { "tag": "div", "class": "fc-day-cnDate-wrap > div.fc-day-cnDate", "desc": "农历 / 节日 / 节气文字（第三方）。hideLunar=true 时仍渲染，只是内容为空 —— 别靠元素存在性写样式" },
+            { "tag": "div", "class": "fc-daygrid-day-events", "desc": "事项区（第三方）。里面每条是 div.fc-daygrid-event-harness > a.fc-daygrid-event…" },
+            { "tag": "div", "class": "fc-daygrid-day-bottom", "desc": "「更多」区（第三方），见下面的 moreLink" },
+            { "tag": "div", "class": "fc-daygrid-day-bg", "desc": "背景层（第三方）" }
+          ]
+        },
+        {
+          "desc": "周 / 日模式的时间网格骨架（叶子链）：",
+          "chain": "div.fc-timegrid > div.fc-timegrid-slots / div.fc-timegrid-cols > table > td.fc-timegrid-col[.fc-day-today] > div.fc-timegrid-col-frame > div.fc-timegrid-col-events",
+          "tips": [
+            "左侧刻度：div.fc-timegrid-slot.fc-timegrid-slot-label > div.fc-timegrid-slot-label-frame > div.fc-timegrid-slot-label-cushion（文案由 slotLabelFormat 决定，只显示 HH:mm）",
+            "轴列：th.fc-timegrid-axis > div.fc-timegrid-axis-frame > a.fc-timegrid-axis-cushion",
+            "当前时间线（nowTimeline=true）：div.fc-timegrid-now-indicator-container > div.fc-timegrid-now-indicator-line / div.fc-timegrid-now-indicator-arrow",
+            "周 / 日模式的星期行同样用 th.fc-col-header-cell.fc-day.fc-day-{dow}"
+          ]
+        },
+        {
+          "tag": "a",
+          "class": "fc-daygrid-event{fc-daygrid-block-event|fc-daygrid-dot-event}.fc-h-event.fc-event [fc-event-start] [fc-event-end] [fc-event-draggable] [fc-event-selected] [fc-event-past] [fc-event-future]",
+          "desc": "第三方 · 事项节点。月 / 双周 / 全天行是这种（fc-h-event）；周 / 日的时间格里是 a.fc-timegrid-event.fc-v-event.fc-event。外面包一层 div.fc-daygrid-event-harness 或 div.fc-timegrid-event-harness。",
+          "tips": [
+            "⚠️ 本组件用 eventContent 覆盖了渲染 → .fc-event-main-frame / .fc-event-title-container / .fc-event-title / .fc-event-time 永远不会出现，正文直接注入 div.fc-event-main",
+            "正文两种形态：纯标题（HTML 字符串），或「人力资源」模式下的人名 div[style=\"white-space:normal\"] > a（点人名弹 HR 卡）",
+            "底色 / 边框是内联 style（backgroundColor 由 rgba(...,0.4) 算出来）不是 class；事件根也不会带 items 里传入的自定义 class（颜色只走内联）",
+            "已有 less：.weapp-ebddatacoms-calendarv .fc-timegrid .fc-event { border-width: 0 0 0 4px } + .fc-event-main { padding-left }"
+          ]
+        },
+        {
+          "desc": "「更多」链接（moreLink）—— 月 / 双周 与 周 / 日 结构不同：",
+          "value": [
+            "月 / 双周：div.fc-daygrid-day-bottom > a.fc-daygrid-more-link > div[style=\"display:inline-block\"]（文案是纯数字）",
+            "周 / 日：div.fc-dayWeek-panel.fc-daygrid-day-bottom > a.fc-daygrid-more-link > span.fc-dayWeek-panel-count（数字写死在这个 span 里，不吃 moreLinkContent）"
+          ],
+          "tips": ".fc-dayWeek-panel / .fc-dayWeek-panel-count / .fc-popover-weeklabel / .fc-more-popover-misc 都是这个 fork 版新增的类，官方 FullCalendar CSS 里没有 —— 网上搜不到但真实存在"
+        },
+        {
+          "tag": "div",
+          "class": "fc-popover.fc-more-popover.fc-day.fc-day-{dow} [fc-day-today] [fc-day-other]",
+          "desc": "第三方 · 点「+more」弹出的当日事项浮层。结构：div.fc-popover-header > span.fc-popover-title + span.fc-popover-close.fc-icon.fc-icon-x；然后 div.fc-popover-weeklabel；最后 div.fc-popover-body（内含 div.fc-more-popover-misc + 若干 div.fc-daygrid-event-harness）。",
+          "tips": "已有钩子：.weapp-ebddatacoms-calendarv-content .fc .fc-popover-body { max-height: 350px; overflow: auto }"
+        }
+      ]
+    },
+    "uiAppend": {
+      "desc": "第三方 · @weapp/ui 组件的 className 拼接规则：传给它们的 className / dropdownClassName / popupClassName 会拼到组件自己的类后面，所以最终元素上是多个类并存。",
+      "children": [
+        { "tag": "button", "class": "ui-btn ui-btn-{primary|default|success|warning|danger|link} ui-btn-{large|middle|small} ui-btn-inline [+ 你传的 className]", "desc": "Button。type='link' 时渲染成 a。日历里只出现在新建按钮和 IE 提示按钮上。" },
+        { "tag": "span", "class": "ui-icon ui-icon-wrapper [+ 你传的 className]", "desc": "Icon 的外层 span；内层是 svg.ui-icon-{xs|sm|md|lg}.ui-icon-svg.{图标名}。让图标变色要同时改外层 span 和内层 svg。" },
+        { "tag": "div", "class": "ui-spin-nested-loading > div.ui-spin-container", "desc": "Spin（嵌套模式）。⚠️ 传给它的 className 落在更内层的 div.ui-spin 上，那层只有 spinning === true 时才渲染 —— 想让容器在两种状态下都有样式，就挂 .ui-spin-nested-loading / .ui-spin-container。中间还有个无 class 的 div 会撑不住高度，已有 less 给这两层补了 height:100%。" },
+        { "tag": "div", "class": "ui-trigger-popupInter-container > div.ui-trigger-popupInner[.ui-trigger-popupInner-visible] > div.ui-trigger-popupInner-childrenDiv > div.ui-popover.ui-popover-tooltip.ui-popover-{placement} > div.ui-popover-arrow + div.ui-popover-content", "desc": "Popover / Help / Trigger 的弹层链路。弹层被 Portal 挂到 body 下（中间有一个无 class 的 div）。自定义类要通过 triggerProps.popupClassName 传，才会落到 div.ui-trigger-popupInner 上。", "tips": "Trigger 本身不包一层 —— 传给 Trigger 的 className 会 merge 到它的 child 元素上（日历新建按钮就是这种情况，见 calendarCard 的 createBtn）" },
+        { "desc": "其余高频内部类：Select / MSelect → .ui-select-input / .ui-select-option / .ui-select-dropdown / .ui-input-wrap（已有 less：.weapp-ebddatacoms-mode-change-select .ui-select-input.is-focus / :hover / .ui-select-input-selected / .ui-select-option.is-active）；Menu → .ui-menu.ui-menu-{select|tab}.… / .ui-menu-list-item[.ui-menu-list-item-active]；Dialog → .ui-dialog-body-container / .ui-title-inDialog / .ui-dialog-content-right / .ui-dialog-wrap" }
+      ]
+    },
+    "themeMap": {
+      "desc": "主题（config.calendarType）→ 两套类名。kebab 那套挂在卡片树根 .weapp-ebddatacoms-date-common 上（common.ts 的 calendarTypeToClassNameMap_old）；全大写那套拼在 Header / selectWrap / modeButton / calendarMain 等子元素后缀上（calendarTypeToClassNameMap）。",
+      "value": {
+        "1 CARD 简易版（默认）": "default-style / DEFAULT",
+        "2 CALENDAR 日历视图": "calendar-style / CALENDAR（这个值走 viewCalendar 树，根不是 date-common，所以 calendar-style 实际不会出现在页面上）",
+        "119 SIMPLESTYLE 简约风格": "simple-style / SIMPLESTYLE（唯一走 -workplan-default_simple_item 卡片结构的分支）",
+        "120 REDSTYLE 红色风格": "red-style / REDSTYLE",
+        "121 GREENSTYLE 绿色风格": "green-style / GREENSTYLE",
+        "122 BLUESTYLE 蓝色风格": "blue-style / BLUESTYLE（用 .date-dot 红点）",
+        "123 LIGHTBLUESTYLE 淡蓝色风格": "light-blue-style / LIGHTBLUESTYLE",
+        "124 WEEKGOVERNSTYLE 一周日程-传统政务": "week-govern-style / WEEKGOVERNSTYLE（只有周模式，上午 / 下午分段 + .agendas-label）",
+        "125 WEEKGRAYSTYLE 一周日程-银灰质感": "week-gray-style / WEEKGRAYSTYLE（PC 用 FullCalendar 排程，唯一用 .fc-* 的卡片主题）",
+        "126 WEEKPURPLESTYLE 一周日程-香芋紫": "week-purple-style / WEEKPURPLESTYLE（竖排周布局，createBtn 在 workplan 内部）",
+        "127 WEEKGREENSTYLE 一周日程-清新绿": "week-green-style / WEEKGREENSTYLE（与香芋紫类名集合完全一致，只有色值不同）",
+        "128 BLUENOTESTYLE 一周日程-蓝色便签": "blue-note-style / BLUENOTESTYLE（只有月面板，强制 innerMode='month'）",
+        "129 REDNOTESTYLE 一周日程-红色便签": "red-note-style / REDNOTESTYLE（同蓝色便签，类名集合一致）",
+        "命中不了任一值": "custom-style（无大写后缀）"
+      },
+      "tips": [
+        "主题类只在卡片树根上；日历视图树（calendarv）不看主题，所以「给日历视图换主题色」这条需求落不到这里",
+        "note-blue 与 note-red 的 class 集合完全相同；week-list-green 与 week-list-purple 也完全相同 —— 差异只在色值",
+        "simple-default.less 同时挂了 .simple-style 和 .custom-style，是未知主题的兜底样式源"
+      ]
+    },
+    "leftGroup": {
+      "desc": "左侧分组筛选栏，由本仓库 common/left-right-layout 用 @weapp/ui 的 Layout / Layout.Box 搭出来。日历视图树（viewCalendar / multiple 的 view 模式）独有。",
+      "chain": "div.ui-layout[.ui-layout-has-side][.weapp-ebddatacoms-left-right-layout] > div.ui-layout-{side|content}.layout-box-block.{side-inner-left-col|content-col} > div.ui-layout-box.{weapp-ebddatacoms-left-right-layout-left|weapp-ebddatacoms-left-right-layout-right}",
+      "tips": [
+        "Box 渲染两层：外层 BoxBlock 是 .ui-layout-{side|content}.layout-box-block.{side-inner-left-col|content-col}（业务 className 不在这一层），内层才是 .ui-layout-box + 业务 className",
+        "hasLeftGroup=false 时左侧整块不存在，且根上的 .weapp-ebddatacoms-left-right-layout 会因为传给不消费 className 的 BoxBlock 而丢失 —— 别拿它当锚点",
+        "hasLeftGroup=true 时左侧宽度由内联 style.width 控制（默认 200）；leftMenuDatas 为空时左侧仍有个空盒子，但不渲染 .view-left-menu"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "class": "view-left-menu ",
+          "desc": "左侧分组菜单根（注意 class 串末尾带一个空格）。内部：div.ui-menu.ui-menu-tab.ui-menu-hasmore.ui-menu-tab-top.view-left-menu-content-tab（只有一个分组时额外加 single-menu）、div.view-left-menu-content；具体分组筛选组件（EmployeeSearch / DepartmentSearch / EBuilderSearch / SelectExpendCustom）的常见容器是 .view-left-menu-select-list。",
+          "when": "leftMenuDatas.length > 0"
+        }
+      ]
+    },
+    "hoverCard": {
+      "desc": "「日历视图」里鼠标悬停事项时的详情气泡。由日历自己 ReactDOM.render 到 body 下的一个 div 里（不在组件 DOM 树内），Popover 的锚点是 span#calendar-popover。卡片模式不走这套，用 Popover 的 popupClassName='agendasPopoverPopup'。",
+      "children": [
+        { "tag": "span", "id": "calendar-popover", "desc": "Popover 锚点（真实 id）。样式里已被定位为 fixed + 透明 + pointer-events:none，可拿它做定位基准。" },
+        { "tag": "div", "class": "calendar-popver-measure[. calendar-popver-measure-<compId>]", "desc": "离屏测量容器（fixed，top / left 都在屏幕外）。里面还有手写的 div.ui-popover-arrow.ui-popover-arrow-bottom。" },
+        { "tag": "div", "class": "weapp-ebddatacoms-calendarv-content-popup", "desc": "气泡正文容器" },
+        { "tag": "div", "class": "ui-trigger-popupInner.calendar-textPopopverPopup.ui-popover-content.calendar-popver-<compId>", "desc": "气泡本体（popupClassName 拼上去的结果）。已有 less：.calendar-textPopopverPopup { opacity: .8; background-color: transparent; padding: 0 }" }
+      ]
+    },
+    "workItems": {
+      "desc": "卡片树右侧「事项列表」的条目。三类（日程 / 任务 / 联系提醒）的 wrapper 与 li 结构同构，只有中段内容不同。源码：calendar/components/{ListAgendas,ListTasks,ListReminds}.tsx（calendar-Multiple 下是同名副本，类名一致）。",
+      "chain": "div.weapp-ebddatacoms-date-content-workFlow-list > div.weapp-ebddatacoms-workplan-wrap.weapp-ebddatacoms-{agendas|tasks|reminds}[mobile] > li.weapp-ebddatacoms-workplan-item.weapp-ebddatacoms-{agendas|tasks|reminds}-item[mobile][has-start-time-span]",
+      "tips": [
+        "容器是 .weapp-ebddatacoms-date-content-workFlow-list —— workFlow 是大写 F",
+        "li 里的时间：span.start-time（仅竖排周主题且 !hideTimeSpan）",
+        "右端图标二选一：Icon（传 className='date-icon'）或 span.date-dot，由主题决定（green / light-blue / week-* 用 date-icon；blue / note-* 用 date-dot）",
+        "completed 条件类：提醒在 span.title 上（ListReminds）；日程的标题 / 时间在 calendar-Multiple 版本里还会多 -title-complete / -time-complete",
+        "simple 风格（SIMPLESTYLE / custom-style）走另一套：div.weapp-ebddatacoms-workplan-default_simple_item.weapp-ebddatacoms-workplan-default_simple_item-{agendas|task|remind} > -title + -time（只有 simple-default.less 覆盖）",
+        "week 风格中段是 div.text > span.title + span.date-month / div.right > span.date",
+        "移动端中段是 div.left.{agendas|task|remind} + div.time + div.detail > span[.completed]（li 上的 mobile 条件类保留，内容仍走 PC 结构）",
+        "条目弹层是 @weapp/ui Popover，popupClassName='agendasPopoverPopup'，已有 less：.agendasPopoverPopup .ui-popover-noMask .ui-popover-content"
+      ]
+    }
+  },
+  "viewCalendar": {
+    "desc": "树 ①｜日历视图（PC）。触发：config 有 dataset 且 calendarType === '2'（CALENDAR）。链路：view/View.tsx → calendar-view/CalendarView.tsx（CalendarMain）→ CalendarContent → @weapp/ui Calendar。",
+    "tips": [
+      "根没有 id，稳定锚点是 .weapp-ebddatacoms-calendarv-container",
+      "容器高度链路已由 less 处理：.weapp-ebddatacoms-calendarv-container 内的 .ui-spin-nested-loading / .ui-spin-container 都是 100%（原因见 shared.uiAppend 的 Spin）",
+      "移动端没有这棵树（view-m/View.tsx 只分派卡片模式）"
+    ],
+    "tag": "div",
+    "class": "weapp-ebddatacoms-calendarv-container",
+    "children": [
+      { "tag": "div", "class": "weapp-ebddatacoms-ie-title", "desc": "IE 提示条，内含一个 primary Button（没有额外类名）。", "when": "isIE && !window.HIDE_EB_CALENDAR_IE_TITLE" },
+      {
+        "tag": "div",
+        "class": "ui-layout … weapp-ebddatacoms-left-right-layout",
+        "desc": "左侧分组布局，结构见 shared.leftGroup。",
+        "children": [
+          {
+            "tag": "div",
+            "class": "ui-spin-nested-loading > div.ui-spin-container",
+            "desc": "Spin（无自定义 className），里面就是日历本体。",
+            "children": [
+              {
+                "tag": "div",
+                "class": "weapp-ebddatacoms-calendarv",
+                "desc": "日历视图主容器。position:relative、flex column、overflow:auto、padding-left: var(--h-spacing-lg)。无 id，但内部用它做高度 / 宽度测量的 ref（_observeResize）。",
+                "children": [
+                  {
+                    "tag": "div",
+                    "class": "weapp-ebddatacoms-calendarv-header",
+                    "desc": "顶部操作栏，flex 左右两区。已有 less：flex: 0 0 50px，左右区各 50px 高、space-between。",
+                    "children": [
+                      {
+                        "tag": "div",
+                        "class": "weapp-ebddatacoms-calendarv-header-left",
+                        "desc": "左侧（日期切换条 / 刷新 / 筛选 / 二开插槽）。",
+                        "children": [
+                          { "tag": "div", "class": "weapp-ebddatacoms-calendarv-header-left-timeline [weapp-ebddatacoms-calendarv-header-left-timeline-hide]", "desc": "日 / 周 / 月 / 双周切换条。来自 CorsComponent 拉的 @weapp/ebdform DateSelector，通过 tabCls prop 注入类名 —— 内部 DOM 不可控。", "tips": "已有 less：.weapp-ebddatacoms-calendarv .weapp-ebddatacoms-calendarv-header-left-timeline-hide { display: none } —— 隐藏模式切换就是加这个条件类（条件是 config.showViewModeChange 为 false 或 null 之外的值）" },
+                          { "tag": "span", "class": "weapp-ebddatacoms-calendarv-refresh-btn [weapp-ebddatacoms-calendarv-refresh-btn-loading]", "desc": "刷新按钮（内含 @weapp/ui Icon，name='Icon-Right-refresh'）。loading 态靠 -refresh-btn-loading 给 .ui-icon 加旋转动画（已有 less + @keyframes loading）。PC 下外面还包一层 @weapp/ui Help，移动端不包。" },
+                          { "tag": "div", "class": "weapp-ebddatacoms-calendarv-filter", "desc": "筛选区，内部二选一：FilterSearch（calendarIsEbDataSet 为真，来自本仓库 lib，内部不可控，前缀 weapp-ebddatacoms-filter-search）或 DatasetSearchCom（CorsComponent 拉 @weapp/ebdlist 的 FilterPanel，内部不可控）。", "tips": "已有 less：{ height:100%; display:flex; align-items:center; margin-left:16px }，并把内部 .weapp-ebddatacoms-filter-search-trigger / -foot-btns 的 margin-bottom 归零" },
+                          { "desc": "二开插槽 customRenderLeftHeaderAddContent 的返回值，放在筛选之后 —— 类名由二开方自己挂，无法预设。" }
+                        ]
+                      },
+                      {
+                        "tag": "div",
+                        "class": "weapp-ebddatacoms-calendarv-header-right",
+                        "desc": "右侧（新建按钮区）。三选一：单个 Button（type=primary，className='weapp-ebddatacoms-calendarv-header-right-btn'）｜Menu（type='select' selectType='btn'，多选新建）｜div.weapp-ebddatacoms-date-content-create.custom-create-button（二开自定义新建）。",
+                        "tips": "weapp-ebddatacoms-calendarv-header-right-right 与 -legend* / -legend-wrapper / -legend-more / -legend-popup 在 less 里有规则或空规则，但源码里 renderLegend 被注释掉了，当前 DOM 不会出现"
+                      }
+                    ]
+                  },
+                  {
+                    "tag": "div",
+                    "class": "weapp-ebddatacoms-calendarv-content",
+                    "desc": "日历画布容器。已有 less：height: 0; flex: 1 1 0; display:flex; flex-direction: column；并把内部 .ui-searchAdvanced-setting 隐藏、.ui-searchAdvanced-condition / -footer 圆角归零。",
+                    "when": "store.canInitViewContent 为真",
+                    "children": [
+                      { "ref": "shared.fcSkeleton", "desc": "日历本体（@weapp/ui Calendar / FullCalendar）" }
+                    ]
+                  },
+                  { "tag": "div", "class": "SysCreateDialog 展开的引擎弹窗", "desc": "日程 / 任务 / 联系提醒的新建与详情弹窗，内部是 CorsComponent 拉的 @weapp/calendar、@weapp/task、@weapp/crm —— 内部 DOM 完全不可控，见 popups。", "when": "store.isSystemType" }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      { "ref": "shared.hoverCard", "desc": "悬停详情气泡被 ReactDOM.render 到 body 下的独立 div 里（不在上面这棵树内），但逻辑上属于本树。" }
+    ]
+  },
+  "calendarCard": {
+    "desc": "树 ②｜卡片 / 主题日历。触发：config 有 dataset 且 calendarType !== '2'（13 个主题值里除 CALENDAR 外的 12 个，含默认的 '1'）。链路：view/View.tsx → calendar/{Calendar.tsx, components/CalendarHeader.tsx}。左侧是 @weapp/ui MCalendar（月面板），右侧是事项列表；一周日程系列则是周面板 + 时间线 / 排程。",
+    "tips": [
+      "根是本组件里唯一挂主题类的地方，主题相关样式一律从它起步",
+      "日历（左 / 上）与事项列表（右 / 下）都在 .weapp-ebddatacoms-date-content 里横向排；竖排周主题（香芋紫 / 清新绿）的 createBtn 被挪进 workplan 内部",
+      "整棵树没有真实 id；MCalendar 内部是 ui-m-calendar-*，不可控但可写选择器"
+    ],
+    "tag": "div",
+    "class": "weapp-ebddatacoms-date-common [mobile] [is-design] [show-lunar] [in-demo-manager] {week-start-mon|week-start-sun} <主题 kebab 类>",
+    "children": [
+      { "tag": "div", "class": "weapp-ebddatacoms-ie-title", "desc": "IE 提示条（primary Button，无额外类名）。", "when": "isIE && !window.HIDE_EB_CALENDAR_IE_TITLE" },
+      {
+        "tag": "div",
+        "class": "weapp-ebddatacoms-date-header-wrapper",
+        "desc": "头部外层。",
+        "children": [
+          { "tag": "div", "class": "weapp-ebddatacoms-date-header-title", "desc": "「一周日程」大标题。", "when": "calendarType ∈ {124 传统政务, 125 银灰质感}" },
+          {
+            "tag": "div",
+            "class": "weapp-ebddatacoms-date-header [mobile]",
+            "desc": "头部主体，flex 左右两区（已有 less 定义了高度与对齐）。",
+            "children": [
+              {
+                "tag": "div",
+                "class": "weapp-ebddatacoms-date-header-left [weapp-ebddatacoms-date-header-left-{isMobile|PC}] [weapp-ebddatacoms-date-header-left-PC-<n>] [-PC_isNotChinese] [-LIST]",
+                "desc": "左区内容随主题分配：模式切换（ModeButtons / Select）、年月切换（month-switcher）、农历面板（lunarPanel）。-PC-<n> 里的 n 是可见模式项个数（动态数字，如 -PC-3 / -PC-4），CSS 里不能穷举，要用前缀匹配或属性选择器。",
+                "tips": "各主题的左 / 右分配见右侧节点的 tips。模式切换相关类：weapp-ebddatacoms-mode-change-modeButtonsWrap[-PC|-isMobile|-{大写主题}]、-modeButton[-PC|-isMobile|-{大写主题}]、-selectWrap[-{大写主题}]、-select[-isMobile]、-select-dropdown[-{大写主题}]"
+              },
+              {
+                "tag": "div",
+                "class": "weapp-ebddatacoms-date-header-right [weapp-ebddatacoms-date-header-right-{isMobile|PC}] [-PC-<n>] [-PC_isNotChinese] [-LIST]",
+                "desc": "右区内容随主题分配。分配表（ThemeType → 左 / 右）：SIMPLESTYLE 模式切换 / 年月切换；REDSTYLE 农历面板 / 模式切换+年月切换；GREENSTYLE、BLUESTYLE 模式切换 / 年月切换；LIGHTBLUESTYLE 年月切换+模式切换 / 农历面板；WEEK-* 四种 年月切换 / 月份标题；BLUENOTESTYLE、REDNOTESTYLE 年月切换 / 农历面板。",
+                "tips": [
+                  "年月切换相关类：weapp-ebddatacoms-month-switcher[-pre|-next|-content|-datepicker][.multiple] / -current-week（内含 span.week-span 与注入的 span.week-number）/ -current-month",
+                  "datepicker 的类名有源码笔误：是 weapp-ebddatacoms-mode-switcher-datepicker-{month|week|day|doubleWeek} 和 -{大写主题}（mode-switcher 不是 month-switcher），照抄即可",
+                  "农历面板：weapp-ebddatacoms-lunar-date > -day（> div.day + div.date）+ -lunar（> div.lunar-date + div.lunar-year）"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "class": "weapp-ebddatacoms-date-content",
+        "desc": "内容区，flex column（mixin .themeContainerStyle 已定义 flex:1 1 auto; overflow:hidden）。内部固定两块：日历（左 / 上）+ 事项列表（右 / 下），外加新建按钮。",
+        "children": [
+          {
+            "tag": "div",
+            "class": "weapp-ebddatacoms-date-content-calendar.weapp-ebddatacoms-date-content-calendar-{month|week|doubleWeek}",
+            "desc": "日历面板外框，后缀是 innerMode（便签主题会被强制成 month）。",
+            "children": [
+              {
+                "tag": "div",
+                "class": "weapp-ebddatacoms-date-content-calendarContainer",
+                "desc": "日历挂载点（代码在这里拿 ref 量宽）。",
+                "children": [
+                  {
+                    "tag": "div",
+                    "class": "weapp-ebddatacoms-date-content-calendarMain [weapp-ebddatacoms-date-content-calendarMain-<大写主题>] [mobile] [doubleweek]",
+                    "desc": "传给 @weapp/ui MCalendar 的 className，会拼到它自己的根上。MCalendar 内部：div.ui-m-calendar-container[.ui-m-calendar-container-hideLunar] > div.ui-m-calendar-wrapper（其余 ui-m-calendar-* 是内部类，不可控）。",
+                    "tips": [
+                      "⚠️ weapp-ebddatacoms-date-content-calendarMain 及其 -{主题} 变体在全部 less 里没有任何选择器 —— 空白钩子，想改日历面板直接用",
+                      "单元格由 MCalendar 渲染后、本组件用 renderCellItem 包一层：div.weapp-ebddatacoms-calendar-cell-item [today] [grey] [date-selected] —— 给单元格写样式的主入口",
+                      "单元格内部随主题两套：竖排周（126 / 127）= div.date-left（> span.week-day + span.day）+ div.date-right（> span.lunar-date + span.agendas-data[.has-agendas]）；平铺周（124 / 125）= span.week-day + 第三方 cell + span.agendas-data[.has-agendas]",
+                      "date-selected 是裸类名（常量 dateSelectedCls），源码会 querySelector('.date-selected') 定位选中格，别删"
+                    ]
+                  }
+                ]
+              },
+              {
+                "tag": "div",
+                "class": "weapp-ebddatacoms-calendar-footer",
+                "desc": "日历底部的折叠 / 展开箭头（内含 @weapp/ui Icon，name='Icon-Down-arrow03'，月模式时 rotate=180）。它通过 MCalendar 的 renderFooter prop 注入，所以落在 ui-m-calendar-footer 槽位里。",
+                "when": "showViewModeChange 为真，且主题不在 {124,125,126,127,128,129}，且（模式≠month 或 window.RENDER_EB_CALENDAR_MONTH_MODE_COLLAPSE_BUTTON 为真）"
+              }
+            ]
+          },
+          {
+            "tag": "div",
+            "class": "weapp-ebddatacoms-date-content-workplan [weapp-ebddatacoms-date-content-workplan-loading]",
+            "desc": "事项列表外层。⚠️ 竖排周主题（126 / 127）下它同时是 createBtn 的父级，其它主题下 createBtn 是它的兄弟节点。已有 less：-workplan-loading 与 -workplan-spin-loading。",
+            "children": [
+              {
+                "tag": "div",
+                "class": "ui-spin-nested-loading > div.ui-spin-container",
+                "desc": "Spin。⚠️ 传给它的 weapp-ebddatacoms-date-content-workplan-spin[-loading] 落在内层 div.ui-spin 上、只有请求中才有 —— 按「loading 态」写样式请用 -workplan-loading / .ui-spin-nested-loading（坑同 shared.uiAppend 的 Spin）。",
+                "children": [
+                  {
+                    "tag": "div",
+                    "class": "weapp-ebddatacoms-date-content-workplan-list [is-empty] [mobile]",
+                    "desc": "列表容器，loading 中内容为空。内部二选一：空态或事项列表。",
+                    "tips": "已有 less：.weapp-ebddatacoms-date-content-workplan-list .agendas-empty（居中）、.weapp-ebddatacoms-workplan-item .date / .text，以及任务卡片固定 #52c41a、提醒卡片固定 #faad14 的边框与底色",
+                    "children": [
+                      { "tag": "div", "class": "agendas-empty", "desc": "空态容器（裸类名）。内部：@weapp/ui Icon（className='weapp-ebddatacoms-date-content-workplan-list-empty-icon'，图标名随主题变）+ span.weapp-ebddatacoms-date-content-workplan-list-empty-text（文案「暂无数据」）。", "when": "列表为空" },
+                      { "ref": "shared.workItems", "desc": "事项列表本体（div.weapp-ebddatacoms-date-content-workFlow-list 包裹）" }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "tag": "div",
+            "class": "weapp-ebddatacoms-date-content-create",
+            "desc": "新建按钮区。三种形态：单一 div.weapp-ebddatacoms-date-content-create-btn（内含 Icon + 可选 span.create-label）｜Trigger 包裹的多选项按钮（className='weapp-ebddatacoms-date-content-create-popover' 会 merge 到那个 div 上，两者合成同一个元素的多个类，不存在独立包裹层）｜二开自定义 div.weapp-ebddatacoms-date-content-create-btn.custom-create-button。",
+            "when": "系统数据源且至少一种可新建，或有 customCreate / customShowCreateBtn",
+            "tips": "create-label 是裸类名（仅周主题与便签主题加这个文案 span）；-date-content-create-popover 本身没有 less 规则，-create-btn 的样式分散在 mixins / 各主题文件里",
+            "children": [
+              { "tag": "div", "class": "weapp-ebddatacoms-date-content-create-popover-content", "desc": "多选新建的下拉内容，每项是 span.weapp-ebddatacoms-date-content-create-popover-content-item（已有 less + :hover）。", "when": "可选新建类型 > 1" }
+            ]
+          }
+        ]
+      },
+      { "tag": "div", "class": "SysCreateDialog 展开的引擎弹窗", "desc": "新建 / 详情弹窗，见 popups。", "when": "!isMobile && (isSystemType || customCreate.open || customOpenItem.open)" }
+    ]
+  },
+  "multiple": {
+    "desc": "树 ③｜多数据源（config 没有 dataset，走 components/calendar-Multiple 与 calendar-view-Multiple）。外部结构、类名、less 与单数据源几乎完全一致 —— 只列差异，其余节点复用 viewCalendar / calendarCard 的描述。",
+    "tips": [
+      "两条子分支用同一套根类：view 模式 = .weapp-ebddatacoms-calendarv-container；card 模式 = .weapp-ebddatacoms-date-common",
+      "less 也是共用的：card 共用 calendar/style/index.less，view 共用 calendar-view/style/index.less",
+      "判断依据：config.dataSetNodes 存在 = 多数据源；否则看 config.dataset 是否存在"
+    ],
+    "children": [
+      {
+        "desc": "视图模式（calendar-type = '2'）的差异清单：",
+        "value": [
+          "header 里多两块：div.weapp-ebddatacoms-calendarv-filterLeft（数据集下拉）、div.weapp-ebddatacoms-calendarv-filterNew（内部 Select 用 className='weapp-ebddatacoms-calendarv-date-header-right-filter'）",
+          "筛选区不再有 If/Else 分支，固定渲染 DatasetSearchComMultiple（CorsComponent，不可控）",
+          "hover 气泡类名有细微差别：测量容器是 'calendar-popver-measure ui-popover-content'（比单数据源多一个 ui-popover-content），popupClassName 反而少了 ui-popover-content",
+          "事件来源是系统事项与数据源事项合并（[...eventsSystem, ...eventsDataset]）"
+        ]
+      },
+      {
+        "desc": "卡片模式的差异清单：",
+        "value": [
+          "div.weapp-ebddatacoms-date-header-right 多一个裸条件类 multiple",
+          "div.weapp-ebddatacoms-month-switcher 多一个裸条件类 multiple（已有 less：.weapp-ebddatacoms-month-switcher.multiple）",
+          "month-switcher 内多渲染一个 Select，className='weapp-ebddatacoms-date-header-right-filter'（受 config.dataSetFilterShow 控制）",
+          "事项列表会混入数据源事项，且日程的标题 / 时间会多 -title-complete / -time-complete 条件类（agenda.calendarStatus === 'finish'）",
+          "renderCellItem 的竖排周主题里不再插入节假日 Icon（少了那个小图标节点）",
+          "新建下拉里额外出现 span.weapp-ebddatacoms-date-content-create-popover-content-item（「新建<数据源名>」）",
+          "loading 由系统 + 数据源两个请求合并（requestLoading || requestLoadingDataSet）"
+        ]
+      }
+    ]
+  },
+  "engineView": {
+    "desc": "树 ④｜Engine 入口的视口。日历组件被单独当「日历视口」用时走这条（engine/Engine.tsx → engine/Content.tsx），它既不是 calendarv 也不是 date-common，很容易找错。",
+    "tag": "div",
+    "class": "weapp-ebddatacoms-view-calendar-main weapp-ebddatacoms-view-content",
+    "tips": "已有 less：-view-calendar-main { position: relative; padding: 0 16px; height: calc(100% - 50px) }；-view-content 只 combo 出现，less 里没有单独规则",
+    "children": [
+      {
+        "tag": "div",
+        "class": "ui-spin-nested-loading > div.ui-spin-container",
+        "desc": "Spin（无自定义 className）。",
+        "children": [
+          {
+            "tag": "div",
+            "class": "weapp-ebddatacoms-calendar-config-action",
+            "desc": "顶部操作区（engine/TopFilter.tsx）。里面依次是 leftDom（二开插槽）、FormSet、StyleSet、FieldSearch、ParamCondition。",
+            "tips": "已有 less：.weapp-ebddatacoms-calendar-config-action button { margin-right: var(--h-spacing-md) }",
+            "children": [
+              { "tag": "div", "class": "weapp-ebddatacoms-calendar-style-set", "desc": "风格设置 Trigger（engine/StyleSet.tsx）。弹层内容：div.weapp-ebddatacoms-calendar-style-set-content > div.weapp-ebddatacoms-calendar-style-set-item > label.weapp-ebddatacoms-calendar-style-set-item-label + Select.weapp-ebddatacoms-calendar-style-set-item-select；每个触发按钮是 div.weapp-ebddatacoms-calendar-style-set-button[.weapp-ebddatacoms-calendar-btn-select]，内含 Icon.btn-icon-left。", "tips": "calendar-btn-select 是选中态类，已有 less：svg { color: var(--primary) }" },
+              { "tag": "div", "class": "weapp-ebddatacoms-view-calendar-config", "desc": "日历设置 Dialog 的内容容器（engine/FormSet.tsx）。已有 less：margin:0; padding:0。", "when": "打开日历设置弹窗" },
+              { "tag": "div", "class": "weapp-ebddatacoms-calendar-style-set-button [weapp-ebddatacoms-calendar-btn-select]", "desc": "参数条件按钮（engine/ParamCondition.tsx）+ Icon.btn-icon-left。点击后打开 CorsComponent（@weapp/components 的 ConditionSetDlg），内部不可控。" }
+            ]
+          },
+          { "tag": "div", "class": "weapp-ebddatacoms-calendar-display-relative", "desc": "日 / 周 / 月切换条容器（engine/Content.tsx），里面是 CorsComponent 拉的 @weapp/ebdform DateSelector。已有 less：padding-bottom + height:46px + flex: 0 0 46px。" },
+          { "tag": "div", "class": "weapp-ebddatacoms-calendar-com", "desc": "日历本体容器，内部是 @weapp/ui Calendar（结构同 shared.fcSkeleton，但外层没有 .ui-calendar 的 -calendarv-content 包裹）。已有 less：height: calc(100% - 102px); flex: 1 1 0，并强制内部 >div 与 #calendar-container 都是 100% 高。", "when": "defaultView 有值" }
+        ]
+      }
+    ],
+    "sibling": { "tag": "div", "class": "weapp-ebddatacoms-calendar-builder-header", "desc": "engine/calendar-builder/CalendarBuilder.tsx 的头部，内部再渲染一遍 TopFilter（buttonType='link'）。它是独立的 header 出口（index.tsx 以 CalendarBuilderHeader 单独 lazy 导出），不在这棵树的 DOM 里。" }
+  },
+  "configPanel": {
+    "desc": "树 ⑤｜设计器右侧属性配置面板。⚠️ config/Config.tsx 本身不产任何 DOM —— 它导出的是配置 schema（groups + items），由引擎的配置面板宿主渲染成 DOM。能定位的只有各配置项自定义组件自己挂的类。",
+    "tips": [
+      "schema 里的 groups[].id（displayTypeGroup / sourceGroup / interDataGroup / baseConfigGroup / conditionGroup / filterSearchGroup / styleSetGroup / dataSetGroup）只是分组锚点，不会变成 DOM 的 id 或 class，别拿它们写选择器",
+      "面板里大量内容来自 @weapp/ebdcoms / @weapp/ebdform / @weapp/components 的 CorsComponent，内部 DOM 完全不可控"
+    ],
+    "children": [
+      { "tag": "div", "class": "weapp-ebddatacoms-calendar-config-100", "desc": "全宽配置项容器。出现在 CalendarModeConfig（展示样式）、DataSourceTypeConfig（来源类型）、ViewModeSelectConfig（模式切换）三项。已有 less：width: 100%。" },
+      { "tag": "div", "class": "weapp-ebddatacoms-calendar-config-weekstart", "desc": "周开始日期配置行。结构：div.weapp-ebddatacoms-calendar-config-weekstart-title > span.weapp-ebddatacoms-calendar-config-weekstart-title-content + Help；下面 Select 带 class 'weapp-ebddatacoms-calendar-config-100 weapp-ebddatacoms-calendar-config-weekstart-select'。已有 less 覆盖 title / select / title-content 与内部 .ui-help .ui-help-explain .ui-icon。" },
+      { "tag": "div", "class": "weapp-ebddatacoms-calendar-config-systemSource", "desc": "系统数据源配置。结构：-checkboxWrap（复选框行）+ 可选 -switchWrap > -switchWrap-label + Switch。-switchWrap-switch 是源码用了但 less 里没定义的空白钩子。" },
+      { "tag": "div", "class": "weapp-ebddatacoms-calendar-node-item", "desc": "「数据源设置」里的单个数据源节点行（config/components/dataSetNodes/Item.tsx）。结构：-checkbox（Popover + Checkbox）+ -btn > -btn-text（span）+ -btn-opt（div，两个 span：视图文案 + Icon-delete02）。已有 less 定义了 -checkbox / -btn / -btn-text / -btn-opt 与内部 button.ebcoms-btn-ex。", "tips": "它的父容器类名是残缺的：List.tsx 写的是 `${clsPrefix}-`，拼出来就是 .ebcoms- —— 源码原文如此，照抄可用" },
+      { "tag": "div", "class": "weapp-ebddatacoms-node-slider", "desc": "右侧滑出的「数据源设置」抽屉（node-slider/index.tsx），Dialog placement='right'。内部：-setting、CorsComponent（@weapp/designer 的 FormPanel，不可控）、.ui-dialog-body-container / .ui-title-inDialog / .ui-dialog-content-right / .ui-dialog-wrap（第三方 Dialog 内部类，已有 less 覆盖）。", "tips": "抽屉顶部的 .weapp-ebddatacoms-node-slider-top（含 -icon）在 customRenderLeft 里，样式在 node-slider/index.less" },
+      { "tag": "div", "class": "weapp-ebddatacoms-calendar-config-form", "desc": "基本信息分组卡（GroupCard，engine/config-form/ConfigForm.tsx）。已有 less 大量覆盖内部：.ui-formItem-wrapper / .ui-select（100% 宽）/ .ui-formSwitch .ui-input-wrap / .ui-formItem-label-required .ui-formItem-label-span / .cke_top.cke_reset_all / .weapp-ebddatacoms-timeline-switch。", "when": "!isOuter（内嵌在配置面板里时）" },
+      { "tag": "form", "class": "{weapp-ebddatacoms-calendar-form | weapp-ebddatacoms-form-label-w116}", "desc": "表单本体，两个互斥的 className 取决于是否 isOuter：isOuter（外层独立表单）用 weapp-ebddatacoms-calendar-form；否则用 weapp-ebddatacoms-form-label-w116（控制 label 宽度 116）。两者在 less 里各有一套规则。", "tips": "实际渲染出的是 form 元素 + @weapp/ui Form 的内部结构（.ui-formItem-* / .ui-select / .ui-formSwitch 等）" },
+      { "tag": "div", "class": "weapp-ebddatacoms-calendar-period", "desc": "时间段滑块行（config-form/Period.tsx）。结构：Slider.Range + span.weapp-ebddatacoms-calendar-period-text（显示「9:00 - 18:00」）。已有 less + -period-text 规则。", "when": "字段是 showTimeSlot" },
+      { "tag": "div", "class": "weapp-ebddatacoms-calendar-form-richtextarea", "desc": "富文本详情行（config-form/ConfigForm.tsx）。内含 @weapp/ui RichText（CKEditor，内部 .cke_contents / .cke_top，已有 less 去掉 .cke_top 边框）+ Help。已有 less：.weapp-ebddatacoms-calendar-form-richtextarea .ui-rich-text { flex: 1 1 auto }。" },
+      { "tag": "span", "class": "openType-pageWidth", "desc": "打开方式里的页宽百分比文本（config-form/OpenTypeGroup.tsx）。注意这是个硬编码的裸类名，没有前缀。" }
+    ]
+  },
+  "popups": {
+    "desc": "树 ⑥｜浮层与弹窗。任何视图分支都可能叠加这些节点，它们大多 Portal 到 body 下或由 CorsComponent 动态加载，脱离组件自身的 DOM 链路。",
+    "children": [
+      { "tag": "div", "class": "ui-trigger-popupInter-container > div.ui-trigger-popupInner…", "desc": "@weapp/ui 所有弹层（Popover / Help / Trigger / Select 下拉 / Menu 下拉）的公共链路，结构见 shared.uiAppend。自定义类只能通过 triggerProps.popupClassName / dropdownClassName 传进来。" },
+      { "tag": "div", "class": "agendasPopoverPopup", "desc": "卡片模式里事项条目的悬停气泡（popupClassName，裸类名）。已有 less：.agendasPopoverPopup .ui-popover-tooltip .ui-popover-arrow 与 .agendasPopoverPopup .ui-popover-noMask .ui-popover-content。" },
+      { "ref": "shared.hoverCard", "desc": "日历视图模式里的事项 hover 详情卡（#calendar-popover + calendar-popver-measure + calendar-textPopopverPopup）。" },
+      { "tag": "div", "class": "SysCreateDialog 展开的引擎弹窗", "desc": "components/SysCreateDialog/index.tsx。它自己没有任何 className，全部是 CorsComponent 动态加载的第三方弹窗：@weapp/calendar 的 CalendarViewDialog、@weapp/task 的 TaskViewDialog、@weapp/crm 的 CrmCreateRemindDialogProvider / ContactRemindViewDialogProvider / CrmCustomerViewDialogProvider。内部 DOM 完全不可控。", "tips": "想改新建 / 详情弹窗样式，只能从 #<comId> 限域外挂，或改这些第三方包里弹窗自己的类（ui-dialog*）" },
+      { "tag": "div", "class": "weapp-ebddatacoms-calendarv-filter / weapp-ebddatacoms-calendarv-filterNew", "desc": "日历视图里的筛选入口。点开的筛选弹窗全部是 CorsComponent：components/Filter/* 对应 @weapp/components 的 ConditionSet、@weapp/ebdcoms 的 FilterDlg 和 FilterInput；DatasetSearchCom 对应 @weapp/ebdlist 的 FilterPanel；field-search 对应 @weapp/ebdform 的 FieldSearch 与 @weapp/ebdlist 的 SearchFields。这些组件本身不带任何日历的 className。", "tips": "唯一可控的钩子是外层那两块 div；弹窗本体只能靠第三方自己的类（.ui-dialog / .ebcomponents-* 等）" },
+      { "tag": "div", "class": "weapp-ebddatacoms-button-group [weapp-ebddatacoms-button-group-checked]", "desc": "按钮组（calendar-view/components/ButtonGroup.tsx，两个分支各有一份同构副本）。⚠️ 它目前只在 engine/config-form/ConfigForm.tsx 的 weekStart 配置行里被用到，而且配套的 style/index.less 没被任何地方 import —— 运行时不会出现在视图里、也没有生效样式。", "tips": "如果哪天看到它，className 可以是任意值（组件会把外部 className 拼上去），内部按钮选中态用 -button-group-checked" }
+    ]
+  },
+  "notes": [
+    "两个 content 陷阱：引擎的 .content 是 #<comId> 的直接子元素（无前缀）；组件的 .weapp-ebddatacoms-calendarv-content 才是日历画布容器。同名不同层，定位前先确认有没有 weapp-ebddatacoms- 前缀。",
+    "less 里有、源码不输出的死钩子（改样式前先在 DOM 里确认）：-calendarv-header-right-right、-calendarv-legend*（renderLegend 被注释掉了）、-date-header-filter（实际输出的是 -date-header-right-filter）、-view-calendar-wrapper、-calendar-btn、-calender-filter-search（源码少了 a 且无挂载点）、-note-binding（便签 mixin 里有完整样式，但卡片树不渲染该节点）。",
+    "源码拼写错误要照抄（不要「修正」）：-date-content-workFlow-list（大写 F）、-mode-switcher-datepicker-*（是 mode 不是 month）、-lazyLodingEmpty（少 a，与正确的 lazyLoadingEmpty 同时挂）、@weapp/ui 的 .ui-spin-dot.false（Spin 内部模板串没做三元兜底，真的会输出一个名为 false 的类）、.ui-menu-select-btn-undefined（selectButtonType 未传时会拼出 undefined）。",
+    "className 会被 merge 而不是包一层的地方（容易找错层级）：@weapp/ui 的 Trigger 会把 className 合并到它的 child 上（新建按钮因而同时有 -create-btn 和 -create-popover）；Spin 的 className 落在内层 .ui-spin 上且只在 spinning=true 时存在；Layout.Box 会渲染两层（外层 BoxBlock 不消费业务 className）。",
+    "两个近义列表类名：.weapp-ebddatacoms-date-content-workplan-list（外层，含空态和 loading）与 .weapp-ebddatacoms-date-content-workFlow-list（有数据时才有的列表本体）。差一个字母，先看 DOM 里到底有哪个。",
+    "已有样式的入口文件（想避免重复写规则先读这些）：calendar/style/{index,header,footer,createBtn,workplan,mixins}.less 与 themes/*.less（卡片树）、calendar-view/style/index.less（日历视图树）、engine/style/index.less（Engine 树）、config/style/index.less（配置面板）、view/index.less（引擎 footer 按钮区 .weapp-ebddatacoms-calendar-foot）。",
+    "主题类名有两套且大小写不同：挂在 .weapp-ebddatacoms-date-common 上的是 kebab（simple-style / week-gray-style …），拼在 Header 子元素后缀上的是全大写（SIMPLESTYLE / WEEKGRAYSTYLE …）。写选择器时别混。",
+    "weId 不等于 id。源码里到处传的 weId 会落到 DOM 上、属性名是小写的 weid；组件自己从来没用过 id= 属性，唯一真实 id 是 @weapp/ui Calendar 内部的 #calendar-container 和 hover 卡的 #calendar-popover。"
+  ]
+}

@@ -1,0 +1,489 @@
+{
+  "component": "slide 幻灯片/轮播组件（weapp-ebdbasecoms/src/components/slide，组件类型 Slide）",
+  "usage": "先按 config.styles 里 category==='8'(StyleType.SLIDE) 的 style.id 选分树：'11' 缩略图样式 / '12' 标题样式 / '13' 多图样式 / 其他或没配样式走默认树。选到树后，用 shared.carouselSwiper + shared.slideItem 里的类名写选择器。注意横切开关 switchEffect==='multiSlides'（多图展示效果）会把 11/12/13 三种样式全部拉回默认树。",
+  "legend": {
+    "[cls]": "条件class，满足业务条件才挂载",
+    "{a|b}": "多选一class（同一位置按配置换成其中一个）",
+    "a > b": "父子层级压缩写法，冒号左边的元素是右边的父级",
+    "ref": "引用 shared 中定义的复用片段：写成 ref:shared.xxx 或 {\"ref\":\"shared.xxx\"}",
+    "uncontrolled": "第三方组件渲染，内部结构不可控，只给挂载点",
+    "<comId>": "组件实例 id；引擎外壳的 id、组件根上的 data-id 都是它，官方样式作用域写成 #<comId>.ebcom",
+    "ebcoms-": "组件自己写的类名前缀（clsPrefix='ebcoms'），含大写字母的 ebcoms-Carousel / ebcoms-s-Carousel 是刻意区分的大小写",
+    "ebcom-": "引擎/框架层的类名前缀（ebcomPrefix='ebcom'），组件源码里不出现",
+    "ui- / swiper-": "@weapp/ui 与 swiper 6.x 产生的类名，组件只是传 className 拼接"
+  },
+  "pickTree": "styleId（config.styles 中 category==='8' 的 style.id，取最后一个；没有则回落主题里的 slideId）：'11'→slide-thumbs，'12'→slide-title，'13'→slide-multi，其余（含未配样式）→slide-default。二次判断：switchEffect==='multiSlides' 时无视上面三种样式，一律渲染 slide-default 的结构（只是 slidesPerView 换成配置值）。",
+  "root": {
+    "tag": "div",
+    "id": "<comId>",
+    "class": [
+      "ebcom",
+      "ebcom-slide",
+      "{ebcom-grid|ebcom-flow|ebcom-excel}",
+      "[ebcom-m]",
+      "ebcom-view",
+      "[has-no-header]",
+      "[content-no-padding]",
+      "[event-action-click]"
+    ],
+    "desc": "引擎外壳，由 weapp-ebdcoms 的 createView.renderView 生成，不在 ebdbasecoms 源码里。类型名拼成 ebcom-slide，布局拼成 ebcom-grid/ebcom-flow/ebcom-excel，移动端多一个 ebcom-m；配了点击事件动作时挂 event-action-click，content-no-padding 需要组件声明 padding=false（slide 没声明，一般看不到）。官方样式作用域就是 #<comId>.ebcom（getSlideStyles 生成的自定义样式会被它限域）。",
+    "when": "运行态视图。设计态没有这层：design/Design.tsx 直接渲染 SlideContent，外面只有设计器自己的容器",
+    "children": [
+      {
+        "tag": "div",
+        "class": [
+          "header"
+        ],
+        "when": "config.titleEnabled===true 时才有；slide 默认 titleEnabled=false，所以通常没有 header，此时外壳上会多 has-no-header",
+        "children": [
+          {
+            "tag": "div",
+            "class": [
+              "ebcom-title"
+            ],
+            "desc": "引擎渲染的组件标题"
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "class": [
+          "content"
+        ],
+        "desc": "引擎内容槽（事件动作的点击绑定在这层）。⚠️ 它和组件根元素都叫 content，是两个不同元素：这层是引擎的，组件根是 div.content.ebcoms-slide-view-content。less 里 .ebcom-slide.ebcom-slide>.content{padding:0;height:150px} 说的就是这层，.content>.content{height:100%} 说的才是组件根",
+        "children": [
+          "ref:shared.comRoot"
+        ]
+      },
+      {
+        "tag": "div",
+        "class": [
+          "footer"
+        ],
+        "when": "config.footerEnabled===true 时才有；slide 默认 false",
+        "desc": "引擎底部按钮区"
+      }
+    ]
+  },
+  "shared": {
+    "comRoot": {
+      "tag": "div",
+      "class": [
+        "content",
+        "ebcoms-slide-view-content",
+        "[single-data]"
+      ],
+      "desc": "组件根（SlideContent.render 的最外层）。class 里的 content 是组件自己写的、不是引擎那层；single-data 在只有 1 张图时挂上，less 用它隐藏左右箭头和分页。运行时引擎会在这层加 data-id=<comId>。4 个分树的根都是它的直接子节点。",
+      "tips": [
+        "自己写的规则建议用 #<comId> .ebcoms-slide-view-content 限域，不要只写 .content（会同时命中引擎那层）",
+        "有 single-data 时别重复抄隐藏逻辑：less 已隐藏分页和箭头"
+      ]
+    },
+    "carouselSwiper": {
+      "desc": "轮播核心片段（@weapp/ui Carousel，内部再包 swiper 6.x 的 Swiper/SwiperSlide），4 个分树都复用；差别只在传入的 props（slidesPerView、effect、className）与外面那层容器。",
+      "chain": "div.ui-carousel[.ebcoms-multiPics-custombtn] > div.swiper-container.ui-carousel-swiper-content > div.swiper-wrapper > div.swiper-slide > div.swiper-zoom-container",
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ui-carousel",
+            "[ebcoms-multiPics-custombtn]",
+            "[ui-carousel-rtl]"
+          ],
+          "desc": "Carousel 根。ui-carousel 来自 prefixCls 默认值（不是 ebcoms- 前缀）；ebcoms-multiPics-custombtn 只有多图样式且横向展示 3 张时由组件传入；RTL 语言加 ui-carousel-rtl",
+          "children": [
+            {
+              "tag": "div",
+              "class": [
+                "swiper-container",
+                "ui-carousel-swiper-content",
+                "ui-carousel-swiper-{horizontal|vertical}",
+                "ui-carousel-swiper-imgFill",
+                "[ui-carousel-swiper-ie]"
+              ],
+              "desc": "Swiper 自己渲染的容器：swiper-container + 组件传的 className（上面这三段）。swiper 运行时还会再追加 swiper-container-horizontal/-vertical、swiper-container-initialized 等状态类",
+              "children": [
+                {
+                  "tag": "div",
+                  "class": [
+                    "swiper-wrapper"
+                  ],
+                  "desc": "swiper 的滑动轨道",
+                  "children": [
+                    {
+                      "tag": "div",
+                      "class": [
+                        "swiper-slide",
+                        "[swiper-slide-active]",
+                        "[swiper-slide-visible]",
+                        "[swiper-slide-thumb-active]",
+                        "[swiper-slide-duplicate]"
+                      ],
+                      "desc": "一张图一个 slide；属性 data-swiper-slide-index 由 virtualIndex 写入。这些都是 swiper 运行时按状态加的类，不是组件写的",
+                      "children": [
+                        {
+                          "tag": "div",
+                          "class": [
+                            "swiper-zoom-container"
+                          ],
+                          "desc": "每个 slide 内固定包的一层（fillWays='imgFill' 时才有），缩略图条和大图的图片都在里面",
+                          "children": [
+                            "ref:shared.slideItem"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "class": [
+                    "ui-carousel-pagination",
+                    "swiper-pagination",
+                    "[pagination-custom-vertical]"
+                  ],
+                  "when": "图片数 > 0 时渲染该容器；竖排方向（switchEffect==='verticalSlide'）且未指定 pagination.type 时多一个 pagination-custom-vertical",
+                  "desc": "分页器容器。圆点是 swiper 生成的 span.swiper-pagination-bullet-carousel，激活态 swiper-pagination-carousel-active（这两个类名是组件在 bulletClass/bulletActiveClass 里指定的）。组件会在 onSlideChange 里动态改它的 style.bottom / style.width",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "class": [
+                        "swiper-pagination-bullet-carousel",
+                        "[swiper-pagination-carousel-active]"
+                      ],
+                      "desc": "分页圆点，一图一个，swiper 渲染"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "class": [
+                    "ui-carousel-swiper-button-next",
+                    "swiper-button-next",
+                    "swiper-button-white"
+                  ],
+                  "desc": "下一个按钮容器（swiper-button-next 是 swiper 自己的类，swiper.less 里有默认样式，组件用 ui-carousel- 前缀的类覆盖）",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "class": [
+                        "ui-icon",
+                        "ui-icon-wrapper",
+                        "ui-carousel-arrow-next"
+                      ],
+                      "desc": "@weapp/ui Icon，内部是 svg.ui-icon-svg；横向用 Icon-Right-arrow01，竖排用 Icon-Down-arrow01"
+                    }
+                  ]
+                },
+                {
+                  "tag": "div",
+                  "class": [
+                    "ui-carousel-swiper-button-prev",
+                    "swiper-button-prev",
+                    "swiper-button-white"
+                  ],
+                  "children": [
+                    {
+                      "tag": "span",
+                      "class": [
+                        "ui-icon",
+                        "ui-icon-wrapper",
+                        "ui-carousel-arrow-prev"
+                      ],
+                      "desc": "同上；横向 Icon-left-arrow01，竖排 Icon-up-arrow01"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "tips": [
+        "effect（fade/cube/coverflow/flip/slide）只改 swiper 内部结构与行内样式，不改外层类名；只有 switchEffect==='verticalSlide' 会让容器多 ui-carousel-swiper-vertical",
+        "lazyLoad=true 时图片是 img.swiper-lazy[data-src]，预加载类为 swiper-lazy-preloader",
+        "想改圆点/箭头就去 .ebcoms-slide-view-content .ui-carousel-pagination / .ui-carousel-swiper-button-next，别写 swiper-button-next（swiper 自带样式优先级低，但容易和别的轮播互相影响）"
+      ]
+    },
+    "slideItem": {
+      "desc": "幻灯片单项（SlideItem），图片 + 标题/描述遮罩。4 个分树都复用它，区别只在父级传的参数：className（active）、hoverCls、type、hideImg。",
+      "chain": "div.ebcoms-carousel-slide-item[{imageMode类}][条件类] > div.ebcoms-carousel-slide-item-img + div.ebcoms-mask-wraper[.hasPadding]",
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ebcoms-carousel-slide-item",
+            "{ebcoms-carousel-contain|ebcoms-carousel-fill|ebcoms-carousel-cover|ebcoms-carousel-none|ebcoms-carousel-adapt}",
+            "[ebcoms-carousel-hover]",
+            "[ebcoms-carousel-slide-item-hover]",
+            "[active]"
+          ],
+          "desc": "单项根元素。图片适应方式按 imageMode 换成 5 选 1 的类（stretch→fill、equalScale→contain、equalScaleCut→cover、original→none、adapt→adapt）；有链接或事件时挂 ebcoms-carousel-hover（less 已给 cursor:pointer）；标题样式下，右侧导航项由 SlideContainer 传 hoverCls=ebcoms-carousel-slide-item-hover、当前项传 className=active。根上还有行内 transitionDuration（轮播速度），别在样式里写死 transition",
+          "children": [
+            {
+              "tag": "div",
+              "class": [
+                "ebcoms-carousel-slide-item-img"
+              ],
+              "when": "hideImg 为 true 时不渲染（标题样式的右侧导航项就是这种）",
+              "desc": "图片容器（less 已设 line-height:0、height:100%、背景 #efefef）",
+              "children": [
+                {
+                  "tag": "img",
+                  "class": [
+                    "ebcoms-assets-img",
+                    "[lazyload]",
+                    "[swiper-lazy]"
+                  ],
+                  "desc": "普通情况是 @weapp/ebdcoms 的 AssetsImg（img.ebcoms-assets-img）；配了 lazyLoad 且非 noLazyLoad 时换成 img.swiper-lazy + data-src。imageMode==='tiling'（平铺）时不渲染 img，改成 div.ebcoms-tiling-box（背景图铺满）；imgUrl 为空时整块只渲染一个空 div"
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "class": [
+                "ebcoms-mask-wraper",
+                "[hasPadding]"
+              ],
+              "when": "showPicTitle===true（默认）才有；标题样式不论 showPicTitle 都会渲染。hasPadding 在有标题或描述时挂上",
+              "desc": "标题/描述遮罩层，内部固定两个 span：第一个是标题、第二个是描述（dangerouslySetInnerHTML 注入，可能含 p 等标签）",
+              "children": [
+                {
+                  "tag": "span",
+                  "desc": "标题（title）"
+                },
+                {
+                  "tag": "span",
+                  "desc": "描述（description）"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "class": [
+            "ebcoms-carousel-slide-item-arrow",
+            "ebcoms-carousel-slide-item-arrow-top",
+            "ebcoms-carousel-slide-item-arrow-bottom"
+          ],
+          "when": "只有标题样式 + type==='title_active'（右侧导航的当前项）才渲染，是单项根的兄弟但视觉上贴在大图上",
+          "desc": "指向大图的小三角。JS 会按箭头容器高度动态写 borderTopWidth，三角形颜色写在 less 里（#0071E3）",
+          "children": [
+            {
+              "tag": "div",
+              "class": [
+                "ebcoms-carousel-slide-item-arrow-top"
+              ]
+            },
+            {
+              "tag": "div",
+              "class": [
+                "ebcoms-carousel-slide-item-arrow-bottom"
+              ]
+            }
+          ]
+        }
+      ],
+      "tips": [
+        "每个渲染出来的元素都带 weId（DOM 里属性名是小写 weid），是样式编辑器/DOM 定位用的，不要写进选择器",
+        "缩略图条里的缩略图也是同一套 slideItem：mask-wraper 被 less 隐藏了，不要在缩略图里再套一层自己的类",
+        "只有 main 轮播的图片会触发图片预览（PhotoView，外部组件，DOM 不在组件内）；缩略图的点击是空实现"
+      ]
+    },
+    "placeholder": {
+      "desc": "三种「组件没渲染轮播」的情况，样式需求落到这里时别去找 ui-carousel",
+      "list": [
+        {
+          "when": "数据集模式下 store.loading===true",
+          "chain": "div.ui-spin > svg（@weapp/ui Spin）",
+          "note": "less 已给 .ui-spin 做居中"
+        },
+        {
+          "when": "picsData.length < 1（无图/数据集没数据）",
+          "chain": "div.ebcoms-empty.ebcoms-empty-noData",
+          "note": "来自 @weapp/ebdcoms 的 Empty（compName='Empty', type='noData'）"
+        },
+        {
+          "when": "手动图片模式且图片地址还在转换中（非设计态）",
+          "chain": "不渲染任何节点（render 返回 null）",
+          "note": "另一个 null：缩略图样式下 slidesPerView 或数据来源变化时会先销毁重建，短暂整块为空"
+        }
+      ]
+    },
+    "state": {
+      "desc": "运行时由 JS 动态加/移除的 class（初始 render 里没有，写选择器时按「可能出现」对待）",
+      "list": [
+        {
+          "condition": "标题样式下切换到的当前项",
+          "targetSelector": ".ebcoms-slider-container .ebcoms-carousel-slide-item",
+          "addClass": "active",
+          "note": "大图区和右侧导航各自都有一份 active"
+        },
+        {
+          "condition": "底部缩略图条的 miniSwiper 实例就绪",
+          "targetSelector": ".ebcoms-s-Carousel",
+          "addClass": "show",
+          "note": "没挂上时 less 让整条 visibility:hidden"
+        },
+        {
+          "condition": "鼠标悬浮主轮播的分页圆点（第 n 个）",
+          "targetSelector": ".ebcoms-s-Carousel .swiper-wrapper > div.swiper-slide（第 n 个）",
+          "addClass": "ebcoms-s-Carousel-swiper-hoverstyle",
+          "note": "给对应缩略图加悬浮态；若该缩略图已有 swiper-slide-thumb-active 则跳过"
+        },
+        {
+          "condition": "鼠标悬浮缩略图条里的缩略图",
+          "targetSelector": ".ebcoms-Carousel .swiper-pagination 下第 n 个 span.swiper-pagination-bullet-carousel",
+          "addClass": "ebcoms-Carousel-swiper-pagination-hoverstyle",
+          "note": "给主轮播对应的分页圆点加悬浮态"
+        },
+        {
+          "condition": "缩略图样式下当前缩略图（swiper thumbs 模块同步）",
+          "targetSelector": "缩略图条的 div.swiper-slide",
+          "addClass": "swiper-slide-thumb-active"
+        },
+        {
+          "condition": "组件被事件动作隐藏",
+          "targetSelector": "引擎外壳 #<comId>",
+          "addClass": "ebcom-display-none",
+          "note": "同时写 style.display='none'"
+        },
+        {
+          "condition": "点击幻灯片（事件绑定标记）",
+          "targetSelector": "被点击的 div.ebcoms-carousel-slide-item",
+          "addClass": "ebsdk-bind-dom",
+          "note": "每次点击会先清掉全页其它 ebsdk-bind-dom"
+        }
+      ]
+    }
+  },
+  "slide-thumbs": {
+    "when": "styleId==='11'（SlideStyle.thumbs，样式库里的缩略图样式）且 switchEffect!=='multiSlides'",
+    "tree": [
+      {
+        "tag": "div",
+        "class": [
+          "ebcoms-Carousel"
+        ],
+        "when": "miniSwiper 实例就绪后才渲染（源码里用 When 包着），在此之前 DOM 里完全没有这个节点",
+        "desc": "主轮播容器。注意是大写 C 的 ebcoms-Carousel，和缩略图条的 ebcoms-s-Carousel 是两层不同容器；鼠标事件挂在这层，脚本会给对应缩略图加悬浮类",
+        "children": [
+          "ref:shared.carouselSwiper"
+        ]
+      },
+      {
+        "tag": "div",
+        "class": [
+          "ebcoms-s-Carousel",
+          "[show]"
+        ],
+        "desc": "底部缩略图条容器（less 已给 height:20%、padding、默认 visibility:hidden，show 后可见）。内部还是同一套 ui-carousel（SCarousel 传 slidesPerView=min(图片数,4)、spaceBetween=4、freeMode），但方向没有透传，所以缩略图条永远是横向",
+        "diffs": [
+          "缩略图条内的 .ebcoms-carousel-slide-item 不显示 mask-wraper（less 已隐藏），也不显示分页",
+          "缩略图项 onClick 是空函数，点缩略图只切换主图、不触发预览和事件动作",
+          "当前缩略图靠 swiper thumbs 模块的 swiper-slide-thumb-active 标记（less 里已经写好选中框）"
+        ]
+      }
+    ]
+  },
+  "slide-title": {
+    "when": "styleId==='12'（SlideStyle.title，标题样式）且 switchEffect!=='multiSlides'",
+    "tree": [
+      {
+        "tag": "div",
+        "class": [
+          "ebcoms-slider-container"
+        ],
+        "desc": "标题样式容器。⚠️ 它不是 swiper：自动播放是自己用 setTimeout 换 active 项，所以这里没有 ui-carousel / swiper-* 类名",
+        "children": [
+          {
+            "tag": "div",
+            "class": [
+              "slide-content"
+            ],
+            "desc": "左侧大图区。⚠️ slide-content / slide-nav 是源码里的裸类名（没加 ebcoms- 前缀），最容易和别处的同名类互相污染，写样式时务必用 #<comId> 或 .ebcoms-slider-container 限域",
+            "children": [
+              {
+                "tag": "div",
+                "class": [
+                  "ebcoms-carousel-slide-item",
+                  "[active]"
+                ],
+                "desc": "每个大图就是 shared.slideItem，当前项由 SlideContainer 传 className='active'（less 里位移+层级切换）；type 为 title_active 时会多渲染箭头",
+                "children": [
+                  "ref:shared.slideItem"
+                ]
+              }
+            ]
+          },
+          {
+            "tag": "div",
+            "class": [
+              "slide-nav"
+            ],
+            "desc": "右侧标题导航列（less 已给宽 150px、每项 40px、白底卡片）。每项都是 shared.slideItem 但传了 hideImg（不渲染 -img）、hoverCls=ebcoms-carousel-slide-item-hover、className='active'（当前项）、type='title_active'|'title_'",
+            "children": [
+              "ref:shared.slideItem"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "slide-multi": {
+    "when": "styleId==='13'（SlideStyle.multi，多图样式）且 switchEffect!=='multiSlides'",
+    "tree": [
+      {
+        "tag": "div",
+        "class": [
+          "ebcoms-multiPics"
+        ],
+        "desc": "多图样式的专用外壳（less 里做中间大、两侧缩小的 transform 动画，并隐藏分页）。里面就是 shared.carouselSwiper",
+        "children": [
+          {
+            "tag": "div",
+            "class": [
+              "ui-carousel",
+              "[ebcoms-multiPics-custombtn]"
+            ],
+            "ref": "shared.carouselSwiper",
+            "desc": "传参固定为 slidesPerView=min(图片数,3)、freeMode、centeredSlides；横向且刚好 3 张时会再传 className=ebcoms-multiPics-custombtn（less 用它把左右箭头往内推）",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "slide-default": {
+    "when": "styleId 不是 11/12/13（没配样式或用了其它样式），以及 switchEffect==='multiSlides'（多图展示效果）时的全部情况",
+    "tree": [
+      {
+        "tag": "div",
+        "class": [
+          "ui-carousel",
+          "[ebcoms-multiPics-custombtn]"
+        ],
+        "ref": "shared.carouselSwiper",
+        "desc": "组件根下直接就是轮播，没有额外外壳（对比：缩略图样式多一层 ebcoms-Carousel、标题样式换成 ebcoms-slider-container、多图样式多一层 ebcoms-multiPics）。ebcoms-multiPics-custombtn 只在多图样式（'13'）时出现，本树默认没有",
+        "children": []
+      }
+    ],
+    "diffs": [
+      "switchEffect==='multiSlides' 时：slidesPerView/slidesPerGroup 用 config 的配置，slidesPerGroupSkip=slidesPerView-slidesPerGroup，DOM 结构与其它情况完全一致（仍是这一棵树）",
+      "其余情况的 slidesPerView 走 Carousel 默认值 1（整屏一张图 + 分页 + 左右箭头）"
+    ]
+  },
+  "notes": [
+    "前缀三类要分清：ebcoms-* 是组件自己写的（含刻意的 ebcoms-Carousel / ebcoms-s-Carousel 大写区分）；ebcom-* 是引擎外壳（组件源码里搜不到）；ui-* 与 swiper-* 来自 @weapp/ui Carousel 和 swiper 6.x。",
+    "最常踩的定位错误是 .content：引擎内容槽和组件根都叫 content，且是父子关系。要改组件根必须写 .ebcoms-slide-view-content（或 #<comId> .content > .content）；只写 .content 会打到引擎那层。",
+    "标题样式的 slide-content / slide-nav、缩略图样式的 ui-carousel 结构都含无前缀类名，写样式时统一用 #<comId> 或 .ebcoms-slide-view-content 限域。",
+    "样式库自定义样式（getSlideStyles 生成）的作用域是 #<comId>.ebcom，同时会把用户 CSS 里的 .ebcom-slide 去掉 —— 所以自定义样式直接用组件类名即可，不需要自己套外壳。",
+    "less 里已有这些钩子，不要重复写：.ebcoms-slide-view-content（flex 竖排/100% 高）、.ebcoms-Carousel（高 80%）/.ebcoms-s-Carousel（高 20% + visibility）、.ebcoms-mask-wraper(+.hasPadding) 遮罩、.ebcoms-carousel-slide-item-img 与 object-fit 映射、.ebcoms-multiPics 缩放动画、.ebcoms-slider-container 标题样式布局、.ebcoms-carousel-slide-item-arrow 三角。",
+    "less 里的 .swiper-paginations 是历史遗留写法，实际 DOM 上分页容器的类是 swiper-pagination，那几条规则不会生效，别照着抄。",
+    "图片元素两套：默认是 img.ebcoms-assets-img（@weapp/ebdcoms AssetsImg），开懒加载后变 img.swiper-lazy[data-src]；改图片样式时建议写 .ebcoms-carousel-slide-item-img > img 兜住两种。",
+    "渲染时序坑：缩略图样式下切换 slidesPerView / 数据来源会 destroy 重建，中间会整块不渲染；数据集模式首次加载渲染 Spin，无数据渲染 Empty。调试样式时先确认当前处于哪种状态。",
+    "设计态（design/Design.tsx）直接渲染 SlideContent，没有引擎外壳和 .content 层；在页面运行态里验证选择器，不要用设计器里的结构当依据。",
+    "反查源码：分树逻辑在 view/SlideContent.tsx 的 render（styleId 判断与 getDefCarouselProps 传参）；轮播类名在 common/carousel/Carousel.tsx；单项在 view/SlideItem.tsx；已有样式在 view/index.less；引擎外壳在 weapp-ebdcoms/src/components/core/view/createView.tsx 的 renderView/renderContent。"
+  ]
+}

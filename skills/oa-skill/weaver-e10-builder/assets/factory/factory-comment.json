@@ -1,0 +1,388 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "daa0e138f2a343bba9dfdafe5cf26b53",
+        "type": "Comment",
+        "package": "@weapp/ui-props-design",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "dca9f206d0df4e7289e700646b9f1eb1",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "评论",
+          "type": "Comment",
+          "commentTitle": "评论",
+          "title": "评论",
+          "showEmpty": true,
+          "hasEdit": "show",
+          "showEditAvatar": true,
+          "showListAvatar": true,
+          "pageSize": "10",
+          "showSource": true,
+          "showTime": true,
+          "moduleValue": "",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "x6ll9p",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "emptyContent": {
+                    "path": "#Icon-Advanced-search",
+                    "title": "搜索",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "#999",
+                      "radius": "3px"
+                    }
+                  },
+                  "selectedContent": {
+                    "path": "#Icon-Advanced-search-selected",
+                    "title": "搜索",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "var(--primary)",
+                      "radius": "3px"
+                    }
+                  },
+                  "customRenderConfig": {
+                    "compare": null
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索/已设条件"
+                },
+                "isOpen": true,
+                "showOrder": 5,
+                "isEdit": false,
+                "showTypeData": [
+                  "ICON",
+                  "FONTBTN"
+                ]
+              },
+              {
+                "customType": "Comment.Sort",
+                "id": "mw6gfi",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "emptyContent": {
+                    "path": "#Icon-Reverse-order",
+                    "title": "默认",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "#999",
+                      "radius": "3px"
+                    }
+                  },
+                  "descContent": {
+                    "path": "#Icon-Reverse-order",
+                    "title": "按评论时间倒序",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "#999",
+                      "radius": "3px"
+                    }
+                  },
+                  "ascContent": {
+                    "path": "#Icon-positive-sequence",
+                    "title": "按评论时间正序",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "#999",
+                      "radius": "3px"
+                    }
+                  }
+                },
+                "event": {
+                  "to": "SORT",
+                  "value": "排序"
+                },
+                "isOpen": true,
+                "showOrder": 5,
+                "isEdit": false,
+                "showTypeData": [
+                  "ICON",
+                  "FONTBTN"
+                ]
+              },
+              {
+                "id": "a7zrpf",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#Icon-performance-appraisal-o",
+                  "title": "统计",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "STATISTICS",
+                  "value": "统计"
+                },
+                "isOpen": true,
+                "showOrder": 5,
+                "isEdit": false,
+                "showTypeData": [
+                  "ICON",
+                  "FONTBTN"
+                ]
+              }
+            ]
+          },
+          "componentShowType": "all",
+          "showFloorExpand": true,
+          "replyFloorExpand": true,
+          "displaySetting": {
+            "displayMode": "normal"
+          },
+          "layout": {
+            "i": "c32bbabe900e468ea51821620dc7f01e",
+            "x": 4,
+            "y": 195.01363636363638,
+            "w": 6,
+            "h": 29,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 2206
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "targetId": "",
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "dca9f206d0df4e7289e700646b9f1eb1",
+        "type": "Comment",
+        "package": "@weapp/ui-props-design",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "daa0e138f2a343bba9dfdafe5cf26b53",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "评论",
+          "type": "Comment",
+          "commentTitle": "评论",
+          "title": "评论",
+          "showEmpty": true,
+          "hasEdit": "show",
+          "showEditAvatar": true,
+          "showListAvatar": true,
+          "pageSize": "10",
+          "showSource": true,
+          "showTime": true,
+          "moduleValue": "",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "x6ll9p",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "emptyContent": {
+                    "path": "#Icon-Advanced-search",
+                    "title": "搜索",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "#999",
+                      "radius": "3px"
+                    }
+                  },
+                  "selectedContent": {
+                    "path": "#Icon-Advanced-search-selected",
+                    "title": "搜索",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "var(--primary)",
+                      "radius": "3px"
+                    }
+                  },
+                  "customRenderConfig": {
+                    "compare": null
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索/已设条件"
+                },
+                "isOpen": true,
+                "showOrder": 5,
+                "isEdit": false,
+                "showTypeData": [
+                  "ICON",
+                  "FONTBTN"
+                ]
+              },
+              {
+                "customType": "Comment.Sort",
+                "id": "mw6gfi",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "emptyContent": {
+                    "path": "#Icon-Reverse-order",
+                    "title": "默认",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "#999",
+                      "radius": "3px"
+                    }
+                  },
+                  "descContent": {
+                    "path": "#Icon-Reverse-order",
+                    "title": "按评论时间倒序",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "#999",
+                      "radius": "3px"
+                    }
+                  },
+                  "ascContent": {
+                    "path": "#Icon-positive-sequence",
+                    "title": "按评论时间正序",
+                    "style": {
+                      "fontSize": "36",
+                      "bgColor": "transparent",
+                      "borderColor": "transparent",
+                      "color": "#999",
+                      "radius": "3px"
+                    }
+                  }
+                },
+                "event": {
+                  "to": "SORT",
+                  "value": "排序"
+                },
+                "isOpen": true,
+                "showOrder": 5,
+                "isEdit": false,
+                "showTypeData": [
+                  "ICON",
+                  "FONTBTN"
+                ]
+              },
+              {
+                "id": "a7zrpf",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#Icon-performance-appraisal-o",
+                  "title": "统计",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "STATISTICS",
+                  "value": "统计"
+                },
+                "isOpen": true,
+                "showOrder": 5,
+                "isEdit": false,
+                "showTypeData": [
+                  "ICON",
+                  "FONTBTN"
+                ]
+              }
+            ]
+          },
+          "componentShowType": "all",
+          "showFloorExpand": true,
+          "replyFloorExpand": true,
+          "displaySetting": {
+            "displayMode": "normal"
+          },
+          "layout": {
+            "i": "ff86c7577b7842bdba0bf800183b3328",
+            "adaptive": true,
+            "h": 29,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": [],
+          "targetId": ""
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms"
+      }
+    ]
+  }
+]

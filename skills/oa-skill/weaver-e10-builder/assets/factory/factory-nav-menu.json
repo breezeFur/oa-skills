@@ -1,0 +1,144 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "b5173a5ff8964461a7fe5f6f8afc320a",
+        "type": "NavMenu",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "aa49e6ef836a4bffaaa24234bc2581cf",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "导航菜单",
+          "type": "NavMenu",
+          "fixedArea": "0",
+          "dataSource": "custom",
+          "showType": "sysall",
+          "showMore": false,
+          "hideSelf": false,
+          "showPortal": true,
+          "showWorkMessage": false,
+          "continuousClickRefresh": true,
+          "navMenus": [
+            {
+              "id": "d4100757f4914b038e247bd397090ed7",
+              "name": "导航项1",
+              "isHomePage": true,
+              "otherParams": {}
+            },
+            {
+              "id": "edce58298fc44975bb5f8cacc7b9700a",
+              "name": "导航项2",
+              "isHomePage": false,
+              "otherParams": {}
+            }
+          ],
+          "remember": false,
+          "layout": {
+            "i": "abb1c9ec13354ad4b20ed49c98803665",
+            "x": 0,
+            "y": 133.9090909090909,
+            "w": 12,
+            "h": 6,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1534
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true,
+          "leftSider": null
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,11",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,NavMenuStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdnavcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "aa49e6ef836a4bffaaa24234bc2581cf",
+        "type": "NavMenu",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "b5173a5ff8964461a7fe5f6f8afc320a",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "导航菜单",
+          "type": "NavMenu",
+          "fixedArea": "0",
+          "dataSource": "custom",
+          "showType": "sysall",
+          "showMore": false,
+          "hideSelf": false,
+          "showPortal": true,
+          "showWorkMessage": false,
+          "continuousClickRefresh": true,
+          "navMenus": [
+            {
+              "id": "d4100757f4914b038e247bd397090ed7",
+              "name": "导航项1",
+              "isHomePage": true,
+              "otherParams": {}
+            },
+            {
+              "id": "edce58298fc44975bb5f8cacc7b9700a",
+              "name": "导航项2",
+              "isHomePage": false,
+              "otherParams": {}
+            }
+          ],
+          "remember": false,
+          "layout": {
+            "i": "d593397be504427cb20fee19f98b4de8",
+            "adaptive": true,
+            "h": 6,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": [],
+          "leftSider": null
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,11",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,NavMenuStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdnavcoms"
+      }
+    ]
+  }
+]

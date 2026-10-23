@@ -1,0 +1,212 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "ff07d90194574ce3a3065beb22510202",
+        "type": "Line",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "eb7b1a2a92ac481f89c8a9dfb7def215",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "折线图",
+          "type": "Line",
+          "title": "折线图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "d0c60f",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "e0ca61",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [],
+          "height": 360,
+          "layout": {
+            "i": "be822da3c617422c9a1ed0c47c121aba",
+            "x": 0,
+            "y": 53,
+            "w": 4,
+            "h": 34,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 644
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "filterVersion": 1,
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "eb7b1a2a92ac481f89c8a9dfb7def215",
+        "type": "Line",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "ff07d90194574ce3a3065beb22510202",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "折线图",
+          "type": "Line",
+          "title": "折线图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "d0c60f",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "e0ca61",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [],
+          "height": 360,
+          "layout": {
+            "i": "ba16a01443a445e89d1fd88b37cf42de",
+            "adaptive": false,
+            "h": 34,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": [],
+          "filterVersion": 1
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  }
+]

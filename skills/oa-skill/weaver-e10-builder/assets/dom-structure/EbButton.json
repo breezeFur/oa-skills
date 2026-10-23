@@ -1,0 +1,387 @@
+{
+  "component": "eb-button EB按钮组件",
+  "usage": "先看 btnKind 字段确定按钮形态：btn=普通按钮 / levelBtnGroup=层级按钮组 / tileBtnGroup=平铺按钮组。层级按钮组进一步区分 renderType（menu=图标菜单，其他=标准下拉）和 mobileShowType（移动端 default=Menu下拉，其他=遮罩Carousel）。找到对应分支后，通过条件class速查表定位元素编写样式。",
+  "legend": {
+    "[className]": "条件class，满足业务条件才挂载",
+    "{a|b}": "二选一class，编译后为联合类型",
+    "ref:shared.xxx": "引用 shared 中定义的复用片段，避免重复书写",
+    "uncontrolled": "外部组件(@weapp/ui)渲染，仅知道挂载点"
+  },
+  "pickTree": "1. btnKind 分支：btn / levelBtnGroup / tileBtnGroup\n2. levelBtnGroup 再看：renderType==='menu' → levelBtnGroup-pc-menu；否则 → levelBtnGroup-pc 或 levelBtnGroup-mobile\n3. levelBtnGroup-mobile 再看 mobileShowType：'default' → Menu下拉弹层；其他 → 遮罩 + Carousel\n4. tileBtnGroup 无 PC/Mobile 独立文件，共用 TileBtnGroupContent.tsx，通过 InMobile prop 切换子元素 class 和外壳",
+
+  "root": {
+    "tag": "div",
+    "class": ["ebcom-ebbutton-group-wrapper"],
+    "desc": "组件最外层引擎外壳 div（btn装饰态、levelBtnGroup、tileBtnGroup 均用此外壳 class）",
+    "children": []
+  },
+
+  "shared": {
+    "btnContent": {
+      "desc": "普通按钮内部内容片段（图标+文字+加载态）",
+      "chain": "span.ui-btn-content > Spin.ebcoms-ebbutton-spin.btn? + span.ui-btn-content-text | AssetsItem | (leftIcon + span.ui-btn-content-text + rightIcon)",
+      "tips": [
+        "display='name' 仅文字；'icon' 仅图标；'both' 图标+文字",
+        "position 决定图标 left/right 侧",
+        "无 btnIcon 或 design 态会渲染默认图标"
+      ]
+    },
+    "levelBtnContent": {
+      "desc": "层级/平铺主按钮内部内容片段",
+      "chain": "span.ebcoms-eb-button-group-content > (Spin.ebcoms-ebbutton-spin.main | AssetsItem)? + span.ebcoms-eb-button-cover-list-item-text + (rightPos Icon)?",
+      "tips": [
+        "tileBtnGroup 主按钮还额外渲染 div.ebcoms-eb-button-has-children",
+        "levelBtnGroup 有 otherAction 时父级 sibling 是 span.ebcoms-eb-button-group-content-otherAction"
+      ]
+    },
+    "subBtnContent": {
+      "desc": "下拉菜单项 / 平铺子菜单的内部内容片段",
+      "chain": "(div.ebcoms-eb-button-cover-list-item | div.ebcoms-eb-button-level-submenu-item) > (Spin.ebcoms-ebbutton-spin.sub | AssetsItem)? + span.ebcoms-eb-button-cover-list-item-text + (rightPos Icon)?",
+      "tips": [
+        "有 btnIcon 时：图标+文字；无 btnIcon 时：仅文字+loading态Spin",
+        "position 由 subIconPosition / subiconPosition 决定"
+      ]
+    },
+    "tileSheetBtnContent": {
+      "desc": "移动端遮罩弹层栅格按钮内容（垂直布局）",
+      "chain": "div.ebcoms-eb-button-group-m-sheet-item > (div.ebcoms-eb-button-cover-list-item-icon? + div.ebcoms-eb-button-cover-list-item-text + div.ebcoms-eb-button-cover-list-item-icon?)",
+      "tips": [
+        "onlyIcon 模式下只渲染 icon",
+        "position 决定 top/bottom 布局"
+      ]
+    },
+    "state": {
+      "desc": "JS运行时动态追加的class（不在初始render输出，交互时由组件setState触发）",
+      "list": [
+        {
+          "condition": "config.isDecoratedBtn===true",
+          "targetSelector": ".ui-btn.ebcoms-ebbutton-btn",
+          "addClass": "new-decorate",
+          "note": "装饰按钮，有自定义padding/border"
+        },
+        {
+          "condition": "config.size==='custom'",
+          "targetSelector": ".ui-btn.ebcoms-ebbutton-btn, .ebcom-ebbutton-group-wrapper",
+          "addClass": "is-custom-size"
+        },
+        {
+          "condition": "status==='disable' 或 btnStatus==='disable'",
+          "targetSelector": ".ui-btn.ebcoms-ebbutton-btn",
+          "addClass": "disabled",
+          "note": "按钮禁用态"
+        },
+        {
+          "condition": "btnStatus==='loading'",
+          "targetSelector": ".ui-btn.ebcoms-ebbutton-btn, .ebcoms-eb-button-group-wrapper, .ebcoms-eb-button-group-layout",
+          "addClass": "loading",
+          "note": "加载态，可能在按钮或外壳上"
+        },
+        {
+          "condition": "btnStatus==='selected'",
+          "targetSelector": ".ui-btn.ebcoms-ebbutton-btn",
+          "addClass": "selected"
+        },
+        {
+          "condition": "样式库自定义样式生效 (inCustomClassName state=true)",
+          "targetSelector": ".ebcoms-ebbutton",
+          "addClass": "inCustomEBButtonStyle",
+          "note": "去除默认 ui-btn:before 覆盖层"
+        },
+        {
+          "condition": "showExpandIcon===true",
+          "targetSelector": ".ebcoms-eb-button-group",
+          "addClass": "showExpandIcon",
+          "note": "主按钮与展开图标分离显示"
+        },
+        {
+          "condition": "主按钮 btnGroupDisabled===true",
+          "targetSelector": ".ebcoms-eb-button-group, .ebcoms-eb-button-level-main-btnOuter",
+          "addClass": "btnGroupDisabled / disabled"
+        },
+        {
+          "condition": "子按钮有 children",
+          "targetSelector": ".ebcoms-eb-button-group-menu-item",
+          "addClass": "hasChild"
+        },
+        {
+          "condition": "otherAction 图标悬停",
+          "targetSelector": ".ebcoms-eb-button-otherActionIcon",
+          "addClass": "isHover"
+        },
+        {
+          "condition": "tileBtnGroup 有 subBtnGroup",
+          "targetSelector": ".ebcoms-eb-button-level-main",
+          "addClass": "hasmore"
+        },
+        {
+          "condition": "tileBtnGroup mainBtnGroup.length===0",
+          "targetSelector": ".ebcoms-eb-button-level-main, .ebcoms-eb-button-level-menu",
+          "addClass": "only-more"
+        },
+        {
+          "condition": "config.filled===true",
+          "targetSelector": ".ebcoms-eb-button-level, .ebcoms-eb-button-level-m",
+          "addClass": "filled"
+        },
+        {
+          "condition": "tileBtnGroup subBtnGroup.length>0",
+          "targetSelector": ".ebcoms-eb-button-level, .ebcoms-eb-button-level-m",
+          "addClass": "hasMoreBtn"
+        },
+        {
+          "condition": "更多菜单前有主按钮",
+          "targetSelector": ".ebcoms-eb-button-level-menu",
+          "addClass": "hasbtn",
+          "note": "有主按钮时取消更多菜单左圆角"
+        },
+        {
+          "condition": "平铺主按钮无子菜单",
+          "targetSelector": ".ebcoms-eb-button-level-main-btnOuter",
+          "addClass": "noSub",
+          "note": "隐藏右侧下拉箭头"
+        },
+        {
+          "condition": "customStyle 指定主题色",
+          "targetSelector": ".ebcoms-eb-button-level-main-btnOuter, .ebcoms-eb-button-level-menu, .ebcoms-eb-button-level-submenu, .ebcoms-eb-button-group-m-menu-mask",
+          "addClass": "primary | success | warning | danger"
+        },
+        {
+          "condition": "tileBtnGroup 子按钮 hasBorder && tileMainBtnShowSplit",
+          "targetSelector": ".ebcoms-eb-button-level-main-btnOuter-split",
+          "addClass": "(渲染此分割线div)",
+          "note": "本身是一个渲染的div元素，不是class"
+        }
+      ]
+    }
+  },
+
+  "branches": {
+    "btn-pc": {
+      "when": "PC环境 + btnKind==='btn' 或未配置 + isDecoratedBtn=true",
+      "root": {
+        "tag": "div",
+        "id": "<comId>",
+        "class": ["ebcom-ebbutton-group-wrapper", "ebcoms-eb-button-group-layout"],
+        "conditionalClass": ["is-custom-size", "ebcom", "has-basic-style"],
+        "desc": "装饰按钮（有外壳div）。hoverTipSelect!=='none' 时外壳内先包一层 Popover 再包 Button；hoverTipSelect==='none' 时外壳内直接是 Button",
+        "children": [
+          {
+            "type": "uncontrolled",
+            "desc": "@weapp/ui Popover tooltip弹层",
+            "tips": [
+              "className: ebcoms-ebbutton-popover",
+              "hoverTipSelect === 'none' 时此层不存在"
+            ]
+          },
+          {
+            "tag": "button",
+            "class": ["ui-btn", "ebcoms-ebbutton-btn", "ebcoms-eb-button-group-layout"],
+            "conditionalClass": ["is-custom-size", "disabled", "new-decorate", "inCustomEBButtonStyle", "selected", "loading"],
+            "desc": "@weapp/ui Button 组件",
+            "children": ["ref:shared.btnContent"]
+          }
+        ]
+      },
+      "absent": []
+    },
+
+    "btn-pc-plain": {
+      "when": "PC环境 + btnKind==='btn' 或未配置 + isDecoratedBtn=false",
+      "root": {
+        "tag": "button",
+        "id": "<comId>",
+        "class": ["ui-btn", "ebcoms-ebbutton-btn", "ebcoms-eb-button-group-layout"],
+        "conditionalClass": ["is-custom-size", "disabled", "new-decorate", "inCustomEBButtonStyle", "selected", "loading"],
+        "desc": "@weapp/ui Button 组件，无外壳直接渲染",
+        "children": ["ref:shared.btnContent"]
+      },
+      "absent": []
+    },
+
+    "btn-mobile": {
+      "when": "移动端 + btnKind==='btn' 或未配置",
+      "root": {
+        "tag": "button",
+        "id": "<comId>",
+        "class": ["ui-btn", "ebcoms-ebbutton-btn", "eb-button-m-content"],
+        "conditionalClass": ["is-custom-size", "disabled", "new-decorate", "inCustomEBButtonStyle", "selected", "loading"],
+        "desc": "移动端普通按钮（固定带 eb-button-m-content class）",
+        "children": ["ref:shared.btnContent"]
+      },
+      "absent": ["ebcoms-eb-button-group-layout"]
+    },
+
+    "levelBtnGroup-pc": {
+      "when": "PC环境 + btnKind==='levelBtnGroup' + renderType !== 'menu'（标准下拉样式）",
+      "root": {
+        "tag": "div",
+        "id": "<comId>",
+        "class": ["ebcom-ebbutton-group-wrapper", "ebcoms-eb-button-group"],
+        "conditionalClass": ["showExpandIcon", "btnGroupDisabled", "loading"],
+        "desc": "层级按钮组 PC端 标准下拉",
+        "children": [
+          {
+            "tag": "div",
+            "class": ["ebcoms-eb-button-group-layout"],
+            "desc": "布局容器",
+            "children": [
+              {
+                "type": "uncontrolled",
+                "desc": "@weapp/ui Menu 组件",
+                "tips": [
+                  "overlayClassName: ebcoms-eb-button-cover-container + <comId> + customStyle",
+                  "showExpandIcon=false → selectType='normal'，主按钮在 customSelectContent 内",
+                  "showExpandIcon=true → selectType='btn'，主按钮在 customBtn 内",
+                  "triggerProps.popupClassName: ebcoms-eb-button-cover-trigger + (empty 时附加 empty)",
+                  "主按钮 Button class: ebcoms-eb-button-group-mainBtn",
+                  "主按钮内容容器: ebcoms-eb-button-group-select-content",
+                  "菜单项核心 class: ebcoms-eb-button-group-menu-item + ebcoms-eb-button-cover-list-item",
+                  "菜单项 otherAction 图标区域: ebcoms-eb-button-otherActionIcon",
+                  "菜单项 has-children 标记: ebcoms-eb-button-has-children",
+                  "菜单项右侧 end 区域: ebcoms-eb-button-group-menu-item-end"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "absent": []
+    },
+
+    "levelBtnGroup-pc-menu": {
+      "when": "PC环境 + btnKind==='levelBtnGroup' + renderType === 'menu'（样式库指定的图标菜单样式）",
+      "root": {
+        "tag": "div",
+        "id": "<comId>",
+        "class": ["ebcom-ebbutton-group-wrapper"],
+        "desc": "层级按钮组 PC端 图标菜单样式",
+        "children": [
+          {
+            "tag": "div",
+            "class": ["ebcoms-eb-button-group-layout"],
+            "conditionalClass": ["loading"],
+            "desc": "布局容器",
+            "children": [
+              {
+                "type": "uncontrolled",
+                "desc": "@weapp/ui Menu 组件 (selectType='iconOverlay')",
+                "tips": [
+                  "selectIcon: div.ebcoms-btn-group-menu-selectIcon [loading] > Popover > div.ebcoms-btn-group-menu [onlyicon|icon-right]",
+                  "ebcoms-btn-group-menu 内部结构: (rightPos 文字) + Spin/Icon + (leftPos 文字) + span.ebcoms-btn-group-menu-otherAction?",
+                  "菜单项与 levelBtnGroup-pc 相同",
+                  "overlayClassName: ebcoms-btn-group-menu-select-overlay + <comId>",
+                  "subGroupBtnPosition==='right' 时 selectOverlay 附加 ebcoms-btn-group-menu-select-overlay-right"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "absent": ["ebcoms-eb-button-group"]
+    },
+
+    "levelBtnGroup-mobile": {
+      "when": "移动端 + btnKind==='levelBtnGroup'",
+      "root": {
+        "tag": "div",
+        "id": "<comId>",
+        "class": ["ebcoms-eb-button-group-m", "ebcoms-eb-button-group-layout", "ebcoms-eb-button-content"],
+        "conditionalClass": ["loading"],
+        "desc": "层级按钮组 移动端",
+        "children": [
+          {
+            "type": "uncontrolled",
+            "desc": "mobileShowType==='default': @weapp/ui Menu (className: ebcoms-eb-button-group-m-menu, overlayClassName: ebcoms-eb-button-group-m-menu-sub)",
+            "tips": [
+              "主按钮 Button class: ebcoms-eb-button-group-m-menu-mainBtn",
+              "菜单项 class: ebcoms-eb-button-level-submenu-item",
+              "菜单项无 hoverTip（移动端不显示 tooltip）",
+              "菜单项子级弹层 overlayClassName: ebcoms-eb-button-group-m-menu-sub + customStyle",
+              "另一种 mobileShowType 模式: 额外渲染遮罩层 div.ebcoms-eb-button-group-m-menu-mask + MCarousel 栅格",
+              "遮罩层 mask 有主题色 primary/success/warning/danger class",
+              "遮罩内栅格按钮 class: ebcoms-eb-button-group-m-sheet-item [hasBorder|disabled]"
+            ]
+          }
+        ]
+      },
+      "absent": ["ebcom-ebbutton-group-wrapper", "ebcoms-eb-button-group", "Popover tooltip"]
+    },
+
+    "tileBtnGroup": {
+      "when": "btnKind==='tileBtnGroup' (PC/Mobile 共用 TileBtnGroupContent.tsx，通过 InMobile prop 切换)",
+      "root": {
+        "tag": "div",
+        "id": "<comId>",
+        "class": ["ebcoms-eb-button-level", "ebcom-ebbutton-group-wrapper"],
+        "conditionalClass": ["filled", "hasMoreBtn"],
+        "desc": "平铺按钮组 PC端外壳。移动端外壳 class 替换为 ebcoms-eb-button-level-m",
+        "children": [
+          {
+            "tag": "div",
+            "class": ["ebcoms-eb-button-group-layout"],
+            "desc": "布局容器",
+            "children": [
+              {
+                "tag": "div",
+                "class": ["ebcoms-eb-button-level-main"],
+                "conditionalClass": ["hasmore", "only-more"],
+                "desc": "主按钮区域容器（可包含多个主按钮）",
+                "children": [
+                  {
+                    "tag": "div",
+                    "class": ["ebcoms-eb-button-level-main-btnOuter"],
+                    "conditionalClass": ["noSub", "disabled", "loading", "primary", "success", "warning", "danger"],
+                    "desc": "单个主按钮外壳（数组 map 渲染）",
+                    "children": [
+                      {
+                        "tag": "span",
+                        "desc": "span > Menu.ui-btn (PC端) 或 Menu.ebcoms-eb-button-level-main-btn (移动端)",
+                        "children": ["ref:shared.levelBtnContent"]
+                      },
+                      {
+                        "tag": "div",
+                        "class": ["ebcoms-eb-button-level-main-btnOuter-split"],
+                        "desc": "按钮间分割线，仅 tileMainBtnShowSplit && item.hasBorder 时渲染",
+                        "children": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "uncontrolled",
+                "desc": "@weapp/ui Menu 更多按钮",
+                "tips": [
+                  "className: ebcoms-eb-button-level-menu.ui-menu",
+                  "conditionalClass: hasbtn | only-more | primary | success | warning | danger",
+                  "overlayClassName: ebcoms-eb-button-level-submenu (PC) 或 ebcoms-eb-button-level-submenu-m (Mobile) + customStyle",
+                  "子菜单项核心 class: ebcoms-eb-button-level-submenu-item",
+                  "子菜单项 loading/disabled 也是条件class",
+                  "更多按钮无 Popover tooltip（hoverTipSelect==='none'）",
+                  "移动端：子菜单 action='click'；PC端：action='hover'"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "diffs": [
+        "移动端外壳 class 为 ebcoms-eb-button-level-m",
+        "移动端 Menu className 为 ebcoms-eb-button-level-main-btn 而非 ui-btn",
+        "移动端子菜单弹层 overlayClassName 为 ebcoms-eb-button-level-submenu-m 而非 ebcoms-eb-button-level-submenu"
+      ],
+      "absent": []
+    }
+  },
+
+  "notes": [
+    "组件大量依赖 @weapp/ui 的 Button / Menu / Popover / Spin / Icon / AssetsItem，这些组件内部DOM不在eb-button控制范围内，但eb-button通过class来自定义样式",
+    "AssetsItem 是 @weapp/ui 的资源图标组件，外层 class 为 ebcoms-assets-item，内部渲染 svg/img",
+    "Spin 是加载态旋转图标组件，外层 class 含 ebcoms-ebbutton-spin，后续有位置修饰符 (btn|main|sub|levelBtn)",
+    "clsPrefix='ebcoms', ebcomPrefix='ebcom'，两者生成的 class 前缀不同，注意区分",
+    "hoverTipSelect==='none' 时普通按钮没有 Popover 包裹，层级组菜单项 tooltip 也会隐藏",
+    "样式库的 id 决定了是否走 levelBtnGroup-pc-menu (renderType='menu') 分支",
+    "tileBtnGroup 的 tileMainBtnShowSplit 由 defaultStyle.dfColorBd==='transparent' 或特定样式库 id 控制",
+    "otherAction 是按钮主操作旁的副操作按钮，有独立 icon 和事件，在 PC 层级组中表现为文字旁边的小图标区域"
+  ]
+}

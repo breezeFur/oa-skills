@@ -1,0 +1,390 @@
+{
+  "component": "NavPanel 导航面板",
+  "usage": "用户说『给导航面板某部分设样式』→ 按 pickTree 定位到某棵树 → 在树里找语义节点 → 用 id/class 写选择器。只列关键节点，纯布局包裹 div 已省略。",
+  "legend": {
+    "[cls]": "条件类名，满足条件才出现",
+    "{a|b}": "多选一",
+    "a > b": "合并两层（中间节点无类名/无关键类）",
+    "ref": "引用 shared 下的复用片段",
+    "<comId>": "组件运行时 id（挂在引擎外壳那层）。官方样式生成器一律以 #<comId> 限域，自写样式建议照做",
+    "前缀": "ebcoms=本仓库源码(clsPrefix) 与引擎(@weapp/ebdcoms)共用 | ebcom=引擎外壳与布局层(ebcomPrefix) | ui=@weapp/ui | swiper=轮播库"
+  },
+  "pickTree": "最外三层固定（见 root）：引擎外壳 > header + content + footer 三个平级兄弟，header/footer 由引擎按 titleEnabled / footerEnabled 决定有无。以下只描述 content 里面怎么分：① paginationDisplay=true → pagination；② 系统数据个人视图 → personal；③ enableGroup=true → layout.group（groupMode 再分 vertical / horizontal / newTab）；④ 其余 → layout.noGroup。PC 与移动端主结构同构，差异在 top.pc / top.mobile 与少量类名后缀；弹窗态多一个 .fromDialog 类。",
+
+  "root": {
+    "tag": "div",
+    "id": "<comId>",
+    "class": "ebcom ebcom-navpanel [ebcom-grid] [ebcom-view|ebcom-design] [has-no-header] [content-no-padding] [event-action-click] [standalone]",
+    "desc": "【引擎外壳】由引擎渲染，flex 纵列，所以下面固定挂 3 个子节点。⚠️ 这 3 个是平级兄弟，不是父子，别写 .content .header。defaultOpts.render.standalone 为真时三层整体不渲染（本组件未开启）。",
+    "children": [
+      { "ref": "shared.header", "desc": "titleEnabled=false 时不渲染，外壳上只留 has-no-header 状态类" },
+      {
+        "tag": "div",
+        "class": "content",
+        "desc": "【引擎内容槽】引擎固定追加，组件自己的 DOM 全在它里面，`#<comId> > .content` 可稳定命中。引擎默认 `flex:1 1 auto; padding:10px 15px; height:100%; overflow:auto`，本组件用 index.less 把 padding 覆盖为 0。⚠️ 别与 ebcoms-navPanel-wrapper-content（组件的内容滚动区，见 shared.content）混用——同名不同层。",
+        "children": [
+          { "ref": "shared.top", "desc": "顶部：快捷搜索栏 / 拓展菜单入口" },
+          { "tag": "div", "desc": "弹窗包裹层，无关键类" },
+          { "tag": "div", "id": "common-menus-<comId>", "class": "ebcoms-navPanel-common-menus-container", "desc": "仅 commonMenuSwitch && showCommonMenuGroup && !menuDataLoading → 见 commonMenus" },
+          { "ref": "layout.main", "desc": "主体：PagePanel 或 NavPanel 二选一" },
+          {
+            "tag": "div",
+            "class": "ebcoms-navPanel-bottom",
+            "desc": "仅『系统数据 + 默认内容 + groupMode=horizontal』的底部条",
+            "children": [
+              { "tag": "div", "class": "ebcoms-navPanel-bottom-wrapper", "desc": "『个人应用设置』整行（@weapp/ui Icon + 文案 + 外部组件 AppSettingDialogCom）" }
+            ]
+          }
+        ]
+      },
+      { "ref": "shared.footer", "desc": "footerEnabled=false 时不渲染（本组件默认不开）" }
+    ]
+  },
+
+  "shared": {
+    "top": {
+      "desc": "【顶部工具栏】PC / 移动端是两个不同容器类名",
+      "pc": {
+        "tag": "div",
+        "class": "ebcoms-navPanel-top",
+        "children": [
+          { "tag": "div", "class": "ebcoms-navPanel-ceiling-search", "desc": "仅 showSearch 或『更多展开且 showMoreInDialog=false』。内含 PinyinInput（ui-input）+ 可选两个 div.more-icon（⚠️ 无 ebcoms- 前缀）" },
+          { "tag": "div", "class": "ebcoms-navPanel-expand-menu", "desc": "仅系统数据 + showExpandMenu；内部是外部组件（@weapp/layout ExtendedMenu），DOM 不可控" }
+        ]
+      },
+      "mobile": {
+        "tag": "div",
+        "class": "ebcoms-navPanel-mobile-top [titleEnabled]",
+        "desc": "⚠️ titleEnabled 是反向条件（!titleEnabled 时才有这个类）",
+        "children": [
+          { "tag": "div", "class": "ebcoms-navPanel-ceiling-search.mobile", "desc": "移动端搜索栏（MPinyinInput）+ 可选 div.more-icon" },
+          { "tag": "div", "class": "ebcoms-navPanel-mobile-top-btn.viewMode", "desc": "视图切换（列表/方图标/圆图标），内含 TopMenu → ui-menu-*" },
+          { "tag": "div", "class": "ebcoms-navPanel-mobile-top-btn.expandMenu", "desc": "拓展菜单，同样 TopMenu → ui-menu-*；弹层用 ui-menu-select-*" }
+        ]
+      }
+    },
+
+    "wrapper": {
+      "tag": "div",
+      "class": "ebcoms-navPanel-wrapper [ebcoms-navPanel-wrapper-{vertical|horizontal|newTab}] [ebcoms-navPanel-wrapper-empty] [ebcoms-navPanel-wrapper-empty-search] [ebcoms-navPanel-wrapper-personal]",
+      "desc": "【主体最外层】-empty=无数据；-empty-search=空且带搜索；-personal=系统数据个人视图。加载中这一层里只有一个 ui-spin。"
+    },
+
+    "header": {
+      "when": "config.titleEnabled=true 且非 standalone。本组件没定义 static renderHeader / renderTitle，所以 100% 走引擎默认实现",
+      "chain": "div.header > ( div.ebcoms-title-icon[.noBgColor] > div.ebcoms-assets-item ) + div.ebcom-title[.ebcom-title-richtext] + div.ebcoms-header-btns > span > .ebcoms-configurable-btn.{showType} > .default-btn|.hover-btn",
+      "tips": "① 整行改高/去边框打 `.ebcom.ebcom-navpanel > .header`（默认 padding:0 20px; min-height/line-height:40px; color:#666; font-size:var(--font-size-lg); font-weight:600; border-bottom:1px solid var(--border-color); flex:0 0 auto）。② 改标题文字只认 .ebcom-title（富文本另带 -richtext）。③ 按钮组 .ebcoms-header-btns 最多两个 div：竖排=positionType RIGHT，横排=LEFT。④ ⚠️ 引擎用 `&:has(.ebcoms-header-btns)` 把标题改成 display:inline-block —— 这是『有顶部按钮时标题加 width 不生效』的原因。⑤ 兼容老结构 `.ebcom-header-wrap > .header`，不确定时两个都覆盖。"
+    },
+
+    "footer": {
+      "when": "config.footerEnabled=true 且 defaultOpts.render.showFooter!==false 且非 standalone。本组件没定义 static renderFooter；否则整块不存在（不是隐藏）",
+      "chain": "div.footer[内联 style=按钮对齐] > ( 组件 renderFooter，可空 ) + div.ebcoms-footer-btns > span > ConfigurableButton",
+      "tips": "① 默认 height/min-height:36px; border-top:1px solid var(--border-color); position:relative; display:flex。② ⚠️ 对齐由 JS 内联 style 写在 .footer 上，覆盖要 !important。③ 按钮组有 max-width:100%; height:100%; overflow-x:auto; padding:3px 0，其 > span 是 color:#666; font-size:12px; margin-right:10px（首个 margin-left:10px）。④ ⚠️ 引擎把内部默认按钮透明化：`.ui-btn.ui-btn-default{border-color:transparent;background-color:transparent}`（disabled/hover 各有独立规则），直接改 .ui-btn 会被压掉。⑤ 无权限/未付费时外壳照渲染但内部为空。"
+    },
+
+    "innerContent": {
+      "desc": "【一组菜单的内容块】非分组时直接挂 .ebcoms-navPanel-wrapper 下，分组时挂 .ebcoms-navPanel-wrapper-group-item 内",
+      "children": [
+        {
+          "tag": "div",
+          "id": "group-title-<comId>-<groupId>",
+          "class": "ebcoms-navPanel-wrapper-group-title",
+          "desc": "【分组标题行】有 id，限域最稳。仅 groupTitle 或 groupIcon 有值才渲染",
+          "children": [
+            {
+              "tag": "div",
+              "class": "ebcoms-navPanel-wrapper-group-title-text | ebcoms-navPanel-wrapper-group-title-text-m",
+              "desc": "PC 用 -text，移动端用 -text-m（独立类名）",
+              "children": [
+                { "tag": "div", "class": "ebcoms-assets-icon | ebcoms-assets-img", "desc": "分组图标（AssetsItem）" },
+                { "tag": "span", "class": "ebcoms-navPanel-wrapper-group-title-text-contentWithIcon > ebcoms-navPanel-wrapper-group-title-text-content", "desc": "【标题文字】有图标时才带 -contentWithIcon；官方样式表改分组标题宽度就是打这个类" }
+              ]
+            },
+            { "ref": "shared.operateBtn", "desc": "标题右侧的操作按钮（groupMode=newTab 时不在这层）" }
+          ]
+        },
+        { "ref": "shared.content" }
+      ]
+    },
+
+    "operateBtn": {
+      "desc": "【菜单操作按钮】编辑(定制)/更多 图标，仅在对应按钮落在面板内时渲染",
+      "tree": [
+        { "tag": "div", "class": "ebcoms-navPanel-wrapper-group-title-set", "desc": "单个按钮外壳（图标 + 5px 左边距），编辑与更多各一个", "children": [{ "tag": "div", "class": "ebcoms-assets-item", "desc": "编辑=Icon-* 自定义图标；更多=openIcon/closeIcon（展开前后切换），点击分别触发 openCustomMenu / openMoreMenu" }] },
+        { "tag": "div", "class": "common-group-edit-btn", "desc": "⚠️ 无 ebcoms- 前缀。仅当前分组=common_group 时出现，内含 @weapp/ui Icon（Icon-set-up-o）" },
+        { "tag": "div", "class": "nav-panel-btn-tabVertical", "desc": "⚠️ 无 ebcoms- 前缀。仅 newTab 且选项卡纵向排列且不在弹窗内时，操作按钮整体挪到这里（此时 group-title 里没有按钮）" }
+      ]
+    },
+
+    "content": {
+      "tag": "div",
+      "class": "ebcoms-navPanel-wrapper-content [ebcoms-navPanel-wrapper-content-notEmpty|ebcoms-navPanel-wrapper-content-isEmpty] [ebcoms-navPanel-wrapper-{styleId}]",
+      "desc": "【内容滚动区】内边距/滚动/最小宽度在这层；-{styleId} 是系统样式 id（41/42/770...），系统样式差异全靠它，改动前先确认当前 styleId。notEmpty/isEmpty 两个类名会在内层 wrapper 上再出现一次。",
+      "children": [
+        {
+          "tag": "div",
+          "class": "ebcoms-navPanel-wrapper-content-notEmpty ebcoms-navPanel-wrapper-content-wrapper",
+          "desc": "【行容器】flex-wrap 行；横向分组时会变成 flex-direction:column 并被 JS 做绝对定位",
+          "children": [
+            {
+              "tag": "div",
+              "class": "gap-style-line-wrap [system-menu-viewMode square|rotundity]",
+              "desc": "⚠️ gap-style-line-wrap 无 ebcoms- 前缀，是一行菜单。system-menu-* 只在『系统数据 + 图标视图 + 默认样式41』时附加",
+              "children": [{ "ref": "shared.card", "desc": "一行内按列数重复" }]
+            }
+          ]
+        },
+        { "ref": "shared.empty", "desc": "gapStyleDatas 为空时替代上面的行容器" }
+      ]
+    },
+
+    "card": {
+      "desc": "【单个菜单条目】= CustomCard。导航面板 90% 的样式需求都落在这棵树里",
+      "tree": [
+        {
+          "tag": "div",
+          "class": "ebcoms-navPanel-wrapper-customCardFirst ebcoms-navPanel-wrapper-customCard [no-border-right] [no-border-bottom] [no-margin-right] [no-margin-bottom] [ISEMPTY] [ebcoms-navPanel-wrapper-customCard-pre1] [ebcoms-navPanel-wrapper-customCard-show-gray-scale]",
+          "desc": "【条目外壳】宽度/高度/外边距在这层，并挂了 CSS 变量 --ebcoms-navPanel-icon-color（取值=图标色）。⚠️ 这些值都是内联 style（flex/height/width/margin），优先级高于样式表。no-*=无样式表的边框合并；ISEMPTY=补位空列（visibility:hidden）；pre1/pre5=预置模板；show-gray-scale=置灰。",
+          "children": [
+            {
+              "tag": "div",
+              "class": "ebcoms-navPanel-wrapper-square-pos ebcoms-navPanel-wrapper-square [ebcoms-navPanel-wrapper-customCardPC] [ebcoms-navPanel-wrapper-square-isDefault] [moreMenu] [customEditMenu] [swiper-lazy]",
+              "desc": "【可点击卡片本体】背景色/边框/圆角/内边距改这层；-customCardPC=PC 端；-square-isDefault=默认样式41（带 ::before 小箭头与内边距差异）；moreMenu/customEditMenu 用于区分『更多』『编辑』按钮条目（官方样式表靠这两个类排除它们）。⚠️ 它上面还有一层无类名的 EventClickable 包裹 div。",
+              "children": [
+                {
+                  "tag": "div",
+                  "class": "ebcoms-navPanel-wrapper-square-content",
+                  "desc": "⚠️ 条件层：只有 (useCustom || libStyle) && (nameIconPos || nameIconPosRelative)（即样式里配过图标/名称位置）才存在。没有它时 iconWrap 与 cardName 直接是 square 的子元素——写选择器务必用 `.square-content` 或后代选择器，别写死层级",
+                  "children": [
+                    {
+                      "tag": "div",
+                      "class": "ebcoms-navPanel-wrapper-iconWrap ebcoms-navPanel-wrapper-iconWrap-pos [ebcoms-navPanel-wrapper-iconWrap-hide]",
+                      "desc": "【图标区】与名称的间距 margin-bottom 在这层；图标本体样式（颜色/背景/圆角/尺寸）内联在这层。hide=仅图标显示模式下 hover 时隐藏",
+                      "children": [
+                        {
+                          "tag": "div",
+                          "class": "ebcoms-angle | ebcoms-angle-position | ebcoms-angle-block",
+                          "desc": "【角标容器】共用的 Angle 组件，恒带 ebcoms-angle（无角标时就是这个类）；有角标时 class 变成 ebcoms-angle-{position|block}",
+                          "children": [
+                            { "tag": "div", "class": "ebcoms-assets-item ebcoms-assets-icon | ebcoms-assets-img [moreMenu] [customEditMenu] [swiper-lazy]", "desc": "【图标本体】svg 图标=ebcoms-assets-icon，图片=ebcoms-assets-img。官方样式表用 `.content .ebcoms-assets-item:not(.moreMenu):not(.customEditMenu)` 定位普通图标、`.ebcoms-assets-item.moreMenu` 单独调更多图标尺寸" },
+                            { "tag": "span", "class": "ebcoms-navPanel-wrapper-numTips-icon ebcoms-angle-position-count > span", "desc": "【数字角标】按系统样式 id 不同会是三套孪生类名之一：ebcoms-navPanel-wrapper-numTips-icon / -numTips-text / -numTips-placeholder（index.less 里成对定义），总是与 ebcoms-angle-{position|block}-count 同时出现" }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tag": "div",
+                      "class": "ebcoms-navPanel-wrapper-cardName ebcoms-navPanel-wrapper-cardName-pos [ebcoms-navPanel-wrapper-cardName-isPre5] [ebcoms-navPanel-wrapper-cardName-hide]",
+                      "desc": "【名称区】对齐方式/内边距在这层；hide=纯图标模式 hover 时隐藏；isPre5=预置模板5",
+                      "children": [
+                        {
+                          "tag": "div",
+                          "class": "ebcoms-angle | ebcoms-angle-position",
+                          "desc": "名称也要挂角标（numTipsType=text 或无图标）时的 Angle 容器",
+                          "children": [
+                            { "tag": "div", "class": "ebcoms-navPanel-wrapper-cardName-text [ebcoms-navPanel-wrapper-cardName-text-m]", "desc": "【名称文字本体】富文本；移动端用 -text-m。官方样式表改名称字体就是打 `.ebcoms-navPanel-wrapper-cardName .ebcoms-navPanel-wrapper-cardName-text`" },
+                            { "tag": "div", "class": "ebcoms-navPanel-wrapper-cardDesc", "desc": "描述文字（仅 showItemDesc 且 descText.nameAlias 有值；横向分组不展示）" }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                { "tag": "div", "class": "ebcoms-navPanel-wrapper-placeholder > ebcoms-angle > ebcoms-navPanel-wrapper-placeholder-content", "desc": "仅默认样式41（isDefault）渲染，1px 占位，用于承载 placeholder 型数字角标" },
+                { "tag": "div", "class": "ebcoms-navPanel-wrapper-RightArrow", "desc": "右侧箭头（@weapp/ui Icon，Icon-Right-arrow01）。默认 display:none，只在部分样式/移动端列表视图下显示——写样式时常见需求就是把它打开" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+
+    "empty": {
+      "desc": "【空状态】NavEmpty → @weapp/ui Empty，恒为 ui-empty",
+      "chain": "div.ui-empty > ( div.ui-empty-image > svg图标 ) + div.ui-empty-description",
+      "tips": "文案随场景变化（暂无数据 / 此分组下暂无菜单 / 请在设计器右侧属性面板『添加菜单』）。index.less 里 `.ebcoms-navPanel-wrapper-content-isEmpty .ui-empty` 被强制撑满居中，调空状态布局先看这条。"
+    },
+
+    "emptyCommonGroup": {
+      "desc": "【常用菜单分组在搭建态的空态】与上面的 Empty 不是同一套 DOM",
+      "chain": "div.ebcoms-navPanel-common-menus-container > div.ebcoms-navPanel-common-menus-empty > ( div.title > ui-icon + span ) + div.ebcoms-navPanel-common-menus-empty-content > div*2"
+    }
+  },
+
+  "layout": {
+    "main": {
+      "desc": "主体二选一：config.paginationDisplay=true → pagination，否则 → noGroup / group",
+      "noGroup": {
+        "when": "!enableGroup",
+        "tree": [
+          { "ref": "shared.wrapper", "children": [
+            { "tag": "ui-spin", "desc": "menuDataLoading 时唯一子节点" },
+            { "ref": "shared.innerContent", "desc": "直接挂在 wrapper 下（没有 group-item 这层）" },
+            { "ref": "shared.empty", "desc": "isEmpty 时渲染 emptyContent" }
+          ] }
+        ]
+      },
+      "group": {
+        "when": "enableGroup=true（为假时 content 为 null，什么都不渲染）",
+        "tag": "div",
+        "class": "ebcoms-navPanel-wrapper-group [ebcoms-navPanel-wrapper-group-empty] [ebcoms-navPanel-wrapper-group-{vertical|horizontal|newTab}] [ebcoms-navPanel-newTab] [ebcoms-navPanel-newTab-vertical] [ebcoms-navPanel-newTab-mobile] [ebcoms-navPanel-newTab-bottom] [ebcoms-navPanel-newTab-right] [ebcoms-navPanel-newTab-inDialog] [ebcoms-navPanel-newTab-emptyGroup]",
+        "desc": "⚠️ 两组类名不同源：分组模式类带 -wrapper-（ebcoms-navPanel-wrapper-group-*），而 newTab 系列类不带（ebcoms-navPanel-newTab-*）。newTab 位置类 -bottom/-right 来自选项卡组件回传的 layout；-vertical=选项卡纵向；-emptyGroup=当前分组没数据。",
+        "mode": {
+          "vertical": {
+            "desc": "【纵向分组，默认】每组一整块竖排",
+            "item": {
+              "tag": "div",
+              "class": "ebcoms-navPanel-wrapper-group-item <comId> [fromDialog]",
+              "desc": "⚠️ 这个容器上同时挂了『组件 id 作为 class』（源码模板串写死的），别当成 id 用。内部 = shared.innerContent。vertical 且 groupSplitting 开启时，组与组之间还有分隔条",
+              "children": [{ "ref": "shared.innerContent" }, { "tag": "div", "class": "ebcoms-navPanel-wrapper-group-item-split", "desc": "分隔条（background:var(--bg-base)，高 20px）" }]
+            },
+            "collapse": {
+              "when": "同 vertical 且 config.collapseEnable=true —— 这时 item 层换成 Collapse",
+              "chain": "div.ui-collapse.ui-collapse--no-border.ui-collapse-group > div.ui-collapse-panel.ui-collapse-panel--has-arrow.ui-collapse-panel--active|--inactive > ( div.ui-collapse-panel__title ) + div.ui-collapse-panel__content-box.ui-collapse-panel__content",
+              "tips": "标题行里的组图标额外带 ebcoms-navPanel-wrapper-group-vertical-collapseIcon；箭头是 .ui-collapse-group-panel__arrow-right。展开态类名是 --active/--inactive（⚠️ group 模式下 active 语义被取反）"
+            }
+          },
+          "horizontal": {
+            "desc": "【横向分组】组在容器里绝对定位，left/top 由 JS 按瀑布流算（列优先），过渡 left/top 0.3s",
+            "tips": "组容器 .ebcoms-navPanel-wrapper-group-item 变成 width:140*hd 的浮动块；.ebcoms-navPanel-wrapper-content-wrapper 转成 flex-direction:column；卡片 .ebcoms-navPanel-wrapper-square 变成一行小条（flex-direction:row，无边框）。给横向分组的组块调样式优先打 .ebcoms-navPanel-wrapper-group-horizontal 限域。"
+          },
+          "newTab": {
+            "desc": "【选项卡分组】选项卡组件由引擎（@weapp/designer 的 DroppableView）挂载，id 固定为 #ebd_nav_panel，导航面板只负责把分组内容塞进去",
+            "tree": [
+              { "tag": "div", "id": "ebd_nav_panel", "class": "ebcom ebcom-newtab ebcoms-tab-header ...", "desc": "选项卡本体（属于 tab 组件，不是本组件的类名）。改选项卡样式请用它的类名；导航面板 index.less 只依赖 `.ebcoms-tab-header.topDropdown .nav-panel-btn` 这一个选择器" },
+              { "tag": "div", "class": "ebcoms-navPanel-wrapper-group-item", "desc": "当前激活分组的菜单内容（结构与 vertical 的 item 相同，但没有 <comId> 类）" },
+              { "tag": "div", "class": "nav-panel-btn-tabVertical", "desc": "选项卡纵向时操作按钮的落点（见 shared.operateBtn）" }
+            ]
+          }
+        }
+      }
+    }
+  },
+
+  "pagination": {
+    "when": "config.paginationDisplay=true（PagePanel 树，PC/移动端共用）",
+    "tree": [
+      { "ref": "shared.wrapper" },
+      {
+        "tag": "div",
+        "class": "ebcoms-navPanel-wrapper-content ebcoms-navPanel-wrapper-content-page [ebcoms-navPanel-wrapper-content-notEmpty|ebcoms-navPanel-wrapper-content-isEmpty]",
+        "desc": "注意多了 -page 后缀；-page 下 .gap-style-line-wrap-page 会强制 flex-wrap:wrap",
+        "children": [
+          { "tag": "div", "class": "ui-spin", "desc": "menuDataLoading 时的占位" },
+          {
+            "tag": "div",
+            "class": "ui-carousel ebcoms-navPanel-wrapper-content-carousel [ui-carousel-rtl]",
+            "desc": "【轮播】@weapp/ui Carousel（swiper）。分页器/箭头样式改这层里的 swiper 类",
+            "children": [
+              {
+                "tag": "div",
+                "class": "ui-carousel-swiper-content ui-carousel-swiper-{horizontal|vertical} ui-carousel-swiper-imgFill [ui-carousel-swiper-ie]",
+                "desc": "swiper 容器。⚠️ 导航面板把 .swiper-wrapper 设成 visibility:hidden，只让 .swiper-slide-active > div 可见（index.less）",
+                "children": [
+                  { "tag": "div", "class": "swiper-container > swiper-wrapper > div.swiper-slide", "desc": "一页一个 slide" },
+                  { "tag": "div", "class": "gap-style-line-wrap-nav [gap-style-line-arrow-padding]", "desc": "非默认样式41：一页的行容器；内部是 div.gap-style-line-wrap > shared.card", "children": [{ "tag": "div", "class": "gap-style-line-wrap", "children": [{ "ref": "shared.card" }] }] },
+                  { "tag": "div", "class": "gap-style-line-wrap-41 gap-style-line-wrap gap-style-line-wrap-page", "desc": "默认样式41 专用的行容器（与上面是互斥分支）", "children": [{ "ref": "shared.card" }] }
+                ]
+              },
+              { "tag": "div", "class": "ui-carousel-pagination swiper-pagination [pagination-custom-vertical]", "desc": "分页器。bullets 里每颗是 span.swiper-pagination-bullet，激活态 .swiper-pagination-active；progressbar 变体用 .swiper-pagination-bullet-carousel + .swiper-pagination-carousel-active。官方样式表改分页激活色就是打这两个激活类" },
+              { "tag": "div", "class": "ui-carousel-swiper-button-next .swiper-button-next.swiper-button-white | ui-carousel-swiper-button-prev .swiper-button-prev.swiper-button-white", "desc": "仅 paginationType=arrow 时存在" }
+            ]
+          },
+          { "ref": "shared.empty" }
+        ]
+      }
+    ]
+  },
+
+  "commonMenus": {
+    "when": "config.commonMenuSwitch && showCommonMenuGroup && !menuDataLoading；searchValue 非空时整块返回 null（隐藏）",
+    "tag": "div",
+    "id": "common-menus-<comId>",
+    "class": "ebcoms-navPanel-common-menus-container",
+    "desc": "【常用菜单分组】设计态走 isDesign 分支渲染空态；预览态内嵌一个 isCommon 的 NavPanelContent —— 也就是说里面还会出现 shared.wrapper / shared.content / shared.card 的同一套类名，写选择器建议用 #common-menus-<comId> 或 .ebcoms-navPanel-common-menus-container 限域。",
+    "children": [
+      {
+        "tag": "div",
+        "class": "ebcoms-common-menus-header",
+        "desc": "仅 !commonSwitch 时出现（commonSwitch=true 表示常用菜单已并入选项卡）",
+        "children": [
+          { "tag": "div", "class": "ebcoms-common-menus-header-title [ebcoms-common-menus-header-m-title]", "desc": "【常用菜单标题】移动端用 -m-title；官方样式表改常用菜单标题就是打这个类", "children": [{ "tag": "div", "class": "ebcoms-assets-icon | ebcoms-assets-img", "desc": "标题图标" }] },
+          { "tag": "div", "class": "icon", "desc": "⚠️ 无前缀。设置齿轮（Icon-set-up-o），点击打开常用菜单设置弹窗" }
+        ]
+      },
+      {
+        "tag": "div",
+        "class": "ebcoms-common-menus-body",
+        "desc": "内部就是一套完整的导航面板（isCommon）",
+        "children": [
+          { "ref": "shared.wrapper" },
+          { "tag": "div", "class": "ebcoms-common-menus-body-split", "desc": "groupSplitting 开启时的分隔条" }
+        ]
+      }
+    ]
+  },
+
+  "personal": {
+    "when": "menuSourceType=SYSTEM_DATA_INTERFACE 且 menuSourceContent=PERSONAL 且 无导航面板样式 且 PC 且 gridLayout",
+    "tree": [
+      { "ref": "shared.wrapper", "desc": "另外带 ebcoms-navPanel-wrapper-personal" },
+      {
+        "tag": "div",
+        "class": "ebcoms-navPanel-personal-data ebcoms-navPanel-wrapper-content",
+        "desc": "⚠️ personal-data 家族用 navPanelClsPrefix（=ebcoms-navPanel），不是 -wrapper- 系列",
+        "children": [
+          {
+            "tag": "div",
+            "class": "ebcoms-navPanel-wrapper-content-wrapper > div.ebcoms-navPanel-wrapper-customCard",
+            "desc": "复用了普通条目的 customCard 类名",
+            "children": [
+              { "tag": "div", "class": "ui-layout-row > ui-layout-col", "desc": "@weapp/ui Layout，按模块数量 1~9 走不同栅格组合" },
+              {
+                "tag": "div",
+                "class": "ebcoms-navPanel-personal-data-single ebcoms-navPanel-wrapper-square [ebcoms-navPanel-personal-data-single-hover] [ebcoms-navPanel-personal-data-single-iconTitle]",
+                "desc": "【个人数据卡】背景色/背景图内联在这层；-iconTitle=图标+文字；-hover=悬停时才显名称",
+                "children": [
+                  { "tag": "div", "class": "ebcoms-navPanel-wrapper-square", "desc": "⚠️ 里面又套了一层同名 square" },
+                  { "tag": "div", "class": "ebcoms-navPanel-personal-data-single-name", "desc": "名称（内部 span，纯图标模式下 visibility:hidden）" },
+                  { "tag": "div", "class": "ebcoms-navPanel-personal-data-single-num", "desc": "数字（右下角绝对定位）" }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  "dialogs": {
+    "moreDialog": {
+      "desc": "【更多菜单弹窗】showMoreInDialog=true 且点了更多",
+      "chain": ".ui-dialog.ebcoms-navPanel-wrapper-more-dialog.ebcom [.ebcoms-navPanel-wrapper-more-dialog-empty] > ... > div.content > ( div[nav-panel 顶部] + SyncNavPanel(fromDialog) )",
+      "tips": "⚠️ ① 弹层挂在 body，不能拿 #<comId> 当祖先选择器；② 弹窗内的内容层类名就叫 content（局部字符串，不是引擎那个全局类）；③ dialogId=`<comId>-more-dialog`；④ 官方取宽度用 `.ebcoms-navPanel-wrapper-more-dialog .ui-layout-inner-container`；⑤ 标题栏里的编辑图标是 .ui-dialog-icon.navPanel-edit-icon。"
+    },
+    "editDialog": {
+      "desc": "【菜单设置/编辑弹窗】（CustomCardDialog）",
+      "chains": [
+        "弹窗态：.ui-dialog.ebcoms-navPanel-wrapper-more-edit-dialog（仅 showMore 时带此类） > ... > div.ebcoms-navPanel-wrapper-more-edit-dialog-content > div.ebcoms-navPanel-wrapper-more-edit-dialog-content-header(+ h4 分组标题) + @weapp/ui List(ui-list)",
+        "内联态（showCustomInDialog=false 且 customizeOuterBtn!=='1'）：直接渲染 div.ebcoms-navPanel-wrapper-more-edit-dialog（无 ui-dialog 外壳）",
+        "空态：.ebcoms-navPanel-wrapper-more-edit-dialog-empty > ui-empty + div.ebcoms-navPanel-wrapper-more-edit-dialog-empty-create"
+      ],
+      "item": ".ebcoms-navPanel-wrapper-square-dialog > .ebcoms-navPanel-wrapper-iconWrap + .ebcoms-navPanel-wrapper-iconWrap-iconname( > i.ebcoms-navPanel-wrapper-iconWrap-iconname-custom + div.ebcoms-navPanel-wrapper-iconWrap-iconname-div ) + .reduce-icon|.add-icon",
+      "tips": "非弹窗态还会出现两个无前缀类：.showCustom-notIn-Dialog-search / .showCustom-notIn-Dialog；底部『完成』类名是 .ebcoms-navPanel-wrapper-more-edit-dialog-content-content，右下角是 .ebcoms-navPanel-wrapper-bottom-right。"
+    },
+    "topOperateButtons": {
+      "desc": "【顶部操作按钮】由引擎渲染（不是本组件 DOM）。导航面板注册了 3 个自定义渲染：快捷搜索 / 更多 / 编辑菜单",
+      "chain": "span.ebcom-quick-search[-hover] > div.ebcom-quick-search-button > 按钮 + div.ebcom-quick-search-field[-show] > ui-input",
+      "tips": "⚠️ 前缀是 ebcom（引擎），不是 ebcoms。普通按钮（刷新等）是 .ebcoms-configurable-btn 体系，结构与 pageheader 的按钮一致。"
+    }
+  },
+
+  "notes": [
+    "【最容易写错的类名】① 分组模式类带 -wrapper-（ebcoms-navPanel-wrapper-group-*），而 newTab 位置类不带（ebcoms-navPanel-newTab-*）；② 源码里写死、无 ebcoms- 前缀的：.nav-panel-btn-tabVertical、.common-group-edit-btn、.common-menus-header .icon、.gap-style-line-wrap、.more-icon；③ 个人数据用 ebcoms-navPanel-personal-data-*（-navPanel-），不是 ebcoms-navPanel-wrapper-personal-data；④ .header/.content/.footer 同样无前缀，但它们是引擎的层，别去本组件源码里找。",
+    "【两个同名陷阱】引擎的 .content（无前缀，组件 DOM 的容器）≠ 组件的 ebcoms-navPanel-wrapper-content（内容滚动区）；引擎 .header 里的标题是 .ebcom-title，不是组件类名。",
+    "【引擎自动加的修饰类】`.content-no-padding > .content{padding:0}`（config.padding===false）、`.event-action-click > .content{cursor:pointer}`（绑了点击事件）、`.header.hide-header{height:0;min-height:0}`（折叠态，本组件不加）。查 padding 异常先确认是被 index.less 还是被 content-no-padding 命中的。",
+    "【官方样式生成器（view/getNavStyles.ts）的选择器清单】它的 CSS 全部以 `#<comId> .content ...` 限域，自写样式直接沿用同一套，可被样式面板的『自定义 CSS』吸收：普通图标 `.content .ebcoms-assets-item:not(.moreMenu):not(.customEditMenu)`；更多/编辑图标 `.ebcoms-assets-item.moreMenu` / `.customEditMenu`（含 .ui-icon .ui-icon-svg 子选择器）；行 `...-wrapper-content .ebcoms-navPanel-wrapper-content-wrapper .gap-style-line-wrap`（分页行为 -nav）；轮播 `...-wrapper-content-carousel`；卡片 `-wrapper-customCard .ebcoms-navPanel-wrapper-square`；图标/名称位置 `-wrapper-square-pos .ebcoms-navPanel-wrapper-square-content .ebcoms-navPanel-wrapper-iconWrap-pos|.cardName-pos`；分组标题 `-wrapper-group-title` 与 `-title-text-content`；常用菜单标题 `.ebcoms-navPanel-common-menus-container .ebcoms-common-menus-header-title`。",
+    "【分页 vs 单页】共用 wrapper / content / card 类名，差异：content 多 -page、行容器变 gap-style-line-wrap-nav（或 -41）、外套 @weapp/ui Carousel（ui-carousel / swiper-*）。改分页器颜色只用 swiper-pagination-active 与 swiper-pagination-carousel-active。",
+    "【反查源码】本组件 → view/（SyncNavPanel.tsx 分组、SyncNavPanelInnerContent.tsx 组标题+行、CustomCard.tsx 条目、PagePanel.tsx + SyncPagePanel.tsx 分页轮播、View.tsx 顶部/弹窗/底部壳、index.less）、common/CommonMenus/、personalDataCom/、design/Sync*.tsx（弹窗）、view-m/View.tsx（移动端顶部）。@weapp/ui → D:\\fwCode\\weapp-ui（empty/collapse/carousel/spin/input/menu/icon）。引擎（外壳 / header / content / footer / 标题 / 按钮 / 顶部操作按钮）→ D:\\fwCode\\weapp-ebdcoms/src/components/core/：view/createView.tsx、view/Content.tsx、design/createDesign.tsx、design/common.less、style/getBasicStyles.ts、utils/comp.ts、view/TitleIconCom/、view/operation-btns/、common/button-config/ConfigurableButton.tsx、constants/index.ts（clsPrefix=ebcoms、ebcomPrefix=ebcom）。设计器侧 id 落点 → D:\\fwCode\\weapp-designer/src/core/view/internal/Container.tsx。"
+  ]
+}

@@ -1,0 +1,337 @@
+{
+  "component": "HBarStack（堆积条图）",
+  "usage": "图表组件的 HTML 结构索引，用于样式定位：用户说「给堆积条图的 XX 设置样式」时，在这里按语义找节点，用它的 id / class 写选择器。不是完整 DOM 树，只列有 id 或关键 class 的元素。",
+  "legend": {
+    "[cls]": "条件类名：条件满足时才出现，否则该类名不存在",
+    "{a|b}": "多选一：实际只会出现其中一个",
+    "a > b": "合并两层：b 是 a 的直接子元素（中间没有有意义的元素）",
+    "ref": "引用本文件 shared.* 里的复用片段",
+    "<comId>": "尖括号 = 需要替换的占位符。<comId> 是该组件在页面里的实例 id（配置界面叫「组件ID」），写样式时用它限域，例如 #<comId> .ebcoms-charts-total；<contentClass> 等同理。注意花括号 {a|b} 只表示「多选一」，不用来表示占位符。",
+    "ebcom / ebcom-*": "weapp-ebdcoms 引擎加的类，不在图表组件源码里（core/view/createView.tsx + core/utils/comp.ts）",
+    "ebcoms-*": "图表组件源码写的类（clsPrefix = 'ebcoms'）",
+    "ui-*": "@weapp/ui 组件的类：ui-echarts / ui-table-grid-* / ui-spin / ui-empty / ui-pagination / ui-icon / ui-bread-crumb / ui-popover",
+    "weapp-ebdf-*": "筛选搜索组件（@weapp/ebpagedesign）的类，只给挂载点，内部结构不可控"
+  },
+  "pickTree": "按「区域」取树：标题区→header，图表区（合计/轴名/canvas/加载）→chartArea，数据表→dataList，图表左右侧的数值清单→labelDataList。写样式时先 #<comId> 限域再往下找。本类型没有「数值展示列表」区域（不在 isDataOnLeftOrRight 列表）。",
+  "root": {
+    "desc": "引擎外壳，所有图表组件完全一致，由 weapp-ebdcoms 渲染（不在图表源码里）。写样式统一用 #<comId> 限域。",
+    "tree": {
+      "tag": "div",
+      "id": "<comId>",
+      "class": "ebcom ebcom-hbarstack [ebcom-m] ebcom-{grid|flow} ebcom-view ebcom-chart has-no-header",
+      "desc": "组件根。ebcom-hbarstack=类型类（同页多个图表组件靠它区分类型）；ebcom-m 仅移动端；ebcom-{grid|flow}=页面布局；ebcom-chart 来自图表 defaultOpts.render.containerClass；has-no-header 恒有（图表用 renderHeader 自渲染标题，不走引擎的默认 header）。",
+      "children": [
+        {
+          "tag": "div",
+          "class": "header",
+          "when": "config.titleEnabled = true",
+          "desc": "标题区。内容由图表自己的 ChartHeader 接管（见 header 树）。标题关闭时这个节点整个不存在。",
+          "ref": "header.tree"
+        },
+        {
+          "tag": "div",
+          "class": "<contentClass> content",
+          "desc": "引擎内容槽，图表全部内容都在这里。view 模式初始只有 content，其余类名由脚本 classList.toggle 追加；design 模式直接带全。可能追加到 .content 上的类：ebcoms-charts-fl（流式布局）、ebcoms-hbarstack-content（流式布局）、show-data-list、data-list-direction-{top|bottom|left|right}、ebcoms-charts-reloading、ebcoms-charts-grid-mobile、displayFlex。",
+          "ref": "chartArea.tree"
+        },
+        {
+          "tag": "div",
+          "class": "footer",
+          "desc": "引擎底部操作栏。图表默认不开，几乎见不到；开了才会在 .content 之后出现 .ebcoms-footer-btns。"
+        }
+      ]
+    }
+  },
+  "shared": {
+    "desc": "跨区域复用的小片段。同一个 class 在多个区域出现时以这里的定义为准。",
+    "empty": {
+      "tag": "div",
+      "class": "ui-empty",
+      "desc": "@weapp/ui Empty。图表里三种用法：未匹配配置（“请设置图表配置项”）、无数据（type=noData）、词云 IE 提示（多一个 ebcoms-charts-com-WordCloud-IEempty）。紧挨着还有一个 .ebcoms-charts-placeholder 占位块（echarts 未实例化时）。"
+    },
+    "spin": {
+      "tag": "div",
+      "class": "ui-spin [ui-spin-nested-loading > ui-spin-container]",
+      "desc": "@weapp/ui Spin。图表里有 3 处，外层都会再拼一个 ebcoms-* 类：ebcoms-charts-view-loading（图表区首次加载，在 .ebcoms-charts-com 内）、ebcoms-charts-view-reloading（刷新遮罩，绝对定位铺满半透明白，在 .ebcoms-charts-main 下）、数据表内部（ui-table-grid 内自动包一层）。"
+    },
+    "toolbarBtn": {
+      "tag": "span",
+      "desc": "标题区每个操作按钮外层都是一个无 class 的 span（OperationBtns 渲染）。里面要么是图表自己的定制视图（ChartSwitch / YMDSwitch / ChartsToolbarBtn），要么是 @weapp/ui 的 ConfigurableButton（ui-btn）或配置的图标（ui-icon > svg.ui-icon-svg）。想单独选中某个按钮只能靠 :nth-child() 或按内容定位。"
+    },
+    "filterMount": {
+      "tag": "div",
+      "class": "ebcoms-cmf-view [showFilter] [empty] [mobile] [onlyCondition]  或  ebcoms-cms-search [design] [active]",
+      "desc": "筛选条件区的挂载点（CommonFilter / SearchContent）。标题区和图表区各可能出现一个，两者互斥：筛选按钮配置在标题区时只在标题区渲染。内部 DOM 不可控，只在这个挂载点上写样式。"
+    }
+  },
+  "header": {
+    "when": "config.titleEnabled = true。关闭时 #<comId> 上带 has-no-header，.header 节点不存在。",
+    "chain": "#<comId> > .header.ebcoms-charts-custom-header.PC|MOBILE",
+    "tree": {
+      "tag": "div",
+      "class": "ebcoms-charts-custom-header header  PC|MOBILE",
+      "desc": "标题区根。同时带引擎的 .header（布局用的通用类）和组件的 ebcoms-charts-custom-header。末尾的 PC / MOBILE 是 page.client 直接拼上去的，用来控制标题最大宽度（PC 65% / MOBILE 45%），不是类名前缀。",
+      "children": [
+        {
+          "tag": "div",
+          "class": "ebcoms-charts-custom-header-title-content",
+          "desc": "标题文本区。可能先有一个标题图标组件（TitleIconCom，仅配了标题图标时），然后是一个 <div> 承载标题 HTML（dangerouslySetInnerHTML，所以标题里的富文本、动态字段也会渲染进这个 div，别以为只有纯文本）。"
+        },
+        {
+          "tag": "div",
+          "class": "[isDesign]",
+          "desc": "flex:1 的右侧区，按顺序放：操作按钮组、筛选条件、再一个操作按钮组（筛选按钮配置在最后一位时按钮会挪到筛选前面）、design 模式下的遮罩 ebcoms-charts-main-filtertotal-mask。",
+          "children": [
+            {
+              "tag": "div",
+              "class": "ebcoms-header-btns",
+              "desc": "顶部操作按钮组（OperationBtns 的 wrapClass）。左侧按钮和右侧按钮会渲染成两个同 class 的兄弟 div，所以 .ebcoms-header-btns 在标题区可能出现两次，别用 :first-child 猜。",
+              "children": [
+                {
+                  "tag": "div",
+                  "class": "ebcoms-chart-toolbar",
+                  "when": "“图表工具栏”按钮开启（isSupportChartToolsConfig）",
+                  "desc": "图表工具栏。固定 6 个 span 槽位，顺序固定；每个槽位内部再分 .default / .hover 两个 span。.default 和 .hover 是通用类名，写样式必须用 .ebcoms-chart-toolbar 限定，否则会串到别处。",
+                  "children": [
+                    {
+                      "tag": "span",
+                      "class": "btn-boxSelect",
+                      "desc": "区域缩放。图标存在；里面有 .default 与 .hover 两个 span（默认显示 default，hover 换成 hover，宽度/颜色/底色可由按钮配置写进行内 style），图标是 ui-icon > svg.ui-icon-svg，选中态加 .selected。"
+                    },
+                    {
+                      "tag": "span",
+                      "class": "btn-clearBoxSelect",
+                      "desc": "区域缩放还原。图标存在；里面有 .default 与 .hover 两个 span（默认显示 default，hover 换成 hover，宽度/颜色/底色可由按钮配置写进行内 style），图标是 ui-icon > svg.ui-icon-svg，选中态加 .selected。"
+                    },
+                    {
+                      "tag": "span",
+                      "class": "btn-changeLine",
+                      "desc": "切换为折线图。图标存在；里面有 .default 与 .hover 两个 span（默认显示 default，hover 换成 hover，宽度/颜色/底色可由按钮配置写进行内 style），图标是 ui-icon > svg.ui-icon-svg，选中态加 .selected。"
+                    },
+                    {
+                      "tag": "span",
+                      "class": "btn-changeBar",
+                      "desc": "切换为柱状图。图标存在；里面有 .default 与 .hover 两个 span（默认显示 default，hover 换成 hover，宽度/颜色/底色可由按钮配置写进行内 style），图标是 ui-icon > svg.ui-icon-svg，选中态加 .selected。"
+                    },
+                    {
+                      "tag": "span",
+                      "class": "btn-restore",
+                      "desc": "还原。图标存在；里面有 .default 与 .hover 两个 span（默认显示 default，hover 换成 hover，宽度/颜色/底色可由按钮配置写进行内 style），图标是 ui-icon > svg.ui-icon-svg，选中态加 .selected。"
+                    },
+                    {
+                      "tag": "span",
+                      "class": "btn-saveAsImage",
+                      "desc": "保存为图片。图标存在；里面有 .default 与 .hover 两个 span（默认显示 default，hover 换成 hover，宽度/颜色/底色可由按钮配置写进行内 style），图标是 ui-icon > svg.ui-icon-svg，选中态加 .selected。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "ref": "shared.filterMount",
+              "when": "筛选按钮在标题区"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "chartArea": {
+    "desc": "引擎 .content 里的全部内容，由 AsyncBaseView + ChartView 渲染。",
+    "tree": {
+      "tag": "div",
+      "class": "ebcoms-charts-main",
+      "desc": ".content 下唯一的内容根。它是个 flex 容器：图表容器 .ebcoms-charts-com 和数据表 .ebcoms-data-list-display-content 是平级兄弟，所以 dataListDisplay.visible 时 .content 加 show-data-list，index.less 用它和 data-list-direction-* 决定图表与数据表是上下还是左右排列。",
+      "children": [
+        {
+          "tag": "div",
+          "class": "ebcoms-charts-main-switchChartType",
+          "when": "“图表类型”按钮开启 && customValue.keepDisplaying && 标题未开启（标题开启时它挪进标题区）",
+          "desc": "常驻在图表上方的图表类型切换条。",
+          "children": [
+            {
+              "tag": "div",
+              "class": "ebcoms-chart-head-chartSwitch",
+              "children": [
+                {
+                  "tag": "span",
+                  "class": "ebcoms-chart-head-chartSwitch-item [active]",
+                  "desc": "每个可切换类型一项，active=当前类型。内含图标（普通类型 ui-icon；Bullet 内联 svg.icon；WordCloud / Facet / HeatMap 是 img）+ 类型名文本。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "id": "id_<comId>",
+          "class": "ebcoms-charts-com [ebcoms-charts-preview] [hide]",
+          "desc": "图表容器，图表区所有东西都在这。id 是 id_<comId>（id_ + 组件 id）。ebcoms-charts-preview 仅 stylePre（预览）时；hide 仅 dataListDisplay.onlyTable（只显示数据表）时。容器自带 min-width: 30px（源码注释：宽度过小时气泡图 echart 内部会报错）。",
+          "children": [
+            {
+              "tag": "div",
+              "id": "filtertotal_<comId>",
+              "class": "ebcoms-charts-main-filtertotal [hasRelationStatistics]",
+              "desc": "图表上方一行：左边合计、右边筛选条件（两者独立出现）。hasRelationStatistics 仅关系图且有统计时（左侧让出 150px）。注意它和 .ebcoms-charts-main 是两个不同的 main。",
+              "children": [
+                {
+                  "tag": "ul",
+                  "class": "ebcoms-charts-total",
+                  "when": "showTotal && 有数据 && 配置已初始化（本类型支持合计）",
+                  "desc": "合计区，每个指标一个 li，li 上没有类名（要单独选只能 :nth-child()）。这里会先撑高再触发图表 resize。"
+                },
+                {
+                  "ref": "shared.filterMount",
+                  "when": "配了筛选条件且按钮不在标题区"
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "id": "chartStatChildren_<comId>",
+              "when": "有维度钻取 或 维度开了“统计下级”",
+              "desc": "下钻 / 统计下级 / 关系图展开的挂载点（面包屑 + 弹出菜单）。不需要时这个 id 节点不存在。",
+              "children": [
+                {
+                  "tag": "div",
+                  "class": "ui-bread-crumb ebcoms-charts-bread-crumb {drilling|...}",
+                  "desc": "面包屑。带 drilling 时样式不同（可点层级为蓝色）。关系图不渲染它。"
+                },
+                {
+                  "tag": "span",
+                  "class": "ebcoms-charts-statChildrenSpan",
+                  "desc": "弹出菜单的定位锚点：1px 绝对定位的隐形 span，left/top 由点击坐标算出来。"
+                },
+                {
+                  "tag": "div",
+                  "class": "ebcoms-charts-statChildrenPop",
+                  "desc": "菜单弹层（Popover）。内部列表项 class 为 ebcoms-charts-list-item；弹层箭头 .ui-popover-arrow 在这里被隐藏。"
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "class": "ebcoms-charts-axis-name {x|y|secondY}",
+              "when": "有数据。x → y → secondY 三个节点按顺序渲染在 .ebcoms-charts-com 下的同一层（不需要的节点直接不渲染，所以实际可能只有一个）。",
+              "desc": "数值轴是 X 轴，AxisLabelName 里 X / Y 名称是互换的：左侧 .y 显示配置里的「X 轴名称」，底部 .x 显示「Y 轴名称」。 三个节点同前缀、靠后缀区分——选左轴要用 .ebcoms-charts-axis-name.y；名字非空时才 display:flex，否则节点在但 display:none。",
+              "children": [
+                {
+                  "tag": "div",
+                  "class": "ebcoms-charts-axis-name x",
+                  "desc": "底部横排的轴名称。绝对定位，bottom 会按图例位置 / dataZoom 高度自动算（写在行内 style 上）。只在该轴名称非空时 display:flex，否则 display:none（节点还在）。文案在 > span 里，颜色取 axisLabel.xColor（行内 style）。"
+                },
+                {
+                  "tag": "div",
+                  "class": "ebcoms-charts-axis-name y",
+                  "desc": "左侧竖排的轴名称。width 12px、span 旋转 -90deg（transform-origin: 0 0），margin-top 按字数算（行内 style）。颜色取 axisLabel.yColor。"
+                }
+              ]
+            },
+            {
+              "tag": "div",
+              "class": "ui-echarts [ui-echarts-rtl]",
+              "when": "非空数据且没在 loading",
+              "desc": "图表本体。ECharts 用 canvas 渲染，图例 / 坐标轴 / 数据标签 / tooltip / 柱子颜色全在 canvas 里，CSS 选不到——这些只能改图表配置项或图表主题。容器本身可改尺寸、背景、边框、滤镜；RTL 页面会多 ui-echarts-rtl（会 transform: scaleX(-1)）。"
+            },
+            {
+              "tag": "div",
+              "class": "ebcoms-label-data-list-content",
+              "when": "永不出现",
+              "desc": "本类型不在 isDataOnLeftOrRight（Pie / Circular / Nightingale）列表里，图表左右侧不会出现数值展示清单。"
+            },
+            {
+              "ref": "shared.empty"
+            },
+            {
+              "tag": "div",
+              "class": "ebcoms-charts-placeholder",
+              "when": "chartInstance 尚未就绪",
+              "desc": "占位块，撑住高度防止塌陷。"
+            },
+            {
+              "tag": "div",
+              "class": "ui-spin ebcoms-charts-view-loading",
+              "when": "配置还未初始化完成，或正在刷新数据（此时上面那批节点都不渲染，互斥）",
+              "desc": "图表区加载态。"
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "class": "ui-pagination ebcoms-charts-pagination",
+          "when": "永不出现（本类型不在 hasPagination 列表，没有分页配置项）",
+          "desc": "图表级分页（不是数据表里的分页）。内部 ui-pagination-pager / ui-pagination-pager-item / ui-pagination-pager-active / ui-pagination-pager-page-input。"
+        },
+        {
+          "ref": "dataList.tree"
+        },
+        {
+          "tag": "div",
+          "class": "ui-spin ebcoms-charts-view-reloading",
+          "when": "reloading（切换图表类型 / 切换日期分组 / 强刷）",
+          "desc": "整块刷新遮罩：绝对定位居中铺满 + rgba(255,255,255,.7) 底。要改遮罩底色改这里。"
+        }
+      ]
+    }
+  },
+  "dataList": {
+    "when": "dataListDisplay.visible = true 且非空数据",
+    "chain": ".content > .ebcoms-charts-main > .ebcoms-data-list-display-content.{horizantal|vertical}[.show-total][.isMobile] > .ui-table-grid.ebcoms-datalist-table",
+    "tree": {
+      "tag": "div",
+      "class": "ebcoms-data-list-display-content {horizantal|vertical} [show-total] [isMobile]",
+      "desc": "数据表区域。和图表的 .ebcoms-charts-com 是 .ebcoms-charts-main 下的平级兄弟（不在图表容器里），所以它不会跟着图表一起被 hide。注意类名是 horizantal（源码里的拼写，少一个 o），别写成 horizontal。位置由 .content 上的 data-list-direction-{top|bottom|left|right} 控制；horizantal 表示横向扩展（第一列固定）。",
+      "children": [
+        {
+          "tag": "div",
+          "class": "ui-table-grid ebcoms-datalist-table ui-table-grid-bordered [ui-table-grid-no-pagination] [ui-table-grid-scroll-position-*] [ui-table-grid-table__fixed]",
+          "desc": "数据表（@weapp/ui Table）。下面这些 ui-table-grid-* 是引擎已有样式钩子，可以直接复用；要改文字色 / 表头底色 / 内容底色 / 边框色，优先用组件外观样式里的「数据表」配置（会自动生成这些选择器，见 notes）。",
+          "children": [
+            {
+              "tag": "div",
+              "class": "ui-spin > ui-spin-nested-loading > ui-spin-container",
+              "desc": "表格自带 loading 包裹层，表格内容都在 ui-spin-container 里。"
+            },
+            {
+              "tag": "div",
+              "class": "ui-table-grid-header-warp > .ui-table-grid-header",
+              "desc": "表头。里面 table > thead.ui-table-grid-thead > tr > th.ui-table-grid-th。固定列时还会有一份 ui-table-grid-sticky-header-warp（滚动吸顶）。"
+            },
+            {
+              "tag": "div",
+              "class": "ui-table-grid-body-outer > .ui-table-grid-body",
+              "desc": "表体。table > tbody.ui-table-grid-tbody > tr > td.ui-table-grid-td。合计行在 tfoot.ui-table-grid-tfoot（showTotal && 纵向扩展时）。细分隔行 tr 带 ui-table-grid-tr__gray。"
+            },
+            {
+              "tag": "div",
+              "class": "ui-table-grid-scroll",
+              "desc": "横向滚动容器；只在有固定列或按 table 滚动时出现。"
+            },
+            {
+              "tag": "div",
+              "class": "ui-table-grid-fixed-left / ui-table-grid-fixed-right",
+              "desc": "左右固定列（横向扩展时第一列 fixed: left）。"
+            },
+            {
+              "tag": "div",
+              "class": "ui-table-grid-empty",
+              "desc": "无数据占位。"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "notes": [
+    "样式作用域：图表样式由「组件外观样式」生成，最终选择器都会被包在 #<comId>.ebcom 下面（自定义源码再套一层 #<comId> .comCodeSource）。自己写选择器也建议 #<comId> .xxx，避免同页多图表互相污染。",
+    "数据表配色有官方生成器：组件外观样式→数据表里的「字体/表头底色/内容底色/边框色」，会直接生成 .ebcoms-data-list-display-content 下的 .ui-table-grid-td/.ui-table-grid-th/.ui-table-grid-thead/.ui-table-grid-header-warp/.ui-table-grid-body-outer/.ui-table-grid-tbody/.ui-table-grid-tfoot 规则。要改数据表颜色优先用这个，不要重复写 CSS。",
+    "canvas 边界：图例、坐标轴刻度、数据标签、tooltip、柱/扇区颜色全部是 ECharts canvas，CSS 选不到。这类需求只能改图表配置项或图表主题，不要试图用选择器命中。",
+    "同名陷阱：引擎的 .header / .content / .footer（无前缀）≠ 组件的 ebcoms-*-content；.ebcoms-charts-main 和 .ebcoms-charts-main-filtertotal 是两个不同层的节点，只差一个后缀；.default / .hover 是工具栏按钮的通用类名，必须用 .ebcoms-chart-toolbar 限定；displayFlex 是无前缀裸类名（全局限定）。",
+    "引擎自动加的修饰类：#<comId> 上恒有 has-no-header；ebcom-chart 来自图表 defaultOpts.render.containerClass；padding=false 时加 content-no-padding；配了点击事件时加 event-action-click。",
+    "移动端：外壳多 ebcom-m 类；网格布局 + 移动端时 .content 多 ebcoms-charts-grid-mobile（内部把加载块高度固定 300px）。",
+    "反查源码：引擎 weapp-ebdcoms/src/components/core/{view,design}/{createView,Base,createDesign}.tsx、core/utils/comp.ts、core/view/operation-btns/OperationBtns.tsx；组件 weapp-ebdchartcoms/src/components/charts/core/{BaseView,ChartView,ChartHeader,AxisLabelName,ChartTotal,ChartStatChildren,getChartsStyles}.ts(x)、core/DataListDisplay/*、core/LabelDataListDisplay.tsx、core/index.less；UI 库 weapp-ui/src/components/{echarts,table,spin,pagination,empty}。",
+    "X/Y 轴名称同样互换（同条形图）。",
+    "不支持副轴，不会有 .ebcoms-charts-axis-name.secondY。",
+    "堆积方式（stackType）只影响数据表列结构，DOM 层级不变。"
+  ]
+}

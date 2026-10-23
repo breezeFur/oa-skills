@@ -1,0 +1,209 @@
+{
+  "component": "picture 图片组件（weapp-ebdbasecoms/src/components/picture，组件类型 Picture；注册见 src/ebcoms.ts）",
+  "usage": "组件根元素就是那张 img（root），引擎类名直接拼在它身上，没有 #<comId>.ebcom > .content 外壳。先按外壳选：默认只有 root 一张 img；config.showTitleAndDesc===true → 看 tree-title-desc（img 外多一层 div.ebcoms-picture-wrapper.<comId>，图上叠标题/描述遮罩）；config.float===true && page.layoutType==='FLOW' && config.position==='absolute' && config.flow.parent==='ROOT' → 看 tree-flow-absolute（最外再套一层 position:fixed 的壳）。定位器优先写 #<comId>（命中 img）或 .ebcoms-picture-content，遮罩统一写 .ebcoms-picture-wrapper .ebcoms-picture-desc。",
+  "legend": {
+    "[cls]": "条件class，满足配置/布局/事件条件才挂载",
+    "{a|b}": "多选一class（同一位置按页面布局或视图类型换成其中一个）",
+    "a > b": "父子层级压缩写法，冒号左边是右边的父级",
+    "ref": "引用 shared 中定义的复用片段：写成 ref:shared.xxx",
+    "uncontrolled": "外部模块（基础设计器/布局引擎/事件动作）渲染，内部结构不可控，只给挂载点",
+    "<comId>": "组件实例 id。picture 是 standalone 组件，没有引擎外壳，<comId> 直接落在 img 的 id 上（开标题描述时同时也是 wrapper 的 class）",
+    "ebcoms-": "组件自己写的类名前缀（clsPrefix='ebcoms'），加上 @weapp/ebdcoms AssetsImg 的 ebcoms-assets-img",
+    "ebcom-": "引擎/框架层类名前缀（ebcomPrefix='ebcom'），由 createView/createDesign 通过 className 拼进组件根，组件源码里搜不到",
+    "standalone": "引擎追加的标记类：picture 声明了 render.standalone=true，所以引擎不渲染 header/content/footer 外壳",
+    "weId": "React 节点上的定位属性，DOM 里小写为 weid，是样式编辑器内部用的，不要写进选择器"
+  },
+  "pickTree": "1. 先看是不是设计态：设计态根类名是 ebcom-design（并多一层 mask 之外的定位容器，见 shared.designShell）；运行态是 ebcom-view。\n2. 再按外壳叠加选树：默认（showTitleAndDesc 不为 true，也没走流式绝对定位）→ 只有 root 一层；showTitleAndDesc===true → tree-title-desc；config.float===true 且 page.layoutType==='FLOW' 且 config.position==='absolute' 且 config.flow.parent==='ROOT' → tree-flow-absolute。\n3. 后两者可叠加，三层结构是 div.ebcoms-picture-flow-absolute-wrap > div.ebcoms-picture-wrapper.<comId> > img。\n4. 看不到图时去 shared.placeholder 对号（空路径/取数中/无权限）。",
+  "root": {
+    "tag": "img",
+    "id": "<comId>",
+    "class": [
+      "ebcoms-assets-img",
+      "[lazyload]",
+      "ebcom",
+      "ebcom-picture",
+      "[ebcom-picture-<pluginResourceType>]",
+      "[ebcom-m]",
+      "{ebcom-grid|ebcom-flow|ebcom-excel}",
+      "{ebcom-view|ebcom-design}",
+      "standalone",
+      "[event-action-click]",
+      "ebcoms-picture-content",
+      "[ebcoms-picture-default-flow]",
+      "[ebcoms-picture-flow-absolute]",
+      "[ebcoms-picture-url]"
+    ],
+    "desc": "图片本体，同时也是组件根元素：引擎类名永远拼在这张 img 上（classNameStr 无条件传给 AssetsImg）。⚠️ 和 slide/nav-bar 不同，picture 的 Design/View 都声明了 render.standalone=true，所以没有 #<comId>.ebcom > .content 这套外壳，别去找 .content。类名分三段：最前 ebcoms-assets-img(+lazyload) 是 @weapp/ebdcoms AssetsImg 自己加的；中间 ebcom + ebcom-picture + ebcom-grid/flow/excel + ebcom-m + ebcom-view/design + standalone 由引擎的 getClassName 按顺序拼；末尾 ebcoms-picture-content 与几个条件类由组件自己拼。",
+    "when": "运行态与设计态都是这张 img；--showTitleAndDesc 时它外面还有 div.ebcoms-picture-wrapper.<comId>，流式绝对定位时外面还有 div.ebcoms-picture-flow-absolute-wrap",
+    "tips": [
+      "写样式直接用 #<comId> 或 .ebcoms-picture-content 即可命中最外层元素；图片尺寸/边框/圆角都在这一层",
+      "img 上会被 spread 一批 config 字段当 HTML 属性（width、height、imageMode、displayMode、scale… 例如 width=\"100%\"），这些是属性不是样式：不要写 img[width]、也不要把它们当成行内样式来源；改尺寸用 CSS",
+      "objectFit 才是行内样式：AssetsImg 收了 useAttr 后用 style={{objectFit: imageMode}}（imageMode 取 config.imageMode，默认 cover），而 config.width/height 不进 style。要覆盖图片适应方式必须显式写 object-fit，或改配置",
+      "lazyLoad 相关：config.lazyLoad===true 时 img 上是 lazyload 类 + data-src（lazysizes 加载完自己加 lazyloaded 并把地址写到 src）；没开时直接 src 出图。写图片选择器建议只认 .ebcoms-assets-img 或 .ebcoms-picture-content",
+      "class 顺序有意义：先 AssetsImg 的 ebcoms-assets-img，再引擎 className，最后组件追加的类；用 class 选择器时不要依赖顺序",
+      "运行态 img 上会由引擎写 data-id=<comId>（createView.onDomMountEvent 用 findDOMNode 取到的根元素；有 wrapper 时 data-id 落在 wrapper 上），data-id 是官方样式的作用域锚点"
+    ]
+  },
+  "shared": {
+    "imgRoot": {
+      "tag": "img",
+      "id": "<comId>",
+      "desc": "图片本体，和 root 是同一个元素，class 以 root.class 为准。外壳树里用它占位。"
+    },
+    "descBlock": {
+      "desc": "图片上的标题/描述遮罩（源码里叫 picture-desc）。只有 showTitleAndDesc===true 且「标题或描述至少一个非空」时才渲染（条件：getLocaleValue(textTitle) || getLocaleValue(textDescribe)）。这是用户说「图片上的标题/描述」时唯一命中的地方",
+      "chain": "div.ebcoms-picture-wrapper > div.ebcoms-picture-desc > div.title + div.desc",
+      "children": [
+        {
+          "tag": "div",
+          "class": ["title"],
+          "desc": "标题文字，取值 config.textTitle（走 getLocaleValue 多语言）。⚠️ .title 是裸类名，没有前缀，全页面其它组件（tabs、list…）也叫 .title，必须用 .ebcoms-picture-desc .title 或 #<comId> 限域"
+        },
+        {
+          "tag": "div",
+          "class": ["desc"],
+          "desc": "描述文字，取值 config.textDescribe；.desc 同样是裸类名，限定方式同上"
+        }
+      ],
+      "tips": [
+        "两个 div 无论标题还是描述为空都会渲染（只是内容为空串），所以别用 :empty 之类的写法去判断「有没有配标题」",
+        "遮罩默认：position:absolute、bottom:0、width:100%、padding:12px 15px、背景 rgba(0,0,0,.5)、圆角 8px，来自 view/index.less",
+        "⚠️ 遮罩的 absolute 参照物不是 wrapper：div.ebcoms-picture-wrapper 只有 height:100%，没有 position，所以遮罩会往上找最近的有定位祖先（流式绝对定位场景就是 position:fixed 的 div.ebcoms-picture-flow-absolute-wrap）。要自己控位置就给 wrapper 加 position",
+        "遮罩样式有两处来源且属性重叠：view/index.less（.ebcoms-picture-wrapper .ebcoms-picture-desc）和样式库默认代码 styleConfigDefault（.ebcoms-picture-desc，含背景色/圆角/绝对定位/display:flex）。写覆盖时用 .ebcoms-picture-wrapper .ebcoms-picture-desc 提高优先级",
+        "区域设置面板（样式库/样式管理）改的就是这三个选择器：背景色 → .ebcoms-picture-desc；标题 → .ebcoms-picture-desc .title；描述 → .ebcoms-picture-desc .desc（见 view/getPictureStyles.ts）",
+        "标题/描述是行内纯文本，没有 span 包裹，想加图标/多行排版要自己用伪元素或改结构，别指望里面有子节点"
+      ]
+    },
+    "placeholder": {
+      "desc": "「看不到图片」的几种情况，样式需求落到这里时不要去 img 的兄弟节点里找东西",
+      "list": [
+        {
+          "when": "config.path 为空（含 { url: '' }）",
+          "chain": "仍然是 img 本身，src 换成默认空图（dftPicPath = images/coms/picture/empty.png），class 上多一个 ebcoms-picture-default-flow",
+          "note": "构造器与 render 各判一次：page.layoutType==='GRID' 和 !=='GRID' 最终都会换成这张空图；该类名只给 img 加了 object-fit/display/max-width，不影响是否有图"
+        },
+        {
+          "when": "图片地址含数据集语法（图片路径绑定数据）且真实地址还没取回来，且非设计态",
+          "chain": "整块不渲染（render 返回 null）",
+          "note": "gettingPath===true 期间组件短暂为空，调样式前先确认不是这个状态"
+        },
+        {
+          "when": "页面开启 showHiddenComs 且当前组件不在 rightCompIds 里",
+          "chain": "div.ebcom-no-right-mask > span（文本「对不起，您暂时没有权限！」，引擎渲染）",
+          "note": "picture 覆写了 renderNoPermission（view/View.tsx → view/NoPermission.tsx），只是补一段流式布局的定位修正，DOM 仍是引擎这段；此时根元素不是 img"
+        }
+      ]
+    },
+    "state": {
+      "desc": "运行时由脚本动态加/移除的类，初始 render 里没有，写选择器时按「可能出现」对待",
+      "list": [
+        {
+          "condition": "开了 lazyLoad 的图片被 lazysizes 加载完成",
+          "targetSelector": "img.ebcoms-assets-img",
+          "addClass": "lazyloaded",
+          "note": "同时把 data-src 的值写进 src"
+        },
+        {
+          "condition": "流式绝对定位壳被选中（选中置顶）",
+          "targetSelector": ".ebcoms-picture-flow-absolute-wrap",
+          "addClass": "selected",
+          "note": "less 只给了 .selected{z-index:102!important}；相关选中逻辑在源码里已注释/废弃"
+        },
+        {
+          "condition": "组件被事件动作隐藏",
+          "targetSelector": "组件根元素（有 wrapper 时是 wrapper，否则是 img）",
+          "addClass": "ebcom-display-none",
+          "note": "同时写 style.display='none'，显示时按原 display 还原"
+        },
+        {
+          "condition": "点击组件（弹出悬浮菜单类事件动作的绑定标记）",
+          "targetSelector": "被点击的元素",
+          "addClass": "ebsdk-bind-dom",
+          "note": "引擎事件动作统一行为（weapp-ebdcoms event-action），每次点击会先清掉全页其它同名类"
+        }
+      ]
+    },
+    "designShell": {
+      "desc": "设计态/运行态最外层的定位容器，由基础设计器与布局引擎渲染，不在这几个仓库的源码里，组件只用 querySelector 反查它们（uncontrolled，只给挂载点，改它们会影响页面上所有组件）",
+      "list": [
+        {
+          "when": "设计态 + 网格布局（非 float）",
+          "chain": "组件按 div[data-i=<config.layout.i>] 找父节点取容器，旋转容器是 div.weapp-ebde-gl-pc-card[data-id=<comId>]"
+        },
+        {
+          "when": "设计态 + 绝对定位（float）",
+          "chain": "div.weapp-ebde-position-absolute[data-id=<comId>]，内部旋转把手是 .weapp-ebde-mgl-card-item-handle"
+        },
+        {
+          "when": "设计态 + 移动端绝对定位",
+          "chain": "div.weapp-ebde-mgl-position[data-id=<comId>]"
+        },
+        {
+          "when": "运行态 + 绝对定位",
+          "chain": "div.weapp-ebpv-gl-position[data-id=<comId>]（PC）/ div.weapp-ebpv-mgl-position[data-id=<comId>]（移动端）",
+          "note": "createView.viewMountHandler 与 NoPermission 改的就是这层的 style"
+        },
+        {
+          "when": "运行态 + 网格布局（非 float）",
+          "chain": "就是组件根 img 自己（JS 用 .ebcoms-assets-img#<comId> 或 img#<comId> 取）"
+        }
+      ],
+      "tips": [
+        "这些容器上的定位/旋转/透明度由 JS 直接重写 dom.style（setPcDomStyle / setMobileSomStyle），写在 CSS 里的同类属性常被行内覆盖",
+        "设计态组件外壳是 ebcom-picture … ebcom-design standalone，由 createDesign 拼好 className 后直接传给 PictureContent，同样没有 .content 层"
+      ]
+    }
+  },
+  "tree-title-desc": {
+    "when": "config.showTitleAndDesc === true。样式库/样式管理场景默认开启（com-style-config/picture/getCompConfig.ts 里写死 showTitleAndDesc:true、isStyleManager:true），所以这个结构在样式调优时是高频命中项",
+    "tree": [
+      {
+        "tag": "div",
+        "class": ["ebcoms-picture-wrapper", "<comId>"],
+        "desc": "标题/描述外壳（源码：`${clsPrefix}-picture-wrapper ${id}`）。⚠️ comId 同时被当成类名挂在这层，所以 .<comId> 命中 wrapper，而 #<comId> 命中里面的 img —— 同名不同层是 picture 最容易定位错的地方。less 只给了 height:100%，没有 position",
+        "children": [
+          "ref:shared.imgRoot",
+          "ref:shared.descBlock"
+        ],
+        "tips": [
+          "wrapper 只有在 showTitleAndDesc===true 时才存在；此时引擎的 data-id 也落在 wrapper 上（findDOMNode 取到的根元素），运行态官方样式作用域 div[data-id=<comId>] 指的就是它",
+          "想给「整张图 + 遮罩」作为一个整体加边框/圆角/overflow:hidden，改这层；只改图片本身用 img 那层",
+          "遮罩是 wrapper 的兄弟还是子级要注意：div.ebcoms-picture-desc 与 img 是兄弟关系，都在 wrapper 下，不是 img 的子节点"
+        ]
+      }
+    ]
+  },
+  "tree-flow-absolute": {
+    "when": "config.float===true && page.layoutType==='FLOW' && config.position==='absolute' && config.flow.parent==='ROOT'（典型是登录前页面/流式布局里的绝对定位图片）。同一个条件还决定 img 上多挂 ebcoms-picture-flow-absolute 类",
+    "tree": [
+      {
+        "tag": "div",
+        "class": ["ebcoms-picture-flow-absolute-wrap"],
+        "desc": "流式布局的绝对定位外壳，带 data-id=<comId>（设计态与运行态都有）。less 给了 position:fixed；偏移/层级/透明度全部由行内 style 决定（wrapStyle：left/right/top/bottom + transform:translate(...) + zIndex + width/height + opacity，按 horizontal.basis/vertical.basis 组合算出）",
+        "children": ["ref:shared.imgRoot"],
+        "tips": [
+          "这一层的位置尺寸是行内样式，CSS 改不动（除非 !important 且确认优先级），要改位置请改配置里的坐标/偏移",
+          "它是 position:fixed，会成为内部遮罩 absolute 的参照物",
+          "selected 类（z-index:102!important）由脚本加，用于选中置顶"
+        ]
+      }
+    ],
+    "diffs": [
+      "开了 showTitleAndDesc 时，壳里的直接子节点是 div.ebcoms-picture-wrapper.<comId>（包住 img + 遮罩），即 fixed 壳 > wrapper > img 三层；wrapper 类名见 tree-title-desc",
+      "img 上会多一个 ebcoms-picture-flow-absolute 类，它只是标记（less 没为它写规则），别当成样式钩子",
+      "img 上还可能带行内 style（imgStyle.transform = rotate(...)，仅在配置了 rotate 时），用于旋转图片本身而不转外壳"
+    ]
+  },
+  "notes": [
+    "前缀三类分清：ebcoms-* 是组件自己写的（含 @weapp/ebdcoms 公共件 AssetsImg 的 ebcoms-assets-img）；ebcom-* 是引擎/框架层，经 className 拼进组件根，组件源码里搜不到；ui-* 基本与 picture 无关（本组件没直接用 @weapp/ui 渲染结构，只有 PhotoView 预览弹层是外部组件）。",
+    "最容易犯的定位错误：照搬其它组件去找 #<comId>.ebcom > .content。picture 是 standalone 组件，引擎不生成这层外壳，组件根就是 img，引擎类名全在 img 上。",
+    "第二个易错点：comId 有双重身份。默认是 img 的 id（#<comId>）；showTitleAndDesc 时又是 wrapper 的 class（.<comId>）。样式管理器模式下 getPictureStyles 生成的自定义样式作用域是 ` .<comId>`，运行态是 ` div[data-id=<comId>]`（data-id 挂在引擎 findDOMNode 找到的根元素上：默认 img，有 wrapper 则 wrapper）。",
+    "裸类名 .title / .desc 只在遮罩内部，务必用 .ebcoms-picture-desc .title / .ebcoms-picture-desc .desc 或 #<comId> 限域，否则会命中页面其它组件的同名类。",
+    "已有 less 钩子（不要重复写）：.ebcoms-picture-content（inline-block + vertical-align）、.ebcoms-picture-url（cursor:pointer，非设计态且有链接时）、.ebcoms-picture-default-flow（object-fit:cover 等）、.ebcoms-picture-flow-absolute-wrap（position:fixed / .selected）、.ebcoms-picture-wrapper（height:100%）及其下遮罩与标题/描述全套默认外观。less 通过 src/style/lib.less 全量引入（PictureContent 里 import './index.less' 是注释掉的，别以为没生效）。",
+    "两处死代码，别照着写选择器：1) view/PictureContent.tsx 的 renderDefaultImg 从未被调用，所以 .ebcoms-picture-default-grid（及 less 里它的 svg 规则）在运行时永远不命中；2) less 的 .ebcoms-picture-default-flow > img 也不会命中——该类挂在 img 自己身上，没有子 img。",
+    "配置面板的类名（ebcoms-picture-config-*、ebcoms-picture-path-*、ebcoms-picture-config-image-mode 等）来自 config/ 目录，只出现在设计器右侧属性面板，不属于组件渲染结构，写页面运行时样式时不要用它们。",
+    "官方样式生成器 getPictureStyles 的三个目标就是 .ebcoms-picture-desc / .ebcoms-picture-desc .title / .ebcoms-picture-desc .desc（来自样式库里「图片」类目 category='1218870220785048537'，见 constants/StyleLib.ts 的 StyleType.PICTURE）；用户自定义 CSS 会被包进 div[data-id=<comId>]（样式管理器下是 .<comId>）作用域，所以自定义代码里可以直接写组件内部类名。",
+    "设计态用同一棵结构树，差别只在根类名是 ebcom-design，且外面多了基础设计器的定位容器（shared.designShell）；在页面运行态验证选择器，不要拿设计器里的结构当依据。",
+    "反查源码：view 渲染与条件分支在 view/PictureContent.tsx 的 render / renderDefaultImg；组件入口与 standalone 声明在 view/View.tsx、design/Design.tsx；class 拼装顺序在 weapp-ebdcoms/src/components/core/view/createView.tsx 的 getContainerClass 与 .../core/utils/comp.ts 的 getClassName；img 元素与 ebcoms-assets-img 在 weapp-ebdcoms/src/common/assets-lib/assets-item/Img.tsx；已有样式在 view/index.less；样式生成在 view/getPictureStyles.ts。"
+  ]
+}

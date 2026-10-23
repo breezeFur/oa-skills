@@ -1,0 +1,274 @@
+{
+  "component": "nav-bar 导航栏组件（weapp-ebdnavcoms/src/components/nav-bar，组件类型 NavBar）",
+  "usage": "先看组件当前处于哪个状态选分树：有数据 → nav-list（主树，PC/MOBILE 共用）；navMenus[0].otherParams.version 缺失 → 再看 nav-list-legacy 的差异清单；还在取数 → state-loading；取到空数组 → state-empty。选到树后用 shared.navItem / shared.navIcon / shared.navTipText / shared.navTipNumber / shared.expandArrow 里的类名写选择器，整棵列表统一用 .ebcoms-navbar-list 或 #<comId> 限域。",
+  "legend": {
+    "[cls]": "条件class，满足业务/配置条件才挂载",
+    "{a|b}": "多选一class（同一位置按配置或客户端换成其中一个）",
+    "a > b": "父子层级压缩写法，冒号左边是右边的父级",
+    "ref": "引用 shared 中定义的复用片段：写成 ref:shared.xxx",
+    "uncontrolled": "第三方组件（@weapp/ui / @weapp/ebdcoms 公共件）渲染，内部结构不可控，只给挂载点",
+    "<comId>": "组件实例 id；引擎外壳的 id 就是它，官方样式作用域写成 #<comId>.ebcom",
+    "ebcoms-": "组件自己写的类名前缀（clsPrefix='ebcoms'）",
+    "ebcom-": "引擎/框架层的类名前缀（ebcomPrefix='ebcom'），组件源码里搜不到",
+    "ui-": "@weapp/ui 组件产生的类名，组件只是传 className 拼接"
+  },
+  "pickTree": "1. 状态分支：initLoading===true 且非设计态 → state-loading；navMenus 为空数组 → state-empty（两者用的都是 .ebcoms-navbar-empty，注意区分）；有数据 → nav-list。\n2. nav-list 下再看 navMenus[0].otherParams.version 是否 >0：>0 走新版（列表带 hideChildItemBorder、箭头用 Icon-Right-arrow03/Down-arrow03）；没配 version 走 nav-list-legacy，只改结构和内联 padding。\n3. 被页签容器当内容区渲染时，外面多一层 tab-view-wrapper（weapp-ebdnavcoms-nav-tab-common-view）。PC/MOBILE 不分树，只换类名（PC / MOBILE / mobile / ebcom-m）。",
+  "root": {
+    "tag": "div",
+    "id": "<comId>",
+    "class": [
+      "ebcom",
+      "ebcom-navbar",
+      "{ebcom-grid|ebcom-flow|ebcom-excel}",
+      "[ebcom-m]",
+      "ebcom-view",
+      "[has-no-header]",
+      "[event-action-click]",
+      "[standalone]",
+      "[content-no-padding]"
+    ],
+    "desc": "引擎外壳，由 weapp-ebdcoms 的 createView.renderView 生成，不在本组件源码里。类型名拼成 ebcom-navbar，布局拼成 ebcom-grid/ebcom-flow/ebcom-excel，MOBILE 端多一个 ebcom-m；配了点击事件动作挂 event-action-click。官方样式作用域就是 #<comId>.ebcom（getNavBarStyles 生成的自定义样式会被它限域）。组件没有自己的根 div：自己的类名从 .content 内部的列表容器才开始出现",
+    "when": "运行态视图。设计态由 weapp-ebdcoms 的 createDesign 拼容器（ebcom-navbar … ebcom-design），组件内部结构与运行态一致",
+    "children": [
+      {
+        "tag": "div",
+        "class": ["header"],
+        "when": "config.titleEnabled===true 时才有（nav-bar 的 config 默认 titleEnabled:true，只有显式关掉才没有）。没有时外壳上会多 has-no-header",
+        "children": [
+          {
+            "tag": "div",
+            "class": ["ebcom-title"],
+            "desc": "引擎渲染的标题文字，取值 config.title"
+          },
+          {
+            "tag": "div",
+            "class": ["ebcoms-header-btns"],
+            "when": "顶部操作按钮开启且有按钮时",
+            "desc": "引擎操作按钮容器，与导航项无关"
+          }
+        ]
+      },
+      {
+        "tag": "div",
+        "class": ["content"],
+        "desc": "引擎内容槽（事件动作的点击绑定在这层，createView 用 querySelector('.content') 取它）。⚠️ 与本组件列表里的 .ui-list-content 是两个东西：.ebcom-navbar 的这个 .content 是引擎的，less 中 `.ebcom-navbar && > .content {padding:0}` 说的就是它；组件列表项的 .ui-list-content 在更深处",
+        "children": ["ref:shared.navList"]
+      },
+      {
+        "tag": "div",
+        "class": ["footer"],
+        "when": "config.footerEnabled===true 时才有；nav-bar 的 config 声明了 footer:false，所以正常看不到"
+      }
+    ]
+  },
+  "shared": {
+    "navList": {
+      "desc": "组件真正的根链：View → Content 直接渲染 @weapp/ui 的 List，没有中间包裹 div。所以最外层组件类名 ebcoms-navbar-list 落在 List 的滚动容器 .ui-list-scrollview 上",
+      "chain": "div.ui-list-scrollview-wrap[style:height:auto;width:100%] > div.ui-scroller__wrap > div.ui-scroller__view > div.ui-list-scrollview.ui-list.ui-list-column.ebcoms-navbar-list[[mobile][not-expends][isCnWord]{PC|MOBILE}[hideChildItemBorder][separator][hasIcon]] > div.ui-list-scrollview-content > div.ui-list-body > div.ui-list-group > ( ref:shared.groupHeader + div.ui-list-animate > div.ui-list-group-body > ref:shared.navItem )",
+      "tips": [
+        "class 顺序即 classnames 参数顺序：ebcoms-navbar-list、mobile、not-expends、isCnWord、PC|MOBILE、hideChildItemBorder、separator、hasIcon。ebcoms-navbar-list 是写样式最稳的锚点",
+        "PC / MOBILE 由 page.client 直接拼；mobile 只在 page.client==='MOBILE' 时加；not-expends 在 config.rightArrow===false 时加（less 用它隐藏 List 自带箭头）",
+        "hideChildItemBorder / separator 只在 navMenus[0].otherParams.version>0 时出现；hasIcon 由「有没有任何一级菜单配了 icon.path」决定",
+        "div.ui-list-animate 是 List 的展开动画层（AnimateHeight），less 里按需改高，别被它挡了选择器",
+        "一组一级菜单 = 一个 div.ui-list-group，group 内部用 less 的 flex-direction:column-reverse 把分组占位行翻到底部，DOM 顺序仍是「占位行在前」",
+        "MOBILE 端结构完全一样：组件没给 List 传 isMobile，List 仍走 PC 的 ScrollView 分支"
+      ]
+    },
+    "groupHeader": {
+      "desc": "每个一级导航项前的「拆分」占位行，由 Content.renderSectionHeader 作为 List 的 renderSectionHeader 传进去，List 会把它塞进一个 header 型 ui-list-item 里",
+      "chain": "div.ui-list-item.ui-list-header.ui-list-item-noorder.ui-list-item-noBorder.ui-list-unsortable > div.ui-list-none + div.ui-list-content > div.ebcoms-navbar-list-group[style:height:10px|0px;backgroundColor:#f0f1f4]",
+      "tips": [
+        "height 由 sectionData.isSplit && !isLastMenu 决定：10px 或 0px；背景色取 config.splitBgColor（默认 #f0f1f4）——都是行内样式，改样式要么写 !important 要么改配置",
+        "这个 div.ebcoms-navbar-list-group 和 less 里的 .ebcoms-navbar-list-group 是同一个类，less 只给了 width:100%;height:10px"
+      ]
+    },
+    "navItem": {
+      "desc": "单个导航项，由 Content.customRenderItemCell 作为 List 的 customRenderContent 返回。List 的外层 item 和组件自己的 item 是两层不同元素，两层都有 padding-left",
+      "chain": "div.ui-list-item.ui-list-item-noorder.ui-list-unsortable[.ui-list-item-noBorder][style:paddingLeft] > [div.ui-list-none] + [div.ui-list-grid-expandable-btn > i.ui-list-grid-expandable-btn-switcher{switcher-ok|switcher-off}] + div.ui-list-content > [ ref:shared.navIcon ] + div.ebcoms-navbar-list-item[.ebcoms-navbar-list-item-separator][.isLastSplitMenu][.hasClick][.firstLevel][.isExpand][.reserveIconPosition][style:内联宽高] > ref:shared.navItemLeft + ref:shared.navItemRight",
+      "tips": [
+        "两层 padding-left：外层 .ui-list-item 是 List 给的（version>0 且 level>=1 时为 36*level+16，否则 10*level，行内 style）；内层 .ebcoms-navbar-list-item 是组件给的（无图标 2px/旧版 6px，有图标 0，保留图标位时 38px，也走行内 style）。改缩进要先确认自己改的是哪一层",
+        "内层 .ebcoms-navbar-list-item 还有行内 width:calc(100% - 30px - 8px)、marginLeft、left；其中 left 是死代码（less 里的 position:absolute 被注释掉了，元素是 static，left 不生效），别指望用它做偏移",
+        "hasClick 只在导航项配了点击事件动作时加（less 用它给 cursor:pointer）；firstLevel 表示没有 pid（一级菜单）；isLastSplitMenu 表示它是被拆分菜单里的最后一项，less 用它去掉底部 border",
+        "isExpand 由 state.expandRowKeys 推导（展开子级时出现）；reserveIconPosition 表示同级有其它项带图标、该项要空出图标位",
+        "ui-list-grid-expandable-btn 是 List 自带的展开按钮，组件不需要它（用自己右侧的箭头），less 把它 opacity:0 但保留 100% 高宽来接点击。想改展开按钮外观要改 .ebcoms-navbar-list-item-expand，不要改这个",
+        "div.ui-list-none 只在「没有子级、也没有展开按钮」时渲染（List 用它占位），less 里被 .ebcom-navbar .ui-list-group .ui-list-none 隐藏"
+      ]
+    },
+    "navIcon": {
+      "desc": "导航项图标（rowData.icon.path 存在才渲染）",
+      "chain": "div.ebcoms-navbar-list-icon[.hasClick] > span.ebcoms-assets-icon[.bg][style:icon.iconStyle] > span.ui-icon.ui-icon-wrapper > span.ui-icon-xs.ui-icon-svg > svg",
+      "tips": [
+        "最外层 div.ebcoms-navbar-list-icon 和 .ebcoms-navbar-list-item 是 .ui-list-content 里的兄弟，不是嵌套；它没设宽度，宽度由 AssetsItem 的 style 撑出来",
+        "hasClick 同样来自「配了点击事件动作」，与外面 item 上的 hasClick 同源",
+        "AssetsItem 是 @weapp/ebdcoms 的公共件（common/assets-lib/assets-item/Icon.tsx），传 backgroundColor 时 span 上多一个 bg",
+        "图标大小/圆角的官方样式钩子就是 .ebcoms-assets-icon 与 .ebcoms-assets-icon .ui-icon-svg（getNavBarStyles 生成）"
+      ]
+    },
+    "navItemLeft": {
+      "desc": "导航项左侧（名称 + 底部提示）",
+      "chain": "div.ebcoms-navbar-list-item-left > span.ebcoms-navbar-list-name[.ebcoms-navbar-list-name-hasBottom] > [span > ]文本 | [div.ebcoms-navbar-list-item-bottom > ref:shared.navTipText]",
+      "tips": [
+        "version>0 时名称是 span.ebcoms-navbar-list-name > span > 文本（多一层 span，省略号/hideChildItemBorder 下的截断样式依赖这层）；旧数据只有一个 span.ebcoms-navbar-list-name 直接装文本",
+        "tipPosition==='bottom' 时名称加 -hasBottom（less 给 padding-bottom:2px），提示挪到下面的 div.ebcoms-navbar-list-item-bottom",
+        "这个 div 一直存在，即使没图标没提示"
+      ]
+    },
+    "navItemRight": {
+      "desc": "导航项右侧（右侧提示 + 展开箭头）",
+      "chain": "div.ebcoms-navbar-list-item-right > [ ref:shared.navTipText ] + [div.ebcoms-navbar-list-item-expand[.ebcoms-navbar-list-item-child] > span.ui-icon.ui-icon-wrapper > span.ui-icon-s.ui-icon-svg]",
+      "tips": [
+        "提示（tipPosition==='right'）和箭头都在这一层；一个都没有时这个 div 仍然渲染，空着",
+        "箭头出现条件：(config.rightArrow===true || 该项有 children)。hasChild 时即使关了 rightArrow 也显示",
+        "命名坑：箭头自己的条件类叫 .ebcoms-navbar-list-item-child（不叫 -expand-child），它挂在这个 div 上，不在列表项上",
+        "箭头图标名：普通态 Icon-Right-arrow01；有子级时 Icon-up-arrow01 / Icon-Down-arrow01；version>0 且 showNewArrow 时换成 Icon-Right-arrow03 / Icon-Down-arrow03"
+      ]
+    },
+    "navTipText": {
+      "desc": "文字提示（tip.tipType 不是 number 时）",
+      "chain": "div.ebcoms-navbar-list-item-tips-text[.ebcoms-transform-content-readonly]",
+      "tips": [
+        "运行态和设计态渲染的是两个不同组件：设计态用 @weapp/ui RichText（class 为 ui-rich-text 拼接本类名），运行态用 @weapp/ebdcoms TransformContent（本类名 + ebcoms-transform-content-readonly，内部再套 ebcoms-transform-content-string 等）",
+        "less 已有钩子：.ebcoms-navbar-list-item-tips-text{color:secondary;white-space:normal;line-height:16}，以及它内部 img / p 的尺寸规则——改提示文字前先看这几条",
+        "内容里的占位符（{字段} 等）会被替换成 HTML，内部节点不可控"
+      ]
+    },
+    "navTipNumber": {
+      "desc": "数字角标（tip.tipType==='number' 且转换出的数值 >=1 且非 NaN）",
+      "chain": "div.ebcoms-navbar-list-item-tips-number > span > 数字文本",
+      "tips": [
+        "数值 <=0 / NaN 时组件直接渲染空 div（class 被 classnames 条件掉，只剩无类名 div），等于不显示；>99 显示 99+",
+        "less 已给完整样式：14px 高、红色背景、9px 圆角，内部 span 用 scale(0.8) 缩放——覆盖时注意这个缩放"
+      ]
+    },
+    "state": {
+      "desc": "运行时由 JS 动态加/移除的 class（初始 render 里没有，写选择器时按「可能出现」对待）",
+      "list": [
+        {
+          "condition": "导航项展开/收起（点击箭头或有子级的项）",
+          "targetSelector": ".ebcoms-navbar-list-item、i.ui-list-grid-expandable-btn-switcher",
+          "addClass": "isExpand / switcher-ok | switcher-off",
+          "note": "isExpand 是组件自己的类；switcher-ok|off 是 List 那个透明按钮的类"
+        },
+        {
+          "condition": "被事件动作隐藏（如切换显隐）",
+          "targetSelector": "引擎外壳 #<comId>",
+          "addClass": "ebcom-display-none",
+          "note": "同时写 style.display='none'；恢复时清掉"
+        },
+        {
+          "condition": "点击绑定了事件动作的 DOM",
+          "targetSelector": "div.ebcoms-navbar-list-item / div.ebcoms-navbar-list-icon",
+          "addClass": "ebsdk-bind-dom",
+          "note": "每次点击先清掉全页其它 ebsdk-bind-dom，再加到当前元素"
+        },
+        {
+          "condition": "鼠标悬浮（仅 less 伪类，非 class）",
+          "targetSelector": ".hideChildItemBorder .ui-list-item",
+          "addClass": "（hover 背景 #f5f5f5）",
+          "note": "只在 version>0 的 hideChildItemBorder 列表上生效"
+        }
+      ]
+    }
+  },
+
+  "nav-list": {
+    "when": "运行态、有导航数据（state.navMenus 非空）、且 navMenus[0].otherParams.version>0 —— 样式库/设计器产出的正常数据。结构见 root → shared.navList → shared.groupHeader / shared.navItem",
+    "tree": [
+      "ref:root 的 content 层",
+      "ref:shared.navList",
+      "ref:shared.groupHeader",
+      "ref:shared.navItem"
+    ],
+    "diffs": [
+      "整棵列表额外带 hideChildItemBorder（version>0 时恒有），separator 开关为 true 时再叠一个 separator",
+      "less 里 .ebcoms-navbar-list.hideChildItemBorder 那一大段（行高 38px、二级项 padding-left 40px、PC 下名称单行截断、MOBILE 下 min-height 48px）只在这棵树里生效"
+    ]
+  },
+
+  "nav-list-legacy": {
+    "when": "运行态有数据，但 navMenus[0].otherParams.version 缺失/为 0（老数据）。不复述整棵树，只列差异",
+    "diffs": [
+      "列表不挂 hideChildItemBorder（config.separator 为 true 时仍然挂 separator），hasIcon 逻辑不变",
+      "导航项名称少一层 span：span.ebcoms-navbar-list-name 直接装文本，没有内层 span",
+      "内层 .ebcoms-navbar-list-item 的 padding-left 无图标时是 6px（新版是 2px），且永远不会出现 38px 的「保留图标位」值",
+      "箭头图标只有 Icon-Right-arrow01 / Icon-up-arrow01 / Icon-Down-arrow01，没有 -03 系列（showNewArrow 只在 version>0 时为真）",
+      "List 的 customItemStyle 不生效，外层 .ui-list-item 的 padding-left 恒为 10*level"
+    ]
+  },
+
+  "state-loading": {
+    "when": "运行态且 state.initLoading===true（数据还没回来）。设计态不会进这个分支",
+    "tree": [
+      {
+        "tag": "div",
+        "class": ["content"],
+        "desc": "引擎内容槽，内部只剩一个 Spin",
+        "children": [
+          {
+            "tag": "div",
+            "class": ["ui-spin", "ui-spin-spinning", "ebcoms-navbar-empty"],
+            "desc": "@weapp/ui Spin，className 拼在 ui-spin 上；spinning 恒为 true，所以 ui-spin-spinning 一直在"
+          }
+        ]
+      }
+    ],
+    "absent": ["ui-list-scrollview-wrap", "ui-scroller__wrap", "ui-list-scrollview", "ebcoms-navbar-list", "ui-list-body"]
+  },
+
+  "state-empty": {
+    "when": "取数完成但 navMenus 是空数组",
+    "tree": [
+      {
+        "tag": "div",
+        "class": ["content"],
+        "children": [
+          {
+            "tag": "div",
+            "class": ["ebcoms-navbar-empty"],
+            "desc": "Empty.tsx 渲染的空态容器，与 loading 用的是同一个类名 ebcoms-navbar-empty，靠子元素区分：空态里有 icon + span，loading 态是 ui-spin",
+            "children": [
+              {
+                "tag": "span",
+                "class": ["ui-icon", "ui-icon-wrapper"],
+                "desc": "Icon-NDmini-mcolor，size='sm'"
+              },
+              {
+                "tag": "span",
+                "desc": "「暂无数据」文案"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "absent": ["ui-list-scrollview-wrap", "ebcoms-navbar-list", "ui-list-body"]
+  },
+
+  "tab-view-wrapper": {
+    "when": "组件被当页签内容区用（components-share 把 NavTabViewCommon 导出成 NavTabView）时，多这一层；普通页面里没有",
+    "tree": [
+      {
+        "tag": "div",
+        "class": ["weapp-ebdnavcoms-nav-tab-common-view"],
+        "desc": "view/index.tsx 里 NavTabViewCommon 的默认 wrapClassName（Container.tsx），是引擎外壳 #<comId> 的父级",
+        "children": ["ref:root"]
+      }
+    ],
+    "tips": [
+      "只有读写这个类名时才需要关心它；组件内部结构与普通页面完全一致",
+      "less 里已有一条 .weapp-ebdnavcoms-nav-tab-common-view .ui-list-group .ui-list-none{display:none}"
+    ]
+  },
+
+  "notes": [
+    "四类前缀分清：ebcoms-* 是本组件写的（ebcoms-navbar-*）；ebcom-* 是引擎外壳（createView/createDesign 拼的 ebcom-navbar、ebcom-view、ebcom-title）；ui-* 来自 @weapp/ui（ui-list-*、ui-icon、ui-spin、ui-scroller__*）；ebcoms-transform-content-* 来自 @weapp/ebdcoms 的 TransformContent，ebsdk-bind-dom 来自事件动作模块。",
+    "最容易打错的两处：一是 .content —— 引擎内容槽，组件自己的「内容」叫 .ui-list-content，两者隔了好几层；二是 .ebcoms-navbar-empty —— loading 和空数据共用，光看类名分不出状态，要看子元素（ui-spin vs 文案）。",
+    "本组件没有自己的根 div：View.tsx 直接 return NavBarContent，Content.tsx 直接 return List。所以「组件根」实际是 div.ui-list-scrollview（带 ebcoms-navbar-list），它在引擎 .content 里还往下隔了 ui-list-scrollview-wrap / ui-scroller__wrap / ui-scroller__view 三层。写整块样式建议用 .ebcoms-navbar-list 或 #<comId> .ui-list-scrollview 限域，不要假设它是 .content 直接子元素。",
+    "官方样式生成器（getNavBarStyles）产出的选择器只有这几条，作用域统一是 #<comId>.ebcom（用 pretreatCssCode 限域）：`> .content`（default 背景色）、`.ebcoms-navbar-list-item`（title 文字色/字号、item 单栏高度 minHeight）、`.ebcoms-assets-icon`（图标圆角）、`.ebcoms-assets-icon .ui-icon-svg`（图标大小）。要精准覆盖这几项，直接照抄这些选择器即可。",
+    "less 里已有、不要再重复写的钩子：.ebcom-navbar（圆角 + 阴影 + .content padding 0）、.ebcoms-navbar-empty（居中空态）、.ebcoms-navbar-list（列表 display:block、.ui-list-item flex-direction:row-reverse + margin-left:13px、隐藏 ui-list-none、透明化 ui-list-grid-expandable-btn、.ebcoms-assets-icon .ui-icon-svg 缩到 85.7%）、.ebcoms-navbar-list-item 及其 -separator/-right/-left/-expand/-child/-tips-number/-tips-text/-name、.ebcoms-navbar-list-group。另外 .ebcoms-navbar-list.hideChildItemBorder 一整段是 version>0 的专用布局。",
+    "配置开关对结构的影响：config.rightArrow 关掉会加 not-expends（只隐藏末级箭头）；config.separator 控制 -separator 类（分割线颜色）；config.splitBgColor 只影响拆分占位行的行内背景色；config.titleEnabled 控制外层 header 是否存在。",
+    "MOBILE 端不换实现：page.client==='MOBILE' 只往列表加 MOBILE / mobile 两个类，data 和结构完全一样；less 里 .mobile 那段只处理「最后一个导航项不显示 border」。",
+    "设计态（design/Design.tsx）直接渲染 NavBarContent 并传 isDesign：没有引擎外壳那套 .content / header 结构，但组件内部列表结构与运行态相同；差异只有「文字提示用 RichText 而不是 TransformContent」和「不请求接口、直接用 config.navMenus」。校验选择器请在运行态页面里做。",
+    "反查源码位置：引擎外壳在 weapp-ebdcoms/src/components/core/view/createView.tsx 的 renderView / renderContent / getContainerClass；列表壳与容器类在 weapp-ui/src/components/list/List.tsx、ScrollView.tsx、ListItem.tsx、MemoListBody.tsx；组件 DOM 在 weapp-ebdnavcoms/src/components/nav-bar/view/Content.tsx（customRenderItemCell / renderCustomIconCell / renderCustomItemLeftCell / renderCustomItemRightCell / renderSectionHeader）；空态在 view/Empty.tsx、提示在 view/TipContent.tsx；已有样式在 view/index.less；样式生成器在 view/getNavBarStyles.ts。"
+  ]
+}

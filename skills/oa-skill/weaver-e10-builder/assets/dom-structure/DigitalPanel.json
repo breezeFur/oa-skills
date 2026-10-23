@@ -1,0 +1,191 @@
+{
+  "component": "DigitalPanel 数字面板",
+  "usage": "用户说「给数字面板的 XX 设样式」→ 按 pickTree 定位到某棵树 → 在树里找语义节点 → 用 id/class 写选择器。只列有 id 或关键 class 的元素，纯布局包裹 div 已省略或合并。",
+  "legend": {
+    "[cls]": "条件类名，满足条件才出现",
+    "{a|b}": "多选一",
+    "a > b": "合并两层（中间节点无类名 / 无关键类）",
+    "ref": "引用 shared 下的复用片段",
+    "<comId>": "组件运行时 id（config.layout.i），挂在引擎外壳那层。官方样式生成器一律以 #<comId> 限域（scope = #<comId>.ebcom），自写样式建议照做",
+    "前缀": "ebcoms=本仓库源码(clsPrefix) 与 @weapp/ebdcoms 公用类(AssetsItem) | ebcom=引擎外壳与布局层(@weapp/ebdcoms) | ui=@weapp/ui | 无前缀=源码里的字面量(digital-panel-item 等)"
+  },
+  "pickTree": "最外三层固定（见 root）：引擎外壳 > header + content + footer 三个平级兄弟。header 由 config.titleEnabled 决定（默认 true，所以默认有）；footer 由 footerEnabled 决定（默认 false，基本见不到）。组件自己的 DOM 全在 content > .ebcoms-digital-panel 里，只有两种形态：① showmode='single'（一行）→ layout.single；② showmode='multiple'（多行/网格）→ layout.multiple。两种形态下 Item 内部结构完全一致，差异只在根容器类名和 item 的宽度/浮动。item 内部再按「有无图标 / 有无 showDatas / 有无同比环比 / 有无对比标签」分支，见 shared.item。PC 与移动端同构，差异：根多一个 is-mobile、item 多一个 ebcoms-digital-panel-glm、移动端不响应 hover。",
+
+  "root": {
+    "tag": "div",
+    "id": "<comId>",
+    "class": "ebcom ebcom-digitalpanel [ebcom-m] ebcom-{grid|flow} [ebcom-view|ebcom-design] [has-no-header] [event-action-click] [ebcom-display-none]",
+    "desc": "【引擎外壳】由 @weapp/ebdcoms 的 createView / createDesign 渲染，不在本组件源码里。flex 纵列，所以下面固定挂 3 个平级兄弟。type='DigitalPanel' → ebcom-digitalpanel（连写、单数、中间无横线）。它是 GRID 布局组件，外壳自带 position:relative; display:flex; flex-direction:column; border:1px solid var(--border-color); overflow:auto; height:100%",
+    "children": [
+      {
+        "ref": "shared.header",
+        "desc": "config.titleEnabled 默认 true → 默认存在；关掉标题后这块整块消失，外壳上只留 has-no-header 状态类"
+      },
+      {
+        "tag": "div",
+        "class": "content",
+        "desc": "【引擎内容槽】引擎固定追加，组件自己的 DOM 全在它里面，`#<comId> > .content` 可稳定命中。引擎默认 padding:10px 15px; height:100%; overflow:auto; flex:1 1 auto。⚠️ 这是引擎通用类名，一个页面里有很多个 .content，单独用它定位必然串味，必须带 #<comId> 限域。",
+        "children": [
+          { "ref": "shared.panelRoot", "desc": "组件根容器，唯一的组件自有节点（同级的还有下面的弹窗）" },
+          { "ref": "dialogs.dataListDlg", "desc": "条件渲染，与 panelRoot 平级" }
+        ]
+      },
+      { "ref": "shared.footer", "desc": "footerEnabled 默认 false，本组件默认不渲染" }
+    ]
+  },
+
+  "shared": {
+    "header": {
+      "when": "config.titleEnabled=true 且 defaultOpts.render.showHeader 不为 false（本组件没定义这两个，所以只受 titleEnabled 控制）。本组件没有 static renderHeader / renderTitle，100% 走引擎默认实现",
+      "chain": "div.header > [div.ebcoms-title-icon[.noBgColor] > div.ebcoms-assets-item] + div.ebcom-title[.ebcom-title-richtext] + [div.ebcoms-header-btns > span > .ebcoms-configurable-btn.{showType} > .default-btn|.hover-btn]",
+      "tips": "① 整行改高/去边框打 `.ebcom.ebcom-digitalpanel > .header`（默认 padding:0 20px; min-height/line-height:40px; color:#666; font-size:var(--font-size-lg); font-weight:600; border-bottom:1px solid var(--border-color); flex:0 0 auto）。② 数字面板的默认标题是「标题」(getLabel 56053)，图标来自 config.titleIcon，只有 titleIcon.path 有值才渲染 .ebcoms-title-icon。③ 按钮组 .ebcoms-header-btns 只在配置了顶部操作按钮时出现，最多两个 div：竖排=positionType RIGHT，横排=LEFT。④ ⚠️ 引擎用 `&:has(.ebcoms-header-btns)` 把 .ebcom-title 改成 display:inline-block —— 这是「有顶部按钮时给标题加 width 不生效」的原因。⑤ 兼容老结构 `.ebcom-header-wrap > .header`，不确定时两个都覆盖。⑥ 标题文案走 compatible.formatComTitle，可能是富文本，此时多一个 .ebcom-title-richtext，内部是 p 标签。"
+    },
+
+    "footer": {
+      "when": "config.footerEnabled=true 且 defaultOpts.render.showFooter 不为 false。数字面板默认 footerEnabled=false，所以正常情况下这块不存在（不是隐藏，是整块没渲染）",
+      "chain": "div.footer[内联 style=按钮对齐] > ( 组件 renderFooter，本组件未定义 ) + div.ebcoms-footer-btns > span > ConfigurableButton",
+      "tips": "① 默认 height/line-height/min-height:36px; border-top:1px solid var(--border-color); position:relative; display:flex。② ⚠️ 对齐由 JS 内联 style 写在 .footer 上，覆盖要 !important。③ 按钮组有 max-width:100%; height:100%; overflow-x:auto; padding:3px 0，其 > span 是 color:#666; font-size:12px; margin-right:10px（首个 margin-left:10px）。④ ⚠️ 引擎把内部默认按钮透明化：`.ui-btn.ui-btn-default{border-color:transparent;background-color:transparent}`（disabled/hover 各有独立规则），直接改 .ui-btn 会被压掉。⑤ 无权限/未付费时外壳照渲染但内部为空。"
+    },
+
+    "panelRoot": {
+      "tag": "div",
+      "class": "ebcoms-digital-panel {ebcoms-digital-panel-single|ebcoms-digital-panel-multiple} [is-mobile]",
+      "desc": "【组件根容器】common/Content.tsx render 的第一个节点，所有数字项都挂在它下面。内联 style：--ebcoms-digitalPanel-columns=config.columns（列数，供 CSS 取用）；PC 且多行时还有 minWidth=90*有效列数（有效列数 counts = min(项数, columns)）。",
+      "tips": "① is-mobile 无前缀，且与根容器同级（page.client !== 'PC'）。② 它本身是 flex 横排、line-height:1.5、z-index:1。③ -single / -multiple 两个类名必有一个，用它区分布局比看别的更稳。④ 已有样式钩子：`.ebcoms-digital-panel .ebcoms-assets-item{margin-right:10px;border-radius:50%}`、`.ebcoms-digital-panel > div{display:flex;align-items:center;padding:20px 10px 20px 20px;flex:1 1 auto;height:100%;transition:background .2s linear}`。",
+      "children": [
+        { "ref": "shared.item", "desc": "按 store.formatData 顺序重复。⚠️ showHInfo.children 里 display=hide 的项、以及 setHidePanels 传入的下标，是**直接 return null 不渲染**（不是 display:none），会影响 :nth-child 序号" }
+      ]
+    },
+
+    "item": {
+      "tag": "div",
+      "class": "digital-panel-item [ebcoms-digital-panel-glm] [hasClick] [row-start] [row-end] [{panel.customClassName}]",
+      "desc": "【单个数字项】90% 的样式需求落在这层。⚠️ digital-panel-item 是源码里的字面量，**没有任何前缀**，别写成 .ebcoms-digital-panel-item。内联 style：多行时 width=100/counts%，单行时 width:auto；另有 CSS 变量 --ebcoms-digitalPanel-icon-color（由 icon 的颜色/填充方式算出，图标与涨跌箭头取色都靠它）。",
+      "tips": "① ebcoms-digital-panel-glm 仅移动端。② hasClick = 配了事件动作(eventGroup) 或 systemOption 有值；view/index.less 只在 .hasClick 上做 hover 背景(#f6f6f6)，改 hover 效果必须带 .hasClick。③ row-start/row-end 仅多行模式用于清浮动。④ customClassName 只在 panel.customCNFlag 为真时才拼上来。⑤ 点击后引擎的 EventClickable 会给这一层加 ebsdk-bind-dom（并先清掉其他元素上的），可用它做选中态。⑥ ⚠️ EventClickable / CorsComponent 都不产生额外包裹 div——它 clone 了这个 div 只注入 onClick，所以 item 就是根容器的直接子元素。",
+      "children": [
+        { "ref": "shared.icon" },
+        {
+          "tag": "div",
+          "desc": "【数值+标题列】无类名，只有内联 maxWidth：有图标时 calc(100% - 56px)，无图标时 100%。⚠️ 内联样式，想改宽度必须 !important。已有钩子：`.ebcoms-digital-panel > div > div{display:flex;flex-direction:column;align-items:center;justify-content:space-between;min-height:39px}`",
+          "children": [
+            {
+              "tag": "span",
+              "desc": "无类名，只有内联 color（有图标时取图标色，没图标时固定 #333）。它是 `.ebcoms-digital-panel > div > div > span:first-child` 的落点，已有样式 font-size:var(--font-size-md); font-weight:bold; text-align:center",
+              "children": [{ "ref": "shared.data" }]
+            },
+            {
+              "tag": "span",
+              "class": "ebcoms-digtial-panel-item-title",
+              "desc": "【标题文字】span:nth-child(2)。已有样式 font-size:var(--font-size-sm); min-width:36px; width:100%; text-align:center; 单行省略号（text-overflow:ellipsis + nowrap + overflow:hidden）。"
+            },
+            {
+              "tag": "span",
+              "class": "ebcoms-digtial-panel-item-last",
+              "desc": "【上一周期值】仅 calcs 里存在 lastCycleVal.isShow 时渲染，span:nth-child(3)，已有样式 font-size:12px; font-weight:400。文案 = lastCycleVal.content + calc.compare + panel.unit"
+            }
+          ]
+        }
+      ]
+    },
+
+    "icon": {
+      "when": "panel.icon.path 有值；没有 path 时整块不渲染（IconEidtor 清空后就会出现这种状态），同时数值列 maxWidth 变成 100%",
+      "desc": "【图标】@weapp/ebdcoms 的 AssetsItem（size='md' → 36px 容器）。⚠️ 它是 Loadable，加载完成前 fallback 是空 Fragment，不占位。",
+      "tips": "同一个 span 上会同时带 ebcoms-assets-icon 和 ebcoms-assets-item 两个类（AssetsIcon 把 config 传来的 className 直接拼上去了），还带尺寸类 md。.bg 类只在 style 里含 backgroundColor 时才出现——数字面板默认图标带 bgColor（会被 parseIconStyleToCssStyle 转成 backgroundColor），所以通常都带 .bg。已有钩子：`.ebcoms-digital-panel .digital-panel-item .ebcoms-assets-icon img.ui-icon-svg{width:100%;height:100%}`。",
+      "branches": [
+        {
+          "when": "path 以 # 开头（系统图标，如 #Icon-Unfinished-business / #icon-rate-star）→ AssetsIcon 分支",
+          "chain": "span.ebcoms-assets-icon.ebcoms-assets-item.md[.bg] > span.ui-icon.ui-icon-wrapper > svg.ui-icon-svg",
+          "tips": "① 容器 36px，图标是容器的 66.7%（.bg 时）/ 100%。② path 里的图标名命中 @weapp/ebdcoms 的 ModuleLine / ModuleSurface 分类时改走 @weapp/ui AppIcon（内部是 .ui-app-icon 体系），其余走 IconFont（字体图标）——这两类的内部 DOM 不可控，只把外面这层当挂载点。③ AssetsItem 是按需加载的跨包组件，别假设它一定同步在。"
+        },
+        {
+          "when": "path 不以 # 开头且不以 /svg 结尾 → AssetsImg 分支",
+          "chain": "img.ebcoms-assets-img.ebcoms-assets-item.md",
+          "tips": "图片图标，样式（含 bgColor 转出的 backgroundColor / radius / 宽高）全部内联在这张 img 上。"
+        }
+      ]
+    },
+
+    "data": {
+      "tag": "span",
+      "class": "ebcoms-digtial-panel-item-data [flex]",
+      "desc": "【数值区】数字 + 单位 + 计算标签的容器。flex 类 = 配置了 showDatas 多值展示。已有样式：display:flex; position:relative; line-height:25px。⚠️ 类名里的 digtial 是源码拼写错误，全组件都是这么写的。",
+      "children": [
+        {
+          "chain": "span.ebcoms-digtial-panel-item-value > svg[width/height=1.2em] > use[href=#numberLoading]",
+          "desc": "【数字加载态】三点闪烁动画。出现条件：数据还没就绪（!(!numberLoading && hasInit)）且不是数据延迟加载的占位。",
+          "tips": "⚠️ svg 是 <use> 引用，symbol 定义由 common/number-loading 注入到一个 display:none 的 div 里、挂到 #root 下——不在组件 DOM 里，用 #<comId> 限域选不到它，要调动画得打 numberLoading 那个 symbol。"
+        },
+        {
+          "chain": "span.ebcoms-digtial-panel-item-value{数值} + [span.ebcoms-digtial-panel-item-unit{单位}]",
+          "desc": "【常规单值】仅 showDatas 为空时渲染。单位没有配置时就没有 item-unit。",
+          "tips": "① 官方样式生成器的「数值字体」「单位字体」分别打 .ebcoms-digtial-panel-item-value 和 .ebcoms-digtial-panel-item-unit。② item-unit 已有钩子：font-weight:normal（common/index.less）+ 单行截断（-webkit-line-clamp:1，只有单位有这层截断，数值本身没有）。③ 数值 >999 且是系统项(systemOption)时会显示成 '999+'。④ title 属性 = 数值拼单位。"
+        },
+        {
+          "chain": "div.ebcoms-digtial-panel-item-group > span.ebcoms-digtial-panel-item-value + [span.ebcoms-digtial-panel-item-unit]",
+          "desc": "【多值（showDatas）】showDatas.length>0 时每个值一个 group，一行并排（item-group 已有样式 display:inline-flex）。此分支下 item-data 恒带 flex 类。"
+        },
+        { "ref": "shared.calc" }
+      ]
+    },
+
+    "calc": {
+      "tag": "sup",
+      "class": "[ebcoms-digital-panel-calc-one|ebcoms-digital-panel-calc-more]",
+      "desc": "【同比/环比计算区】恒渲染（calcs 为空时 class 是空字符串，元素照样在）。绝对定位到数值右侧（left:100%），one（1 个计算）时 top:-7px，more（多个）时 top:-14px。里面每个 calc 一个 CalcField；countType=NONE 的项自己返回 null。",
+      "children": [
+        {
+          "chain": "div.{ebcoms-digital-panel-calc-up|ebcoms-digital-panel-calc-down|ebcoms-digital-panel-calc-flat}[title=计算说明] > [span.ebcoms-digital-panel-calc-prefix] + [span.ui-icon.ui-icon-wrapper > svg.ui-icon-svg | span{--}] + span.ebcoms-digital-panel-calc-data + [span.ebcoms-digital-panel-calc-suffix]",
+          "desc": "【同比/环比 YOYMOM】三个状态类按数值符号选：-up=大于 0（红，var(--danger)）、-down=小于 0（绿，var(--success)）、-flat=等于 0（灰，var(--invalid-fc)）。前缀/后缀是可选 span（-suffix 有 margin-left:5px）。中间的图标是 CountIcon：>0 → Icon-up-arrow04、<0 → Icon-Down-arrow04、=0 或空串 → span{--}（内联 padding:0 2px）、原始值(dataType=origin)且非数字（如 YYYY-MM-DD）→ 不渲染图标。",
+          "tips": "① ⚠️ -up 是红、-down 是绿（与国内涨红跌绿一致，别按欧美习惯反着改）。② 官方样式生成器的 YOYMOMIncrease/YOYMOMDecrease/YOYMOMFlat 打的就是这三个类，并且会同时生成一条 `.ebcoms-digital-panel > div > div .ebcoms-digtial-panel-item-data .ebcoms-digital-panel-calc-{up|down|flat} .ui-icon` 去覆盖箭头图标色。"
+        },
+        { "ref": "shared.comparison" }
+      ]
+    },
+
+    "comparison": {
+      "when": "calc.countType === COMPARISONTAG（对比标签），与同比环比共用同一个 <sup> 容器",
+      "chain": "div.ebcoms-digitalpanel-comparison[style=color] > span.ebcoms-digitalpanel-comparison-content( > span > ui Icon | span{--} | 无 ) + [span{annotation}]",
+      "desc": "【对比标签】外层 div 带内联 color：increase=#ff4d4f、decrease=#52c41a、其余=#bbbbbb（iconStyle.style.color 优先）。数值与 percentValue 拼在同一行；annotation 是第二行灰色小字。",
+      "tips": "⚠️ 前缀是 digitalpanel 而不是 digital-panel：ebcoms-digitalpanel-comparison / -comparison-content，别写成 ebcoms-digital-panel-comparison。已有样式：-comparison-content 是 inline-block; height/line-height:20px，其 `+ span`（annotation）是 display:block; color:#bbb; line-height:16px; text-align:center。"
+    }
+  },
+
+  "layout": {
+    "single": {
+      "when": "config.showmode = 'single'（一行）。此时 config.columns 只影响根容器上的 --ebcoms-digitalPanel-columns 变量，不产生换行",
+      "ref": "shared.panelRoot",
+      "tips": "根容器带 ebcoms-digital-panel-single，index.less 有一条 `.ebcoms-digital-panel.ebcoms-digital-panel-single > div.digital-panel-item{height:100% !important; align-items:center !important; justify-content:center}` —— 单行模式下每个 item 都被强制满高居中对齐，改高度/对齐必须 !important。item 宽度是 auto，靠 flex 均分。"
+    },
+    "multiple": {
+      "when": "config.showmode = 'multiple'（多行/网格）",
+      "ref": "shared.panelRoot",
+      "tips": "根容器带 ebcoms-digital-panel-multiple，index.less 把根改成 display:block，item 改成 float:left + 内联 width:100/counts%；`.row-start{clear:left}` 用来断行。⚠️ 是浮动布局，item 之间调间距用 margin（flex 的 gap 在这里无效）。官方样式生成器的「主题色」是按 `.ebcoms-digital-panel .digital-panel-item:nth-child(i)` 逐项上色的，所以项数与顺序变化会让配色重排。"
+    }
+  },
+
+  "dialogs": {
+    "dataListDlg": {
+      "when": "运行态点击数字项且事件动作是「打开数据列表」（linkInfo.type='dataList'）；配了字段列表直接开，没配字段列表则先拉 dsUtils.getFields 再开。store.dataListDlgVisible 为真才渲染",
+      "desc": "【数据列表弹窗】外部组件 @weapp/ebdlist 的 DataListDlg，id 是一个模块级 UUID（dataListId），不是组件 id。它由 When 包裹，与 shared.panelRoot 平级，都挂在引擎的 .content 里 —— 不是挂 body。",
+      "tips": "⚠️ 弹窗内部 DOM 属于 @weapp/ebdlist，本组件不做任何控制，别在这里找类名；要限域只能用 `#<comId> .content` 或它自己的 id。移动端不弹窗，走路由 `${parentPath}/dataList?refComId=<comId>`，参数存在 sessionStorage.dataListProps 与 window.EBUILDER.pageParams 里。"
+    }
+  },
+
+  "configPanel": {
+    "when": "设计器右侧属性面板（config/Config.tsx → config/stats-panel），只在搭建态出现，与运行态 DOM 无关",
+    "chain": "div.ebcoms-digital-panel-config > div > ( SortableItem 的包裹 div > ( div.{ebcoms-dpc-data-element|ebcoms-dpc-collect-element}[.divider] > ( div > 数据源/字段区 + [div.ebcoms-dpc-data-element-bottom > .ebcoms-digital-icon-editor + div > LocaleEx + EventsActionBtn] ) + div.ops-group ) ) + div.ebcoms-digital-panel-config-add > ui Menu(overlayClassName=ebcoms-dpc-drop-menu)",
+    "tips": "① statType='data' → ebcoms-dpc-data-element；'collect'（系统项）→ ebcoms-dpc-collect-element。② needDivider（非第一项）才加 .divider（padding-top:15px + 上边框）。③ 图标编辑区类名统一是 .ebcoms-digital-icon-editor（作为 className 传给 @weapp/ebdcoms 的 IconEidtor）。④ 显示模式单选在 .ebcoms-digital-panel-columns 里（ui Radio）。⑤ 每项右侧的切换/删除按钮在 div.ops-group（无前缀）里。"
+  },
+
+  "notes": [
+    "【最容易写错的类名】① 拼写是 digtial（源码把 digital 写错了），全套：ebcoms-digtial-panel-item-data / -item-value / -item-unit / -item-group / -item-title / -item-last —— 只有 ebcoms-digital-panel（容器）和 ebcoms-digital-panel-calc-*（计算）是真 digital。② digital-panel-item、is-mobile、hasClick、row-start、row-end、flex、divider、ops-group、content / header / footer 全部无前缀。③ 对比标签前缀是 digitalpanel（ebcoms-digitalpanel-comparison），少一个横线。④ 外壳是 ebcom-digitalpanel（连写），不是 ebcom-digital-panel。",
+    "【两个同名/近名陷阱】引擎的 .content（无前缀，组件 DOM 的容器）≠ 组件根 .ebcoms-digital-panel；ebcom-digitalpanel（外壳）≠ ebcoms-digital-panel（组件根）——一个是 ebcom、一个是 ebcoms，肉眼极易混。",
+    "【引擎自动加的修饰类】`.has-no-header`（titleEnabled=false 或 renderHeader 存在时）、`.event-action-click > .content{cursor:pointer}`（配了点击事件动作）、`.ebcom-display-none`（被事件动作隐藏时引擎加的，同时内联 display:none）。⚠️ 本组件**不会**出现 content-no-padding（defaultOpts 里没定义 padding），padding:0 是 view/index.less 里 `.ebcom-digitalpanel.ebcom-digitalpanel > .content{padding:0;overflow:auto}` 打进去的——想把内边距加回来要覆盖这条，而不是找 content-no-padding。",
+    "【官方样式生成器（common/getPanelStyles.ts）的选择器清单】它把所有 CSS 作用域写成 `#<comId>.ebcom`，产物挂在 `#<comId> .comStyle` / `.comCodeSource` / `.comCodeOld` 三组上。原样清单：容器背景 `.content .ebcoms-digital-panel`；主题色 `.ebcoms-digital-panel .digital-panel-item:nth-child(i)`（按 panels 顺序对 subjectColor 取模循环）；图标 `.content .ebcoms-assets-item .ui-icon-svg`、`.content .ebcoms-assets-item.bg .ui-icon-svg`、`.content .ebcoms-assets-item`；字体 `.ebcoms-digital-panel .ebcoms-digtial-panel-item-value|item-unit|item-title|item-last`；涨跌 `.ebcoms-digital-panel .ebcoms-digital-panel-calc-up|flat|down` 以及 `.ebcoms-digital-panel > div > div .ebcoms-digtial-panel-item-data .ebcoms-digital-panel-calc-* .ui-icon`。自写样式沿用同一套即可被「自定义 CSS」吸收。",
+    "【自带 CSS 变量】根容器上有 --ebcoms-digitalPanel-columns（=config.columns）与 --ebcoms-digitalPanel-icon-color（=图标颜色，hexToRgb 后的值），item 上继承。调图标色/列宽优先改这两个变量，比覆写一堆选择器稳。",
+    "【已有但用不上的样式钩子（别照着写）】`.ebcoms-digital-panel-loading`、`.ebcoms-digtial-panel-item-hide`、`.ebcoms-digital-panel-calc`（纯组，源码从没挂过）只定义在 view/index.less 里，没有任何元素带这些类。另有一条 `.ebcoms-digital-panel .is-mobile{...}` 因为 is-mobile 与根容器是同一个元素（不是后代）而永远不生效——移动端去 hover 要写 `.ebcoms-digital-panel.is-mobile`。",
+    "【移动端与 RTL】移动端：根加 is-mobile、item 加 ebcoms-digital-panel-glm，并且 index.less 会把 .hasClick 的 hover/active 背景强制 transparent（但受上面那条失效规则影响，实际靠 !important 的写法也没生效，改移动端 hover 直接覆盖 .hasClick 即可）。RTL：`body[page-rtl='true'] .ebcoms-digtial-panel-item-data{transform:scaleX(-1)}`，item-value / item-unit 又被 transform:none 还原，calc-one 再翻一次。",
+    "【反查源码】本组件 → common/Content.tsx（引擎对接 + 根容器 + 弹窗 + 取数）、common/PanelItem.tsx（数字项全部 DOM + CountIcon）、common/calc-field/{YOYMOM,Comparison}.tsx（同比环比 / 对比标签）、common/number-loading/（三点动画 symbol 注入）、common/getPanelStyles.ts（官方样式生成器）、view/index.less + common/index.less（全部已有样式）、view/View.tsx + design/Design.tsx + design-m/Design.tsx（出入口与 defaultProps）、config/stats-panel/（属性面板）。@weapp/ui → D:\\fwCode\\weapp-ui（Icon=ui-icon/ui-icon-svg、AppIcon=ui-app-icon、CorsComponent 不产生 DOM）。引擎（外壳 / header / content / footer / 按钮）→ D:\\fwCode\\weapp-ebdcoms/src/components/core/：view/createView.tsx、design/common.less、utils/comp.ts（getClassName → ebcom-<type>）、common/assets-lib/assets-item/{Item,Icon,Img}.tsx（图标 DOM）、common/event-action/event-click/EventClickable.tsx（clone 不包裹，加了 ebsdk-bind-dom）。"
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "MAX 创鑫流程规范"
+  short_description: "按创鑫公司规范与默认约定搭建、修改和审阅 E10 流程及配套表单"
+  default_prompt: "使用 $max-workflow-standard 按公司规范和已确认默认约定完成这项 OA 流程或配套表单任务，核对需求来源、实施范围及验证证据。"

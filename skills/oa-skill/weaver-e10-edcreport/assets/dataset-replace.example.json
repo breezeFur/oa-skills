@@ -1,0 +1,17 @@
+{
+  "_comment": "替换数据集 body 示例 — edc-report dataset replace --file（替换 example 内占位）",
+  "reportId": "1313049481975267329",
+  "builtinId": "OLD_DATASET_ID",
+  "name": "新数据源名",
+  "sourceType": "LOGIC",
+  "sourceId": "NEW_SOURCE_ID",
+  "sourceGroup": "weaver-ebuilder-form-service",
+  "appid": "APP_ID",
+  "fieldMap": [
+    {
+      "builtinField": "旧字段leaf",
+      "replaceField": "新字段name",
+      "replaceFieldName": "新显示名"
+    }
+  ]
+}

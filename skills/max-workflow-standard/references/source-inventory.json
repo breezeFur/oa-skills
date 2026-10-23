@@ -1,0 +1,1865 @@
+{
+  "source_filename": "创鑫项目建设工作流程搭建规范V2.1(1016).docx",
+  "source_sha256": "43695c60cfb768ec489ad2c4b44fbbc75aff447022cfa4a28d68f494b6485e93",
+  "source_bytes": 3760157,
+  "extracted_at": "2026-10-15",
+  "counts": {
+    "body_paragraphs": 102,
+    "body_tables": 2,
+    "media": 27,
+    "embeddings": 2,
+    "comments": 2,
+    "image_occurrences": 28
+  },
+  "paragraphs": [
+    {
+      "id": "P001",
+      "text": "d创鑫项目建设工作流程搭建规范",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P002",
+      "text": "一 流程类型设置规范：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P003",
+      "text": "搭建内容基于搭建大表：（含流程L1流程L2，流程类型编码，编码规则，流程名称）",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P004",
+      "text": "",
+      "resources": [
+        "media/image1.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P005",
+      "text": "",
+      "resources": [
+        "media/image2.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P006",
+      "text": "流程类型分类参考：",
+      "resources": [],
+      "comments": [
+        "0"
+      ]
+    },
+    {
+      "id": "P007",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P008",
+      "text": "二 命名规范：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P009",
+      "text": "1、 流程起名规范：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P010",
+      "text": "流程编码+流程名称例如：IPD101 外部产品需求申请流程",
+      "resources": [
+        "media/image3.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P011",
+      "text": "流程表单起名规范：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P012",
+      "text": "表单名称：《AC502 办公用品申请》流程，表单名称为《办公用品申请单》，以搭建实施方案为准，",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P013",
+      "text": "",
+      "resources": [
+        "media/image4.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P014",
+      "text": "注意：流程标题，流程编号用系统字段，不需手动创建自定义字段。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P015",
+      "text": "表单字段命名规范：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P016",
+      "text": "标准字段命名规范按照实际业务表格字段内容命名，在系统表单字段命名时，统一使用字段名的第一个字母表示。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P017",
+      "text": "当出现重复名称时，在字段后跟01、02……不断向后追加；",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P018",
+      "text": "例如：",
+      "resources": [
+        "media/image5.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P019",
+      "text": "PS：申请单位字段必须为“sqdw”,不允许修改数据库字段名称。历史表单中的单据编码修改成流程编码！",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P020",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P021",
+      "text": "流程节点名称规范：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P022",
+      "text": "开始节点：XXX发起；中间节点： XXX审核；中间节点有直接结束则：XXX 审批；结束节点：归档；",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P023",
+      "text": "例如：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P024",
+      "text": "",
+      "resources": [
+        "media/image6.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P025",
+      "text": "流程节点顺序规范：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P026",
+      "text": "发起节点为第一顺序，所有的审核节点为第二顺序（多个可以不管具体排序），审批节点为第三顺序，结束为最后顺序。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P027",
+      "text": "",
+      "resources": [
+        "media/image7.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P028",
+      "text": "出口名称与目标节点保持一致",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P029",
+      "text": "在出口设置时，当“源节点”向“目标节点”流转时，出口名称：采用出口自动填充注意：若目标节点选择错误，需要修改，出口名称是不会自动修改的，需要再次操作自动填充",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P030",
+      "text": "",
+      "resources": [
+        "media/image8.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P031",
+      "text": "流程出口顺序规范",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P032",
+      "text": "出口顺序按流程同一节点流转条件大小进行排序。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P033",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P034",
+      "text": "",
+      "resources": [
+        "media/image9.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P035",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P036",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P037",
+      "text": "三 流程设置规范：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P038",
+      "text": "新建流程时，可直接用流程模板导入",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P039",
+      "text": "",
+      "resources": [
+        "media/image10.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P040",
+      "text": "流程基本设置",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P041",
+      "text": "参考以下截图中的红框所示，进行对应勾选",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P042",
+      "text": "提醒设置：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P043",
+      "text": "",
+      "resources": [
+        "media/image11.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P044",
+      "text": "功能设置：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P045",
+      "text": "",
+      "resources": [
+        "media/image12.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P046",
+      "text": "自动处理：根据实际流程情况启用前置或后置审批，默认前置审批",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P047",
+      "text": "",
+      "resources": [
+        "media/image13.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P048",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P049",
+      "text": "附件设置：",
+      "resources": [],
+      "comments": [
+        "1"
+      ]
+    },
+    {
+      "id": "P050",
+      "text": "流程的附件保存目录需要和签字意见保存目录一致，文件夹命名层级在流程附件下面新建L1 ,L2，流程名称（和流程起名规范保持一致）",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P051",
+      "text": "",
+      "resources": [
+        "media/image14.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P052",
+      "text": "",
+      "resources": [
+        "media/image15.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P053",
+      "text": "",
+      "resources": [
+        "media/image16.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P054",
+      "text": "根据实际情况补充附件上传目录和签字意见附件上传目录",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P055",
+      "text": "流程异常处理：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P056",
+      "text": "中间审核环节都需要开启异常处理，由用户指定操作者。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P057",
+      "text": "",
+      "resources": [
+        "media/image17.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P058",
+      "text": "超时设置：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P059",
+      "text": "根据需求来设置，具体参考以下文件",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P060",
+      "text": "",
+      "resources": [
+        "media/image18.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P061",
+      "text": "",
+      "resources": [
+        "embeddings/oleObject1.bin",
+        "embeddings/oleObject2.bin",
+        "media/image19.emf",
+        "media/image20.emf"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P062",
+      "text": "",
+      "resources": [
+        "media/image21.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P063",
+      "text": "流程签字意见设置",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P064",
+      "text": "设置退回申请、加审、减审、退回、委托、加签、干预，在操作中需要意见必填。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P065",
+      "text": "",
+      "resources": [
+        "media/image22.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P066",
+      "text": " ",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P067",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P068",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P069",
+      "text": "高级设置：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P070",
+      "text": "根据实际场景需求设置流程撤回功能",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P071",
+      "text": "",
+      "resources": [
+        "media/image23.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P072",
+      "text": "下一节点未查看时允许强制收回，下一节点查看后不允许强制收回，申请节点允许强制结束",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P073",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P074",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P075",
+      "text": "自定义报表：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P076",
+      "text": "报表命名需要按层级区分，参考上面的L1,L2,流程名称命名配置，具体显示字段按需求调整。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P077",
+      "text": "建立一级菜单：流程报表 ，二级菜单：L1级 三级菜单：L2级 四级菜单：具体流程报表",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P078",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P079",
+      "text": "",
+      "resources": [
+        "media/image24.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P080",
+      "text": "四 流程表单设置：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P081",
+      "text": "流程表单固定样式如下：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P082",
+      "text": "",
+      "resources": [
+        "media/image4.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P083",
+      "text": "表单字体：系统默认",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P084",
+      "text": "",
+      "resources": [
+        "media/image25.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P085",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P086",
+      "text": "基础信息按顺序排列：流程标题，流程编号，申请人，岗位，工号，申请单位，申请部门，申请日期。注意：申请单位数据库字段必须为“sqdw”",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P087",
+      "text": "流程标题需要显示字段填写内容，显示格式：流程名称-申请人-年月日，特殊流程可增加自定义流程标题显示。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P088",
+      "text": "例如：IFS701 个人费用报销申请流程-张三-2025-09-09",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P089",
+      "text": "",
+      "resources": [
+        "media/image26.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P090",
+      "text": "流程提交完成后显示流程图",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P091",
+      "text": "",
+      "resources": [
+        "media/image27.png"
+      ],
+      "comments": []
+    },
+    {
+      "id": "P092",
+      "text": "五 打印模板设置：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P093",
+      "text": "打印模板与默认流程表单模板保持一致即可。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P094",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P095",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P096",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P097",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P098",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P099",
+      "text": "请相关负责人确认以上流程搭建规范和表单样式是否符合要求，确认无误请签字，如需修改请及时沟通。如果签字后流程和表单样式需要进行修改，由相关人员进行调整。",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P100",
+      "text": "",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P101",
+      "text": "  客户方负责人：                                          泛微审批人：",
+      "resources": [],
+      "comments": []
+    },
+    {
+      "id": "P102",
+      "text": "签字日期：                                            签字日期：",
+      "resources": [],
+      "comments": []
+    }
+  ],
+  "tables": [
+    {
+      "id": "T1",
+      "rows": [
+        [
+          {
+            "text": "流程大类",
+            "gridSpan": 3,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "1、AC 行政综合类",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "2、HR 人力资源类",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "3、BT/IT 管理流程与IT类",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "4、MA 资产管理类",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "5、ER 外部事务类",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "6、IFS 集成财经管理类",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "7、IPD 集成产品开发类",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "8、ISC 集成供应链类",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "9、LTC 线索到回款类",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "10、ITR 问题到解决类",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "11、R/C 管理风险/合规类",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ]
+      ]
+    },
+    {
+      "id": "T2",
+      "rows": [
+        [
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "流程L1级",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "流程L2级",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "1",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "AC 行政综合",
+            "gridSpan": 1,
+            "vMerge": "restart"
+          },
+          {
+            "text": "差旅服务",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "2",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "后勤服务",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "3",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "安保管理",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "4",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "办公用品",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "5",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "基建工程",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "6",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "综合管理",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "7",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "BT/IT 管理流程与IT",
+            "gridSpan": 1,
+            "vMerge": "restart"
+          },
+          {
+            "text": "IT产品管理",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "8",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "IT服务管理",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "9",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "业务流程管理",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "10",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "ER 外部事务",
+            "gridSpan": 1,
+            "vMerge": "restart"
+          },
+          {
+            "text": "法务",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "11",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "证照管理",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "12",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "IFS 集成财经管理",
+            "gridSpan": 1,
+            "vMerge": "restart"
+          },
+          {
+            "text": "预算",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "13",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "资金",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "14",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "总账",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "15",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "应收",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "16",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "应付",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "17",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "费用管理",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "18",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "财务运作",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "19",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "IPD 集成产品开发",
+            "gridSpan": 1,
+            "vMerge": "restart"
+          },
+          {
+            "text": "产品规划",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "20",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "产品/技术 立项",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "21",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "产品/技术 开发",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "22",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "产品/技术 验证",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "23",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "产品/技术 发布",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "24",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "工程管理",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "25",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "BOM",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "26",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "知识产权",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "27",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "HR 人力资源",
+            "gridSpan": 1,
+            "vMerge": "restart"
+          },
+          {
+            "text": "组织",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "28",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "人才供应",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "29",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "人才发展",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "30",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "薪酬绩效",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "31",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "员工关系",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "32",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "基础人事",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "33",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "ISC 集成供应链",
+            "gridSpan": 1,
+            "vMerge": "restart"
+          },
+          {
+            "text": "计划",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "34",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "采购（需求管理）",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "35",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "采购（价格管理）",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "36",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "采购（订单管理）",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "37",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "采购（供应商管理）",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "38",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "智造",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "39",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "仓储",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "40",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "物流",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ],
+        [
+          {
+            "text": "41",
+            "gridSpan": 1,
+            "vMerge": null
+          },
+          {
+            "text": "",
+            "gridSpan": 1,
+            "vMerge": "continue"
+          },
+          {
+            "text": "质量",
+            "gridSpan": 1,
+            "vMerge": null
+          }
+        ]
+      ]
+    }
+  ],
+  "comments": [
+    {
+      "id": "0",
+      "author": "wei qiu",
+      "date": "2025-10-15T19:00:00Z",
+      "text": "加二级分类",
+      "paragraphs": [
+        "P006"
+      ]
+    },
+    {
+      "id": "1",
+      "author": "wei qiu",
+      "date": "2025-10-15T19:03:00Z",
+      "text": "建立流程名称对应的附件目录",
+      "paragraphs": [
+        "P049"
+      ]
+    }
+  ],
+  "other_text_parts": [
+    {
+      "part": "word/footnotes.xml",
+      "text": ""
+    }
+  ],
+  "media": [
+    {
+      "part": "word/media/image1.png",
+      "sha256": "a2534ad8f40b85746086587d8f53e93b3e19d857d221076550d036fb864a221b",
+      "bytes": 316688
+    },
+    {
+      "part": "word/media/image10.png",
+      "sha256": "35af9bee3a588a8841c0d0b5156b9d8b94d21157bdaa9d7e85f6bc7d605f0b8a",
+      "bytes": 118840
+    },
+    {
+      "part": "word/media/image11.png",
+      "sha256": "06fc3efb26b2090cadb290afaa45fff981d124fa547da6dc1435655ee62bac10",
+      "bytes": 175283
+    },
+    {
+      "part": "word/media/image12.png",
+      "sha256": "7b4ce9e09513a4af1db05e4760e0f50dfed6bf99e2e64f94ac5cffbaff98a1d6",
+      "bytes": 36117
+    },
+    {
+      "part": "word/media/image13.png",
+      "sha256": "32f2bf21a8583b48b05dd59a5de5a77cc006a7ed4bd2e40b88234baf93940760",
+      "bytes": 88271
+    },
+    {
+      "part": "word/media/image14.png",
+      "sha256": "a9fd7bd82498a30f5eaa933314895ebe2c7705d3462c55cc90a3c0c5f5fac7a0",
+      "bytes": 80087
+    },
+    {
+      "part": "word/media/image15.png",
+      "sha256": "c77812035d9a95d96c81ec604fbc8cf204146feafa80ee4426e23a9e1e3d7ffb",
+      "bytes": 251502
+    },
+    {
+      "part": "word/media/image16.png",
+      "sha256": "0c15a65a7e2c85d4feb871e9977ec649e66fa4e64e1a5da6fb50fdbd0540331f",
+      "bytes": 214091
+    },
+    {
+      "part": "word/media/image17.png",
+      "sha256": "2f5f5837908463516de6258a3a97a854c762657c85568f1fe7aafa7f1f496b08",
+      "bytes": 172422
+    },
+    {
+      "part": "word/media/image18.png",
+      "sha256": "cdaf4ed9a2f066c2707a1b8047bff968424cd622ce3d6db99977acefdbae6c67",
+      "bytes": 16535
+    },
+    {
+      "part": "word/media/image19.emf",
+      "sha256": "1d38862caefc61850987c99758f374cd1dcd54d6efad825113ad25aff07211b3",
+      "bytes": 17400
+    },
+    {
+      "part": "word/media/image2.png",
+      "sha256": "b29785d40704ec404cade61b0bcebc62fe6122aa9d61f52f666053e7815d3c07",
+      "bytes": 99715
+    },
+    {
+      "part": "word/media/image20.emf",
+      "sha256": "2dd9f5dbac40914d18dcafa190d331462e54987f73d2919edcc9aad63588fb80",
+      "bytes": 17388
+    },
+    {
+      "part": "word/media/image21.png",
+      "sha256": "cc412f6ed4518472a51f6e1a78226d8fa3a467d7eb21f8846216783698401cc5",
+      "bytes": 101444
+    },
+    {
+      "part": "word/media/image22.png",
+      "sha256": "88ee8175045a000263379e6e543601f8a5f55fba02c1bcba0df5551f85a6e304",
+      "bytes": 100829
+    },
+    {
+      "part": "word/media/image23.png",
+      "sha256": "3b6c1969029475e2088b464b7006e2cb737eeea3065ae85c2a7f7a8fddba714a",
+      "bytes": 97101
+    },
+    {
+      "part": "word/media/image24.png",
+      "sha256": "7fa9377219cb07c468b6bba1ba5b6222702ffdd0b151250edc5e6f47ae82fe27",
+      "bytes": 201394
+    },
+    {
+      "part": "word/media/image25.png",
+      "sha256": "92812516fb2f47c24bef342e005346b0fa0f9775450007bc66b2113fedc0f511",
+      "bytes": 249656
+    },
+    {
+      "part": "word/media/image26.png",
+      "sha256": "2fe3b235fda7fb5fee513aa6d088f027237faf5d898c7404c01c43757b3926ce",
+      "bytes": 177363
+    },
+    {
+      "part": "word/media/image27.png",
+      "sha256": "8071038f9db09d8f46683299df3f792c8eb37e6d6310cd49dd7a1aa138a9a35f",
+      "bytes": 161426
+    },
+    {
+      "part": "word/media/image3.png",
+      "sha256": "703429eadedfa50b4d637914c3797b42cb6222a7d6df18c286b04020b0038808",
+      "bytes": 31795
+    },
+    {
+      "part": "word/media/image4.png",
+      "sha256": "dc4848a9bba933061f0e1d713c69e1182e2f37a57e7cba68287e2ef647db0f20",
+      "bytes": 225054
+    },
+    {
+      "part": "word/media/image5.png",
+      "sha256": "639e81593a2e2e97a224a73f8b6a885219ec87aea8fbfbc0909799a703213dae",
+      "bytes": 82992
+    },
+    {
+      "part": "word/media/image6.png",
+      "sha256": "3c9cf30d4bdcee1ec820d7c5d11d8e826cd836b5b7e4e40014c28eaa7313ae1f",
+      "bytes": 21232
+    },
+    {
+      "part": "word/media/image7.png",
+      "sha256": "429de04fc5965d2511d37ea2deed82c390d1c378840b97d0798b829681c8540e",
+      "bytes": 189730
+    },
+    {
+      "part": "word/media/image8.png",
+      "sha256": "01453f9af92eb16861c1a22fe962ca3a1c7820b6a8a21bf3c625de2cf59753ba",
+      "bytes": 40934
+    },
+    {
+      "part": "word/media/image9.png",
+      "sha256": "62476d238f30c439badd9892e4eaf934d0079cf3dfa34904411ab5e2c9eb7699",
+      "bytes": 249642
+    }
+  ],
+  "embeddings": [
+    {
+      "part": "word/embeddings/oleObject1.bin",
+      "sha256": "bfc76d74f36fc19bc3f620e4329b2a98612b5ee49170ea11bbde2bb23b2461a7",
+      "bytes": 631808
+    },
+    {
+      "part": "word/embeddings/oleObject2.bin",
+      "sha256": "422a59dd9adfcf70caf2fc866f5ac2af410620d37d959d96268f32ce0c9ef44c",
+      "bytes": 102400
+    }
+  ],
+  "tracked_insertions": 0,
+  "tracked_deletions": 0,
+  "image_occurrences": [
+    {
+      "figure": 1,
+      "paragraph": "P004",
+      "source_part": "word/media/image1.png",
+      "source_sha256": "a2534ad8f40b85746086587d8f53e93b3e19d857d221076550d036fb864a221b",
+      "preview": "../assets/images/image1.png"
+    },
+    {
+      "figure": 2,
+      "paragraph": "P005",
+      "source_part": "word/media/image2.png",
+      "source_sha256": "b29785d40704ec404cade61b0bcebc62fe6122aa9d61f52f666053e7815d3c07",
+      "preview": "../assets/images/image2.png"
+    },
+    {
+      "figure": 3,
+      "paragraph": "P010",
+      "source_part": "word/media/image3.png",
+      "source_sha256": "703429eadedfa50b4d637914c3797b42cb6222a7d6df18c286b04020b0038808",
+      "preview": "../assets/images/image3.png"
+    },
+    {
+      "figure": 4,
+      "paragraph": "P013",
+      "source_part": "word/media/image4.png",
+      "source_sha256": "dc4848a9bba933061f0e1d713c69e1182e2f37a57e7cba68287e2ef647db0f20",
+      "preview": "../assets/images/image4.png"
+    },
+    {
+      "figure": 5,
+      "paragraph": "P018",
+      "source_part": "word/media/image5.png",
+      "source_sha256": "639e81593a2e2e97a224a73f8b6a885219ec87aea8fbfbc0909799a703213dae",
+      "preview": "../assets/images/image5.png"
+    },
+    {
+      "figure": 6,
+      "paragraph": "P024",
+      "source_part": "word/media/image6.png",
+      "source_sha256": "3c9cf30d4bdcee1ec820d7c5d11d8e826cd836b5b7e4e40014c28eaa7313ae1f",
+      "preview": "../assets/images/image6.png"
+    },
+    {
+      "figure": 7,
+      "paragraph": "P027",
+      "source_part": "word/media/image7.png",
+      "source_sha256": "429de04fc5965d2511d37ea2deed82c390d1c378840b97d0798b829681c8540e",
+      "preview": "../assets/images/image7.png"
+    },
+    {
+      "figure": 8,
+      "paragraph": "P030",
+      "source_part": "word/media/image8.png",
+      "source_sha256": "01453f9af92eb16861c1a22fe962ca3a1c7820b6a8a21bf3c625de2cf59753ba",
+      "preview": "../assets/images/image8.png"
+    },
+    {
+      "figure": 9,
+      "paragraph": "P034",
+      "source_part": "word/media/image9.png",
+      "source_sha256": "62476d238f30c439badd9892e4eaf934d0079cf3dfa34904411ab5e2c9eb7699",
+      "preview": "../assets/images/image9.png"
+    },
+    {
+      "figure": 10,
+      "paragraph": "P039",
+      "source_part": "word/media/image10.png",
+      "source_sha256": "35af9bee3a588a8841c0d0b5156b9d8b94d21157bdaa9d7e85f6bc7d605f0b8a",
+      "preview": "../assets/images/image10.png"
+    },
+    {
+      "figure": 11,
+      "paragraph": "P043",
+      "source_part": "word/media/image11.png",
+      "source_sha256": "06fc3efb26b2090cadb290afaa45fff981d124fa547da6dc1435655ee62bac10",
+      "preview": "../assets/images/image11.png"
+    },
+    {
+      "figure": 12,
+      "paragraph": "P045",
+      "source_part": "word/media/image12.png",
+      "source_sha256": "7b4ce9e09513a4af1db05e4760e0f50dfed6bf99e2e64f94ac5cffbaff98a1d6",
+      "preview": "../assets/images/image12.png"
+    },
+    {
+      "figure": 13,
+      "paragraph": "P047",
+      "source_part": "word/media/image13.png",
+      "source_sha256": "32f2bf21a8583b48b05dd59a5de5a77cc006a7ed4bd2e40b88234baf93940760",
+      "preview": "../assets/images/image13.png"
+    },
+    {
+      "figure": 14,
+      "paragraph": "P051",
+      "source_part": "word/media/image14.png",
+      "source_sha256": "a9fd7bd82498a30f5eaa933314895ebe2c7705d3462c55cc90a3c0c5f5fac7a0",
+      "preview": "../assets/images/image14.png"
+    },
+    {
+      "figure": 15,
+      "paragraph": "P052",
+      "source_part": "word/media/image15.png",
+      "source_sha256": "c77812035d9a95d96c81ec604fbc8cf204146feafa80ee4426e23a9e1e3d7ffb",
+      "preview": "../assets/images/image15.png"
+    },
+    {
+      "figure": 16,
+      "paragraph": "P053",
+      "source_part": "word/media/image16.png",
+      "source_sha256": "0c15a65a7e2c85d4feb871e9977ec649e66fa4e64e1a5da6fb50fdbd0540331f",
+      "preview": "../assets/images/image16.png"
+    },
+    {
+      "figure": 17,
+      "paragraph": "P057",
+      "source_part": "word/media/image17.png",
+      "source_sha256": "2f5f5837908463516de6258a3a97a854c762657c85568f1fe7aafa7f1f496b08",
+      "preview": "../assets/images/image17.png"
+    },
+    {
+      "figure": 18,
+      "paragraph": "P060",
+      "source_part": "word/media/image18.png",
+      "source_sha256": "cdaf4ed9a2f066c2707a1b8047bff968424cd622ce3d6db99977acefdbae6c67",
+      "preview": "../assets/images/image18.png"
+    },
+    {
+      "figure": 19,
+      "paragraph": "P061",
+      "source_part": "word/media/image19.emf",
+      "source_sha256": "1d38862caefc61850987c99758f374cd1dcd54d6efad825113ad25aff07211b3",
+      "preview": "../assets/images/image19.png"
+    },
+    {
+      "figure": 20,
+      "paragraph": "P061",
+      "source_part": "word/media/image20.emf",
+      "source_sha256": "2dd9f5dbac40914d18dcafa190d331462e54987f73d2919edcc9aad63588fb80",
+      "preview": "../assets/images/image20.png"
+    },
+    {
+      "figure": 21,
+      "paragraph": "P062",
+      "source_part": "word/media/image21.png",
+      "source_sha256": "cc412f6ed4518472a51f6e1a78226d8fa3a467d7eb21f8846216783698401cc5",
+      "preview": "../assets/images/image21.png"
+    },
+    {
+      "figure": 22,
+      "paragraph": "P065",
+      "source_part": "word/media/image22.png",
+      "source_sha256": "88ee8175045a000263379e6e543601f8a5f55fba02c1bcba0df5551f85a6e304",
+      "preview": "../assets/images/image22.png"
+    },
+    {
+      "figure": 23,
+      "paragraph": "P071",
+      "source_part": "word/media/image23.png",
+      "source_sha256": "3b6c1969029475e2088b464b7006e2cb737eeea3065ae85c2a7f7a8fddba714a",
+      "preview": "../assets/images/image23.png"
+    },
+    {
+      "figure": 24,
+      "paragraph": "P079",
+      "source_part": "word/media/image24.png",
+      "source_sha256": "7fa9377219cb07c468b6bba1ba5b6222702ffdd0b151250edc5e6f47ae82fe27",
+      "preview": "../assets/images/image24.png"
+    },
+    {
+      "figure": 25,
+      "paragraph": "P082",
+      "source_part": "word/media/image4.png",
+      "source_sha256": "dc4848a9bba933061f0e1d713c69e1182e2f37a57e7cba68287e2ef647db0f20",
+      "preview": "../assets/images/image25.png"
+    },
+    {
+      "figure": 26,
+      "paragraph": "P084",
+      "source_part": "word/media/image25.png",
+      "source_sha256": "92812516fb2f47c24bef342e005346b0fa0f9775450007bc66b2113fedc0f511",
+      "preview": "../assets/images/image26.png"
+    },
+    {
+      "figure": 27,
+      "paragraph": "P089",
+      "source_part": "word/media/image26.png",
+      "source_sha256": "2fe3b235fda7fb5fee513aa6d088f027237faf5d898c7404c01c43757b3926ce",
+      "preview": "../assets/images/image27.png"
+    },
+    {
+      "figure": 28,
+      "paragraph": "P091",
+      "source_part": "word/media/image27.png",
+      "source_sha256": "8071038f9db09d8f46683299df3f792c8eb37e6d6310cd49dd7a1aa138a9a35f",
+      "preview": "../assets/images/image28.png"
+    }
+  ]
+}

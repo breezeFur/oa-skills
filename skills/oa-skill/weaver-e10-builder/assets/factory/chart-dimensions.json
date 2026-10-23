@@ -1,0 +1,536 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "b15b5c2178304583b2a026bba6443ec4",
+        "type": "Pie",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "df3420a2c28842fcb42694167cf1fa25",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "饼状图",
+          "type": "Pie",
+          "title": "饼图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "d0c60f",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "e0ca61",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [
+            {
+              "axisId": "",
+              "shortKey": "",
+              "orderType": "DEFAULT",
+              "conditionTypeValue": "in",
+              "type": "Select",
+              "lazyLoad": false,
+              "fieldClassification": "CUSTOM",
+              "compTypec": "",
+              "editMark": true,
+              "browserType": "browser",
+              "compType": "Select",
+              "disAllowedUsage": [],
+              "parseMark": true,
+              "id": "",
+              "text": "",
+              "mainPrimaryKey": false,
+              "otherParams": {
+                "extraColumn": [
+                  "field_1299322250982506500_obj"
+                ],
+                "objType": "physical"
+              },
+              "formInfo": {},
+              "mainField": true,
+              "module": "ebuilderform",
+              "deleteType": false,
+              "fieldGroup": {},
+              "parentId": "",
+              "physicalField": "",
+              "browserParams": {
+                "serviceModule": "ebuilderform",
+                "formInfo": {
+                  "fieldId": "1299402897790722057"
+                },
+                "formId": "",
+                "fieldId": "",
+                "layoutId": ""
+              },
+              "placeholderMark": false,
+              "objId": "",
+              "name": "",
+              "dbFieldType": "STRING",
+              "conditionType": [
+                {
+                  "id": "in",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "notIn",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "isNull",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "isNotNull",
+                  "content": "",
+                  "disabled": false
+                }
+              ],
+              "describe": "",
+              "config": {
+                "formId": "1299402897790722064",
+                "hideScore": true,
+                "groupId": "-1",
+                "dataType": [
+                  "dataOptionObj"
+                ],
+                "title": "",
+                "type": "Select",
+                "dataCount": 0,
+                "selectedNum": "",
+                "dataKey": "",
+                "columnType": "VARCHAR",
+                "systemField": true,
+                "columnTypeSwitch": false,
+                "options": [],
+                "showType": "Select",
+                "showOrder": 9,
+                "placeholder": "",
+                "componentKey": "Select",
+                "typeLen": 20,
+                "columnName": "",
+                "fieldId": "",
+                "formTableId": ""
+              },
+              "multiSelect": "false",
+              "disabled": false,
+              "dataShowWay": "byResult",
+              "cusOrder": [],
+              "drilling": []
+            },
+            {
+              "axisId": "",
+              "shortKey": "",
+              "orderType": "DEFAULT",
+              "conditionTypeValue": "between",
+              "type": "Date",
+              "lazyLoad": false,
+              "fieldClassification": "CUSTOM",
+              "compTypec": "",
+              "editMark": true,
+              "browserType": "",
+              "compType": "DateComponent",
+              "disAllowedUsage": [],
+              "parseMark": false,
+              "id": "",
+              "text": "",
+              "mainPrimaryKey": false,
+              "otherParams": {
+                "objType": "physical"
+              },
+              "formInfo": {},
+              "mainField": true,
+              "module": "ebuilderform",
+              "deleteType": false,
+              "fieldGroup": {},
+              "parentId": "",
+              "physicalField": "",
+              "browserParams": {
+                "formId": "",
+                "formInfo": {
+                  "fieldId": "1299402897790722055"
+                },
+                "layoutId": "",
+                "serviceModule": "ebuilderform",
+                "fieldId": ""
+              },
+              "placeholderMark": false,
+              "objId": "",
+              "name": "",
+              "dbFieldType": "STRING",
+              "conditionType": [
+                {
+                  "id": "between",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "isNull",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "isNotNull",
+                  "content": "",
+                  "disabled": false
+                }
+              ],
+              "describe": "",
+              "config": {
+                "groupId": "-1",
+                "earlyType": "currentDay",
+                "title": "",
+                "type": "Date",
+                "dataCount": 0,
+                "dataKey": "",
+                "systemField": true,
+                "columnTypeSwitch": false,
+                "placeholder": "",
+                "earlyDate": false,
+                "formTableId": "",
+                "timePanelStyle": {
+                  "type": "system"
+                },
+                "componentKey": "DateComponent",
+                "typeLen": 25,
+                "fieldId": "",
+                "formId": "1299402897790722064",
+                "lateType": "currentDay",
+                "dataType": [
+                  "content"
+                ],
+                "format": "yyyy-MM",
+                "lateDate": false,
+                "columnType": "VARCHAR",
+                "isDefault": false,
+                "isSystemDate": false,
+                "showOrder": 3,
+                "describe": "",
+                "columnName": ""
+              },
+              "multiSelect": "false",
+              "disabled": false,
+              "cusOrder": [],
+              "drilling": [],
+              "formatType": "4",
+              "format": "yyyy-MM",
+              "dateGroupType": "month"
+            },
+            {
+              "axisId": "",
+              "shortKey": "",
+              "orderType": "DEFAULT",
+              "conditionTypeValue": "in",
+              "type": "Employee",
+              "lazyLoad": false,
+              "fieldClassification": "CUSTOM",
+              "compTypec": "",
+              "editMark": true,
+              "browserType": "browser",
+              "compType": "Employee",
+              "disAllowedUsage": [],
+              "parseMark": true,
+              "id": "",
+              "text": "",
+              "mainPrimaryKey": false,
+              "otherParams": {
+                "objType": "physical"
+              },
+              "formInfo": {},
+              "mainField": true,
+              "module": "ebuilderform",
+              "deleteType": false,
+              "fieldGroup": {},
+              "parentId": "",
+              "physicalField": "",
+              "browserParams": {
+                "serviceModule": "ebuilderform",
+                "formInfo": {
+                  "fieldId": "1291917280869564418"
+                },
+                "formId": "",
+                "fieldId": "",
+                "layoutId": ""
+              },
+              "placeholderMark": false,
+              "objId": "",
+              "name": "",
+              "dbFieldType": "NUMBER",
+              "conditionType": [
+                {
+                  "id": "in",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "notIn",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "eq",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "notEq",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "isNull",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "isNotNull",
+                  "content": "",
+                  "disabled": false
+                }
+              ],
+              "describe": "",
+              "config": {
+                "viewDataDetail": true,
+                "groupId": "-1",
+                "displayOrder": "order",
+                "title": "",
+                "type": "Employee",
+                "dataCount": 0,
+                "dataKey": "",
+                "systemField": true,
+                "columnTypeSwitch": false,
+                "defaultExtend": {
+                  "type": "current",
+                  "relation": "current"
+                },
+                "placeholder": "",
+                "formTableId": "1291917113293930535",
+                "componentKey": "Employee",
+                "typeLen": 20,
+                "fieldId": "",
+                "mobileDisplaySelectedCount": {
+                  "type": "default"
+                },
+                "formId": "1291917113293930498",
+                "pcDisplaySelectedCount": {
+                  "type": "default"
+                },
+                "dataType": [
+                  "dataOptionObj"
+                ],
+                "showDimension": true,
+                "columnType": "BIGINT",
+                "displayType": "space",
+                "isDefault": false,
+                "enableAggregation": false,
+                "isSingle": true,
+                "showOrder": 6,
+                "describe": "",
+                "columnName": ""
+              },
+              "multiSelect": "false",
+              "disabled": false,
+              "cusOrder": [],
+              "drilling": [],
+              "format": "%Y%m"
+            },
+            {
+              "axisId": "",
+              "shortKey": "",
+              "orderType": "DEFAULT",
+              "conditionTypeValue": "like",
+              "type": "String",
+              "lazyLoad": false,
+              "fieldClassification": "CUSTOM",
+              "compTypec": "",
+              "editMark": true,
+              "browserType": "",
+              "compType": "Text",
+              "disAllowedUsage": [],
+              "parseMark": false,
+              "id": "",
+              "text": "",
+              "mainPrimaryKey": false,
+              "otherParams": {
+                "objType": "physical"
+              },
+              "formInfo": {},
+              "mainField": true,
+              "module": "ebuilderform",
+              "deleteType": false,
+              "fieldGroup": {},
+              "parentId": "",
+              "physicalField": "",
+              "browserParams": {
+                "formId": "",
+                "formInfo": {
+                  "fieldId": "1299789783948451843"
+                },
+                "layoutId": "",
+                "serviceModule": "ebuilderform",
+                "fieldId": ""
+              },
+              "placeholderMark": false,
+              "objId": "",
+              "name": "",
+              "dbFieldType": "STRING",
+              "conditionType": [
+                {
+                  "id": "like",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "notLike",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "eq",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "notEq",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "isNull",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "isNotNull",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "startWith",
+                  "content": "",
+                  "disabled": false
+                },
+                {
+                  "id": "endWith",
+                  "content": "",
+                  "disabled": false
+                }
+              ],
+              "describe": "",
+              "config": {
+                "formId": "1299789783948451855",
+                "groupId": "-1",
+                "dataType": [
+                  "content"
+                ],
+                "isUnique": false,
+                "title": "",
+                "type": "Text",
+                "dataCount": 0,
+                "dataKey": "",
+                "systemField": true,
+                "isDefault": false,
+                "readonlyTransLink": false,
+                "columnTypeSwitch": false,
+                "unique": false,
+                "showOrder": 5,
+                "describe": "",
+                "placeholder": "",
+                "componentKey": "Text",
+                "columnName": "",
+                "fieldId": "",
+                "maxLen": 100
+              },
+              "multiSelect": "false",
+              "disabled": false,
+              "cusOrder": [],
+              "drilling": []
+            }
+          ],
+          "height": 360,
+          "layout": {
+            "i": "dc890236289f43859995cd9a822ae981",
+            "x": 4,
+            "y": 53,
+            "w": 4,
+            "h": 22,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 644
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "filterVersion": 1,
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  }
+]

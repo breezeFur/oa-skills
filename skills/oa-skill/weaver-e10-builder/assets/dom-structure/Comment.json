@@ -1,0 +1,617 @@
+{
+	"component": "comment 评论（组件层 weapp-ui-props-design/src/components/comment；注册 type=Comment、uiType=Comment，导出 Design/View/Config 三份）。DOM 由三层拼出来：引擎外壳（weapp-ebdcoms 的 createView / createDesign）+ 组件层壳与插槽（weapp-ui-props-design：外壳容器、标题、筛选条、评论项插槽内容）+ UI 库（@weapp/ui：PC 用 ui-comment，移动端用 ui-m-comment，评论项/输入框/回复/点赞/列表都在这里）",
+	"usage": "先按 page.client 选树：PC 走 pc，MOBILE 走 mobile（两棵树类名前缀完全不同，别互相套）。再看 config.displaySetting.displayMode：advanced（高级显示）会把每个评论项的内容整块换成 ListCard，见 advanced。再看『展示模式-模板』（displaySetting.template / mTemplate）决定评论项内部层级，见 shared.pcListItem / shared.mobileListItem。用户说『评论项/头像/用户名/评论内容/底部按钮/回复』都在评论项里；说『输入框』→ shared.pcEditArea；说『标题』→ shared.engineTitle（不是引擎的 ebcom-title）。",
+	"legend": {
+		"[cls]": "条件class，满足业务条件才挂载",
+		"{a|b}": "多选一class（同一位置按配置换成其中一个）",
+		"a > b": "父子层级压缩写法，冒号左边是右边的父级",
+		"ref": "引用 shared 里的复用片段，写成 ref:shared.xxx",
+		"uncontrolled": "第三方渲染（@weapp/ui 的 Menu / List / ScrollView / 富文本 / SearchAdvanced，以及 @weapp/ebdcontainercoms 的 ListCard），内部结构不可控，只给挂载点",
+		"<comId>": "组件实例 id；引擎外壳的 id 就是它，样式作用域写成 #<comId>.ebcom",
+		"weapp-ui-props-design-": "组件层类名前缀（uiPropsDesignClsPrefix）；本组件自己的类名前缀是 weapp-ui-props-design-comment，源码里的 prefixCls 就是它",
+		"ebcoms-": "引擎通用渲染的类名前缀（clsPrefix=ebcoms，如 ebcoms-header-btns / ebcoms-title-icon）",
+		"ebcom-": "引擎/框架层类名前缀（ebcomPrefix=ebcom），组件源码里搜不到",
+		"ui-": "@weapp/ui 的类名（PC 端前缀 ui，移动端前缀 ui-m）"
+	},
+	"pickTree": "三步走。① page.client === 'PC' → pc 树；'MOBILE' → mobile 树（两棵树内部骨架完全不同，编辑区的存在形式也不同：PC 是列表上方的输入区，移动端是头部占位入口 + 路由弹窗编辑页）。② config.displaySetting.displayMode === 'advanced' → 评论项内容被整块替换，看 advanced 的差异清单。③ isDesign（外壳含 ebcom-design）→ 内部骨架照旧用 pc / mobile 树，只是外面多包两层，看 design。",
+	"root": {
+		"tag": "div",
+		"id": "<comId>",
+		"class": [
+			"ebcom",
+			"ebcom-comment",
+			"{ebcom-grid|ebcom-flow|ebcom-excel}",
+			"[ebcom-m]",
+			"{ebcom-view|ebcom-design}",
+			"[has-no-header]",
+			"[mask]",
+			"[event-action-click]",
+			"<布局/设计器追加的类名>"
+		],
+		"desc": "引擎外壳，由 weapp-ebdcoms 的 createView.renderView（运行态）/ createDesign（设计态）生成，不在本组件源码里。类型段固定 ebcom-comment（type=Comment 小写拼接），与本组件 constants 里的 ebcomCommentClsPrefix 是同一个字符串，但 DOM 上它是引擎拼的。布局段 ebcom-grid / ebcom-flow / ebcom-excel；运行态 ebcom-view、设计态 ebcom-design；移动端外壳只多一个 ebcom-m。官方样式作用域用 #<comId>.ebcom 限域最稳（同一页面可以放多个评论组件）。",
+		"tips": [
+			"三个平级兄弟：div.header（看 titleEnabled，comment 的 defConfig 默认 true）、div.content（一定在）、div.footer（看 footerEnabled，comment 默认没配 → 看不到）",
+			"has-no-header 只在 titleEnabled 为假时挂上；mask 只在设计态出现（CommentDesign.defaultOpts.mask=false，网格布局由 ebdcoms 加、流式布局由基础设计器加），它只关掉外壳直接子元素的 pointer-events，不影响内部样式",
+			"运行态 View 的首帧会先返回 loading 占位，内部组件树可能还没挂上；定位用 #<comId>，不要依赖某一帧的子元素"
+		],
+		"children": [
+			{
+				"tag": "div",
+				"class": [
+					"header"
+				],
+				"when": "titleEnabled 为真，且组件没有自定义 renderHeader（本组件没写）",
+				"desc": "引擎标题栏（flex 行 / min-height 40px / 底部 1px 分隔线由引擎 less 写好，别重复写）。顺序固定：图标、标题、右侧按钮组。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-title-icon",
+							"[noBgColor]"
+						],
+						"when": "config.titleIcon.path 有值",
+						"desc": "标题左侧图标（引擎 TitleIconCom），内部是 img/svg（img.ebcoms-assets-img）；noBgColor = titleIcon.style.fillType 为 none"
+					},
+					{
+						"ref": "shared.engineTitle"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-header-btns"
+						],
+						"when": "标题操作按钮开启（topOperatBtns.enabled 且配了按钮）",
+						"desc": "引擎标题栏按钮组（OperationBtns，wrapClass 由引擎传入）"
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"class": [
+					"content"
+				],
+				"desc": "引擎内容槽（点击事件绑在这一层），运行态与设计态都是这个类名。是整棵组件树的父级，只有 content 一个类。⚠️ 它和组件内部的 ui-comment-content / ui-m-comment-content、以及标题的 weapp-ui-props-design-comment-title-content 都不是同一个元素，写选择器时常见错误就出在这。",
+				"tips": [
+					"padding:10px 15px / flex:1 1 auto / overflow:auto 是引擎给所有外壳 &>.content 的默认值，会被评论组件自己的 -pc-container 布局覆盖一部分"
+				],
+				"children": [
+					"ref:pc.tree | ref:mobile.tree | ref:design.tree"
+				]
+			},
+			{
+				"tag": "div",
+				"class": [
+					"footer"
+				],
+				"when": "footerEnabled 为真",
+				"desc": "引擎底部按钮区；comment 的 defConfig 里没有 footerEnabled，默认不渲染，一般看不到"
+			}
+		]
+	},
+	"shared": {
+		"engineTitle": {
+			"tag": "div",
+			"class": [
+				"weapp-ui-props-design-comment-title"
+			],
+			"desc": "评论区标题，由组件自己渲染（不是引擎的 div.ebcom-title）。链路：组件把 static renderTitle 透传到引擎（ebMiddleware 复制静态方法）→ 引擎 renderTitle 发现就调它 → 渲染 CommentTitle → 这一层。PC 与移动端共用同一份标题，移动端没有另一份。titleEnabled 为假时 CommentTitle 返回 null，此时外壳带 has-no-header。",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"weapp-ui-props-design-comment-title-content"
+					],
+					"desc": "标题文本；config.showTotal 为真时末尾追加 (总数)，总数由评论组件事件实时回填。标题支持 title.nameAlias 覆盖文案。改标题字号/颜色/加粗打这一层。"
+				}
+			],
+			"tips": [
+				"打 div.ebcom-title 一定落空：本组件实现了 renderTitle，引擎的回退标题分支不会走",
+				"标题区的操作按钮在引擎的 div.ebcoms-header-btns 里，不在本层内"
+			]
+		},
+		"pcEditArea": {
+			"tag": "div",
+			"class": [
+				"ui-comment-edit"
+			],
+			"when": "hasEdit 为真；只列表模式（componentShowType==='list'）下被 -pc-container-list-only 隐藏，但仍在 DOM 里",
+			"desc": "PC 评论输入区（UI 库 CommentEdit）。收起/只读态把内部换成 div.ui-comment-edit-input（一段『请输入评论内容...』占位，点击才展开为真实输入区）。展开态：div.ui-comment-body 里依次是头像、文本域、底部操作条、地址、附件/关联事项、更多按钮。",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ui-comment-body",
+						"[ui-comment-body-not-avatar]"
+					],
+					"desc": "输入区主体。body-not-avatar = 不显示输入者头像（showEditAvatar 为假）。⚠️ 这个类名和每个评论项里的 div.ui-comment-body 同名不同层，打样式必须带父级 .ui-comment-edit 限域。",
+					"children": [
+						{
+							"tag": "span",
+							"desc": "头像外壳（无 class），里面是 Avatar 组件渲染的 div.ui-comment-avatar，点击打开人员卡片",
+							"when": "showEditAvatar 为真",
+							"children": [
+								{
+									"tag": "div",
+									"class": [
+										"ui-comment-avatar"
+									],
+									"desc": "Avatar 自身类名。⚠️ 评论项里的头像外壳也叫 ui-comment-avatar，同名不同层。"
+								}
+							]
+						},
+						{
+							"tag": "div",
+							"class": [
+								"ui-comment-edit-input"
+							],
+							"when": "收起态（showText 为假）",
+							"desc": "占位入口，点击展开输入区。它仍在 div.ui-comment-body 里面。"
+						},
+						{
+							"tag": "div",
+							"class": [
+								"ui-comment-textarea-wrap"
+							],
+							"when": "展开态且非富文本（useRichText 为假）",
+							"desc": "文本域外层。富文本模式（useRichText 为真）这个位置换成 CommentRichText 组件，内部结构不可控，只能在挂载点外层写样式。",
+							"chain": "div.ui-comment-textarea-wrap > div.ui-comment-textarea-container[-focus|-readonly][is-high-light][is-high-light-required] > textarea.ui-textarea.ui-comment-textarea（只读时是 span；配了 maxLength/allowClear 时外面再包 div.ui-textarea-wrap）",
+							"tips": [
+								"is-high-light / is-high-light-required 没有 ui-comment 前缀，是 UI 库通用状态类"
+							]
+						},
+						{
+							"tag": "div",
+							"class": [
+								"ui-comment-option"
+							],
+							"desc": "输入区底部操作条（表情、附件、@、快捷短语、签名等按钮 + 提交按钮），由 EditText 渲染。按钮列表和提交按钮都在这一层里。",
+							"chain": "div.ui-comment-option > div.ui-comment-option-container（> div.ui-comment-option-icons > div.ui-comment-option-item[-option-item-upload-msg] × N + div.ui-comment-option-info × N）+ div.ui-comment-option-submit（> span.ui-comment-option-submit-desensitization）",
+							"tips": [
+								"图标按钮的功能类名（按钮自身）：ui-comment-at / -phrase / -emoticon / -quick-phrase / -action / -action-name / -action-separation / -upload-button1 / -add-data / -option-setting[-readonly] / -option-upload-msg，都包在 -option-item 里"
+							]
+						},
+						{
+							"tag": "div",
+							"class": [
+								"ui-comment-textarea-address-container"
+							],
+							"when": "有定位/地址数据且非匿名",
+							"desc": "定位信息条，内部 Address 组件类名 ui-comment-textarea-address，关闭按钮 ui-comment-textarea-address-close"
+						},
+						{
+							"tag": "div",
+							"class": [
+								"ui-comment-create-labels"
+							],
+							"desc": "附件与关联事项区",
+							"chain": "div.ui-comment-create-labels > div.ui-comment-upload-list（> div.ui-comment-upload-style / -upload-uploading / -upload-hidden / -upload-button1 / -upload-uploaded）+ div.ui-comment-associated"
+						},
+						{
+							"tag": "div",
+							"class": [
+								"ui-comment-edit-more"
+							],
+							"desc": "输入区右下角的自定义更多内容插槽（renderMore），组件层往里塞评论设置类按钮"
+						}
+					]
+				}
+			],
+			"tips": [
+				"引用上一段评论时，被引内容在 div.ui-comment-textarea-container 内部（ui-comment-textarea-quote），不是输入区外面",
+				"常用语是 div.ui-comment-quick-phrase，签名/签批图是 div.ui-comment-signature-container，都在 textarea-container 内部"
+			]
+		},
+		"pcListItem": {
+			"tag": "div",
+			"class": [
+				"ui-comment-item",
+				"[ui-comment-item-background]",
+				"[ui-comment-readonly-item]",
+				"[ui-comment-item-show]",
+				"[ui-comment-item-sticky]",
+				"[ui-comment-item-template-{模板id}]"
+			],
+			"desc": "PC 单条评论（UI 库 CommentItem），列表体 div.ui-list-body 的直接子元素（评论不使用分组，没有 ui-list-item 包裹层）。带 data-comment-id=<评论id>，是页面上最好用的定位属性。item-background = 有底色；readonly-item = 只读；item-show = 悬停/常显底部按钮；item-sticky = 置顶；item-template-<id> = 当前模板（displaySetting.template，空表示默认模板）。",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ui-comment-body",
+						"[ui-comment-body-only-content]",
+						"[ui-comment-body-not-avatar]"
+					],
+					"desc": "评论项主体。⚠️ 与输入区的 div.ui-comment-body 同名不同层，选择器要带 .ui-comment-item 限域。only-content / not-avatar 分别对应『只显示内容』和『不显示头像』。默认模板下里面是：头像 + div.ui-comment-item-box（用户名行、评论内容、底部按钮）。advanced 模式下这一层的内容被整块换成 ListCard，见 advanced。",
+					"children": [
+						{
+							"tag": "div",
+							"class": [
+								"ui-comment-avatar",
+								"[ui-comment-avatar-notdata]"
+							],
+							"when": "showListAvatar 为真且非 only-content",
+							"desc": "头像外壳（里面是 Avatar 组件）；notdata = 没有头像数据时的兜底样式"
+						},
+						{
+							"tag": "div",
+							"class": [
+								"ui-comment-item-box"
+							],
+							"desc": "默认模板（templateId 为 ''）下包住三段的容器。⚠️ 不同模板这一层的层级会变，见下方模板分支说明，别把 child 顺序写死。",
+							"children": [
+								{
+									"tag": "div",
+									"class": [
+										"ui-comment-item-header"
+									],
+									"desc": "用户名行。用户名是 span.ui-comment-username.ui-comment-link（匿名时文案是『匿名』）；组件层通过 renderItemHeaderInfo 追加了部门名 span.ui-comment-hrm-span（点击打开部门卡片）；私评标记是 div.ui-comment-item-privy。",
+									"tips": [
+										"用户名的部门/组织信息类名带 hrm 字样，是组件层加的，别当成 UI 库的通用类"
+									]
+								},
+								{
+									"tag": "div",
+									"class": [
+										"ui-comment-item-content"
+									],
+									"desc": "评论内容区：引用块（ui-comment-item-text-container[-item-text-quote-ellipsis][-item-text-container-privy] > div.ui-comment-item-text[-item-text-rich]）、被引用评论（ui-comment-quote）、关联事项（ui-comment-item-associated）、附件（ui-comment-upload-content / -upload-style / -upload-label）、地址（ui-comment-address）、楼中楼回复（ui-comment-reply 系列）、私评角标（ui-comment-item-privy）、查看更多（ui-comment-item-more）。",
+									"tips": [
+										"富文本评论的正文结构在 div.ui-comment-item-text 里由富文本组件渲染，内部不可控",
+										"楼层回复（replyUnderComment 开启）：ui-comment-reply > -reply-top（> -reply-info > -reply-user + -reply-open[-reply-open-active][-reply-open-disabled]）+ -replylist（> -replylist-item × N > -replylist-info / -replylist-time / -replylist-content / -replylist-user[-replylist-user-anonymous]）；加载中 ui-comment-reply-loading，私密回复 ui-comment-private"
+									]
+								},
+								{
+									"tag": "div",
+									"class": [
+										"ui-comment-item-footer"
+									],
+									"desc": "底部按钮区（点赞、回复、删除、时间、来源等），由 CommentFooter 渲染",
+									"chain": "div.ui-comment-item-footer > div.ui-comment-item-other / -item-footer-wrap / -item-footer-info[-ellipsis] / -item-footer-btns / -item-from（i 标签）/ -item-footer-more（> -item-footer-more-btn）；点赞是 div.ui-comment-upvote（> -upvote-children[-rtl] / -upvote-icon / -upvote-wrap / -upvote-name / -upvote-list[-all] / -upvote-popup / -upvote-empty）"
+								}
+							]
+						}
+					]
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ui-comment-readonly-item-mask",
+						"[ui-comment-readonly-item-mask-hover]"
+					],
+					"when": "readOnly 为真",
+					"desc": "只读遮罩；mask-hover = 可删除的只读态（readOnly 不为 'notDelete'），里面有关闭图标 Icon.ui-comment-readonly-item-close"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ui-comment-item-sticky-logo"
+					],
+					"when": "置顶且非引用数据",
+					"desc": "置顶角标（Icon-Back-to-top），绝对定位在项内"
+				}
+			],
+			"tips": [
+				"分隔线有两种写法：普通虚线/实线是项自身上的 inline borderBottomStyle + borderBottomColor（写 CSS 覆盖不掉，要改配置的 splitline/splitlineColor）；longDashed / differDashed 时项外多一个兄弟 div.ui-comment-item-bottom-line-special[-item-bottom-line-differ]（differDashed 时里面再套一层 -item-bottom-line-differinner），背景是 inline 渐变",
+				"模板分支（displaySetting.template）：默认 '' = 头像 + item-box（用户名、内容、底部三段）；'2' = 头像 + 用户名 + item-box（内容、底部）；'5' = 头像 + item-box（用户名、时间、内容、底部）；'6' = 头像 + item-box（内容、用户名、底部）；'3'/'4'/'7' = 左侧 div.ui-comment-leftbar（> div.ui-comment-leftbar-line > -leftbar-line-header/-leftbar-line-tail）+ 右侧 div.ui-comment-rightcontent（> 时间 + div.ui-comment-item-box.ui-comment-maincontent）。改层级需求前先确认模板"
+			]
+		},
+		"mobileListItem": {
+			"tag": "div",
+			"class": [
+				"ui-m-comment-item",
+				"[ui-m-comment-item-background]",
+				"[ui-m-comment-item-template-{模板id}]"
+			],
+			"desc": "移动端单条评论（UI 库 MCommentItem）。项内顺序：只读遮罩、模板内容、置顶角标。",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ui-m-comment-item-mask"
+					],
+					"when": "readOnly 为真",
+					"desc": "只读遮罩，无额外修饰类"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ui-m-comment-body",
+						"[ui-m-comment-body-not-avatar]"
+					],
+					"when": "非 only-content（只显示内容时不渲染）",
+					"desc": "头像 + 用户名行。默认模板下它是项的直接子级，和 div.ui-m-comment-item-box 平级。",
+					"chain": "div.ui-m-comment-body > div.ui-m-comment-avatar（脏数据时 -item-avatar 挂在 MAvatar 上）+ div.ui-m-comment-item-header（> span.ui-m-comment-username.ui-m-comment-link + div.ui-m-comment-item-privy）"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ui-m-comment-item-box"
+					],
+					"desc": "评论内容 + 底部按钮。内容区是 div.ui-m-comment-item-content > div.ui-m-comment-text / div.ui-m-comment-item-text[-rich|-reply|-quote|-quote-ellipsis]，附件是 ui-m-comment-item-filelist，关联事项是 ui-m-comment-item-associated；底部是 div.ui-m-comment-item-footer。",
+					"tips": [
+						"移动端模板（displaySetting.mTemplate）分支完全不同：'2' = 头像 + div.ui-m-comment-item-arrow + item-box；'6' = div.ui-m-comment-leftbar（头像 + -leftbar-line）+ -item-arrow + item-box；'7' = -leftbar + div.ui-m-comment-rightcontent（用户名 + item-box）；'3' = div.ui-m-comment-top-box（头像 + -top-box-content > div.ui-m-comment-user）+ item-box；'4'/'5'/'9' = -leftbar（> -leftbar-line > -leftbar-line-header/-leftbar-line-tail）+ -rightcontent（时间 + div.ui-m-comment-item-box.ui-m-comment-maincontent > div.ui-m-comment-maincontent-header（头像 + -maincontent-header-user））"
+					]
+				}
+			]
+		}
+	},
+	"pc": {
+		"when": "page.client === 'PC'（运行态与设计态共用这套内部 DOM，设计态只是外面多包两层，见 design）",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"weapp-ui-props-design-comment-pc-container",
+					"[weapp-ui-props-design-comment-pc-container-part]",
+					"[weapp-ui-props-design-comment-pc-container-input-only]",
+					"[weapp-ui-props-design-comment-pc-container-list-only]"
+				],
+				"desc": "组件层 PC 外壳（挂在引擎 div.content 下，是它的第一个元素）。三个条件类来自接口配置：paginationType==='part' 时分页在容器内（-container-part）；componentShowType==='input'（只输入）隐藏 .ui-comment-list；==='list'（只列表）隐藏 .ui-comment-edit。这三个类只做显隐，不影响内部层级。",
+				"chain": "#<comId>.ebcom.ebcom-comment[.ebcom-view|.ebcom-design] > div.content > 本层",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ui-comment",
+							"weapp-ui-props-design-comment-pc",
+							"[weapp-ui-props-design-comment-pc-design]",
+							"[weapp-ui-props-design-comment-pc-advanced]"
+						],
+						"desc": "@weapp/ui PC 评论根。ui-comment 来自 UI 库，后面两个是组件层传进来的 className。⚠️ View / Design 传给它的 weapp-ui-props-design-comment-view / -design 在 PC 端被解构后丢弃了，PC DOM 上不存在这两个类，别拿来当选择器。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ui-comment-top"
+								],
+								"when": "UI 库 showHeader 为真（默认有）",
+								"desc": "UI 库自己的顶部菜单条（不是引擎的 div.header，也不是组件层的 -pc-header-info）。里面是 @weapp/ui Menu 渲染的 tab 条 + 右侧按钮组，Menu 是异步 chunk（Loadable），首帧可能还没挂上。",
+								"chain": "div.ui-comment-top > div.ui-menu-tab-top-container（Tab 列表，ui-menu-* / ui-list-* 类名，不可控）+ div.ui-menu-extra",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ui-comment-top-btns"
+										],
+										"when": "activeKey === 'main'（切到查阅情况/操作日志等页签时不渲染）",
+										"desc": "搜索、统计、正倒序、自定义筛选按钮组。它通过 Menu 的 extraContent 插槽渲染，所以在 div.ui-menu-extra 里，不是 ui-comment-top 的直接子级。按钮是 MoreIconButton：div.ui-comment-more-icon[-more-icon-selected]。"
+									}
+								],
+								"tips": [
+									"Menu 的 className（ui-comment-tabs）会被透传到它内部的 List / Nav 上，位置不固定，别依赖它定位",
+									"组件层的筛选条（div.weapp-ui-props-design-comment-customfilter > -customfilter-content > -customfilter-title）和顶部按钮（div.weapp-ui-props-design-comment-header-btns）也是塞在 UI 库插槽里的，挂在 div.ui-comment-top 区域附近"
+								]
+							},
+							{
+								"tag": "div",
+								"class": [
+									"ui-comment-more"
+								],
+								"when": "activeKey === 'main'",
+								"desc": "搜索/统计/筛选面板容器，内容包在 AnimateHeight 里（未展开时高度 0，DOM 仍在）。搜索面板是 div.ui-comment-search-panel.ui-comment-searchwarp（SearchAdvanced 的 Panel，内部不可控）；统计是 UI 库 Statistic。",
+								"tips": [
+									"非 main 页签时 renderMore 直接返回 null，这一层不存在"
+								]
+							},
+							{
+								"tag": "div",
+								"class": [
+									"ui-comment-content"
+								],
+								"desc": "当前激活菜单项的内容容器。main 页签下里面就是输入区 + 列表（顺序：输入区在上，列表在下）。⚠️ 又一个 content：它不是引擎的 div.content，也不是标题的 -title-content。",
+								"children": [
+									{
+										"ref": "shared.pcEditArea"
+									},
+									{
+										"tag": "div",
+										"class": [
+											"ui-comment-list",
+											"[ui-comment-list-nodata]"
+										],
+										"when": "有 hasEdit 之外总存在；只输入模式（-pc-container-input-only）下被隐藏但仍渲染",
+										"desc": "PC 列表根（UI 库 CommentList）。list-nodata = 无数据且不显示空状态（此时不放列表体）。空状态是 div.ui-comment-empty。",
+										"children": [
+											{
+												"tag": "div",
+												"class": [
+													"ui-list",
+													"ui-comment-list-body",
+													"[ui-comment-list-horizontal]",
+													"[ui-comment-list-nomore]",
+													"[ui-comment-list-horizontal-nomasonry]"
+												],
+												"when": "有数据或加载中",
+												"desc": "列表体容器。⚠️ 它不是 List 自己的 div.ui-list-body —— 它其实是 @weapp/ui List 下面 ScrollView 的根（className 由 List 透传给 ScrollView 根），真正的列表体在它里面。horizontal 三个类只在横向布局 / 横向且关闭瀑布流时出现；list-nomore 在数据不足一页且没有更多时出现。",
+												"chain": "div.ui-list.ui-comment-list-body > div.ui-list-scrollview-wrap > …（Scroller 内部不可控）… > div.ui-list-scrollview-content > div.ui-list-body[data-id=eb-comment-list]",
+												"children": [
+													{
+														"tag": "div",
+														"class": [
+															"ui-list-body",
+															"[ui-list-body-scroll]",
+															"[ui-list-body-noBorder]"
+														],
+														"desc": "真正的列表体，带 data-id=eb-comment-list（bodyKey 由组件层传入，pc.less 就用这个属性定位）。评论项是它的直接子元素，没有 ui-list-item 包裹层。",
+														"children": [
+															{
+																"ref": "shared.pcListItem",
+																"desc": "每条评论一个，直接平铺在列表体下（无分组时不包 ui-list-group）"
+															},
+															{
+																"tag": "div",
+																"class": [
+																	"ui-pagination",
+																	"ui-list-pagination"
+																],
+																"when": "paginationType === 'part' 且总页数大于 1",
+																"desc": "分页器。⚠️ 它挂在 List 的 div.ui-list-footer 里面（不是列表体的直接子级），所以 pc.less 里那条 .ui-comment-list-body > .ui-pagination 实际匹配不到，写样式请用 .ui-list-footer .ui-pagination 或直接 .ui-pagination.ui-list-pagination。",
+																"tips": [
+																	"paginationType 为默认 'more' 时没有分页器，只有底部『加载更多』；'scroll' 时靠滚动加载，也没有"
+																]
+															}
+														]
+													}
+												]
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		]
+	},
+	"mobile": {
+		"when": "page.client === 'MOBILE'（内部骨架与 PC 完全不同；设计态同样共用这套，见 design）",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ui-m-comment",
+					"weapp-ui-props-design-comment-m",
+					"weapp-ui-props-design-comment-view",
+					"[weapp-ui-props-design-comment-m-container-input-only]",
+					"[weapp-ui-props-design-comment-m-container-list-only]"
+				],
+				"desc": "@weapp/ui 移动端评论根。⚠️ 与 PC 相反：移动端组件层外壳（MEbComment）保留了传入的 className，所以运行态根上是 ui-m-comment + -m + -view 三个类（设计态把 -view 换成 -design）；PC 端的 -view 则被丢掉了。input-only / list-only 与 PC 的 -pc-container-*-only 同义。",
+				"chain": "#<comId>.ebcom.ebcom-comment.ebcom-m[.ebcom-view|.ebcom-design] > div.content > 本层",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ui-m-comment-top"
+						],
+						"when": "hasHeader 为真",
+						"desc": "顶部条：左侧标题文字 + 右侧图标（搜索/统计/正倒序）。⚠️ 移动端这一层是 UI 库自己的 header，标题文字由 UI 库 renderTitle 渲染，与引擎 header 里的 weapp-ui-props-design-comment-title 是两回事。",
+						"chain": "div.ui-m-comment-top > div.ui-m-comment-top-title + div.ui-m-comment-top-options（Icon × N）"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"weapp-ui-props-design-comment-m-edit"
+						],
+						"when": "hasEdit 为真",
+						"desc": "组件层的『写评论』占位入口（MEbCommentEdit），点击跳转到路由弹窗里的编辑页。它是 div.ui-m-comment-top 的兄弟（组件层通过 customRenderHeader 插在 header 后面），不是列表里的输入框。",
+						"chain": "div.weapp-ui-props-design-comment-m-edit > div.weapp-ui-props-design-comment-m-edit-avatar（> MAvatar）+ div.weapp-ui-props-design-comment-m-edit-body > div.weapp-ui-props-design-comment-m-edit-text（占位文案）"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ui-m-comment-content"
+						],
+						"desc": "评论列表区。里面是 div.ui-m-comment-list-container > 移动端 List（@weapp/ui 移动 List，类名 ui-m-comment-list 落在它的根上，内部滚动层级不可控）> 评论项。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ui-m-comment-list-container"
+								],
+								"desc": "列表容器（MCommentList 的根）。空数据时里面是 div.ui-m-comment-list-empty（不显示空状态时这一层为空）。",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ui-m-comment-list"
+										],
+										"desc": "@weapp/ui 移动端 List 的根（className 由组件层传入），内部列表体类名是 ui-m-list-* 之类，属于第三方，不给具体层级。",
+										"children": [
+											{
+												"ref": "shared.mobileListItem"
+											}
+										]
+									}
+								]
+							}
+						]
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ui-m-comment-search"
+						],
+						"when": "hasSearch 为真",
+						"desc": "移动端搜索面板挂载点（内层 MSearchAdvanced 带 ui-m-comment-top-search），挂在评论根下、与列表平级。"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"weapp-ui-props-design-comment-m-custom-menu"
+						],
+						"when": "ebProps.config.showEbMenu 为真",
+						"desc": "组件层加的 MMenu 条（自定义头部），是 div.ui-m-comment 的兄弟（在评论根外面、引擎内容槽里）。⚠️ 名字里有 menu 但它是页签条，不是标题，别和标题混。",
+						"tips": [
+							"自定义扩展内容在 div.weapp-ui-props-design-comment-m-extra-content，也是评论根的兄弟"
+						]
+					},
+					{
+						"tag": "div",
+						"class": [
+							"weapp-ui-props-design-comment-m-add",
+							"[weapp-ui-props-design-comment-m-add-input-only]"
+						],
+						"when": "编辑页（新增评论）；正常列表态不渲染，只在满足『只输入模式 + 显示文本 + 不显示输入头像』或 onlyCommentEdit 时直接顶到最外层",
+						"desc": "移动端评论编辑页外壳（MCommentEdit 的容器）。路由弹窗形式时它被包在 MDialog 里，路径为 <父路径>/addEbComment/<targetId>，此时不带 -m-add-input-only；直接顶到最外层时带 -m-add-input-only。",
+						"chain": "div.weapp-ui-props-design-comment-m-add > MCommentEdit（ui-m-comment-edit → ui-m-comment-edit-text / ui-m-comment-edit-mask / ui-m-comment-edit-btns-submit）"
+					}
+				]
+			}
+		]
+	},
+	"design": {
+		"when": "isDesign 为真（外壳类含 ebcom-design）；内部骨架照旧用 pc / mobile 树，只是外面多包两层，并且几个 DOM 会被设计器动态打上状态类",
+		"tree": [
+			{
+				"tag": "div",
+				"id": "comment_<targetId>",
+				"class": [
+					"weapp-ui-props-design-comment-design"
+				],
+				"desc": "设计态最外层包裹（CommentDesign.render 输出）。它在引擎内容槽里、并且外面还有一层 ebMiddleware 为 Design 额外包的无 class div。⚠️ id 里的 targetId 是评论对象 id，不是 comId；限域仍用 #<comId>.ebcom。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"weapp-ui-props-design-comment-design-container"
+						],
+						"desc": "设计态容器（设计器用它做整体拖拽/量测参照），里面就是 pc / mobile 那棵树。",
+						"children": [
+							"ref:pc.tree | ref:mobile.tree"
+						]
+					}
+				]
+			}
+		],
+		"diffs": [
+			"PC 设计态的评论根多一个 weapp-ui-props-design-comment-pc-design（isDesign 注入）；移动端则是根上的 -view 换成 -design",
+			"⚠️ -design 这个类名会在两个层级同时出现：外层包裹 div.weapp-ui-props-design-comment-design 和它内部的容器 -design-container；移动端还会因为保留了 className，在 div.ui-m-comment 上再出现一次。用 .weapp-ui-props-design-comment-design 当选择器会命中多个元素，必须带层级",
+			"设计器会把 active_area 类动态 toggle 到两块区域上：PC 是 .ui-comment-edit 和 .ui-comment-list，移动端是 .weapp-ui-props-design-comment-m-edit 和 .ui-m-comment-content，用来高亮当前选中的设置范围。这是运行时加的，写页面样式不要依赖它",
+			"设计态多出组件层装饰类：div.weapp-ui-props-design-comment-design-floor-item-name（楼层回复头部的用户名，PC/移动端设计态都渲染）",
+			"CommentDesign.defaultOpts：mask=false（设计态外壳通常不出现 mask）、operationBtns=true（设计态底部显示按钮）"
+		]
+	},
+	"advanced": {
+		"when": "config.displaySetting.displayMode === 'advanced'（样式面板的『高级显示』）",
+		"diffs": [
+			"PC 评论根多一个 weapp-ui-props-design-comment-pc-advanced；移动端没有对应的类，只能靠评论项内部结构判断",
+			"每个评论项的 div.ui-comment-body 内容被整块替换：里面变成 div.weapp-ui-props-design-comment-list-card（移动端再多一个 -m-list-card），卡片本体是 @weapp/ebdcontainercoms 的 ListCard（跨应用异步组件，内部结构不可控，只给这个挂载点）",
+			"被替换掉的原生内容（默认模板的头像 / item-box / 用户名 / 内容 / 底部按钮那一整套）仍在 DOM 里，但被塞进 list-card 内部的 div[style=\"display:none\"] 中，所以选择器还能命中却看不见；别以为样式没生效",
+			"卡片布局与字段来自 displaySetting.displayContentAdvanced（cardLayout + listField + relatedDataSource），改卡片样式要打在 ListCard 自己的类名上，或调样式面板配置",
+			"高级模式下评论项模板（displaySetting.template / mTemplate）不再影响项内层级 —— 项内层级由 ListCard 决定"
+		]
+	},
+	"notes": [
+		"命名坑：外壳的 ebcom-comment 由引擎按 type=Comment 拼出来；组件 constants 里的 ebcomCommentClsPrefix 是同一个字符串，但只用于样式作用域/正则，别在组件源码里找 DOM 上的 ebcom-comment",
+		"三个 content 别混：引擎内容槽 div.content（#<comId>.ebcom 的直接子级）≠ UI 库 div.ui-comment-content / div.ui-m-comment-content（当前页签内容）≠ 标题的 div.weapp-ui-props-design-comment-title-content。另有组件层外壳 div.weapp-ui-props-design-comment-pc-container 也不是它们中的任何一个",
+		"PC 会丢 className，移动端不会：View / Design 传给 EbComment 的 weapp-ui-props-design-comment-view / -design 在 PC 端被解构后丢弃，PC DOM 上不存在；移动端 MEbComment 保留 className，根元素是 ui-m-comment + weapp-ui-props-design-comment-m + [-view | -design]。写选择器时 PC 端不要引用 -view / -design",
+		"同名不同层（必须父级限域）：div.ui-comment-body 同时是输入区主体和评论项主体；div.ui-comment-avatar 同时是输入区头像和评论项头像；div.ui-comment-item-content / -item-header / -item-footer 只在评论项里",
+		"标题不在 div.ebcom-title：组件实现了 static renderTitle 并被 ebMiddleware 透传给引擎，引擎直接调组件自己的 CommentTitle → div.weapp-ui-props-design-comment-title > -title-content。移动端 UI 库头部另有一份文字标题（div.ui-m-comment-top-title），两者不是同一个",
+		"inline 样式覆盖不掉：评论项分隔线（非特殊样式是项上的 borderBottomStyle/borderBottomColor，特殊样式是 -item-bottom-line-special 上的 backgroundImage 渐变）、进度类、卡片布局都是行内样式。要改就改样式面板配置",
+		"组件层自己加的 DOM 类（容易误认成 UI 库的通用类）：PC 有 -pc-blog-info / -pc-header-info / -pc-header-left / -pc-header-right / -pc-empty / -hrm-span / -header-btns / -customfilter(-content|-title) / -list-card，移动端对应 -m-blog-info / -m-header-info / -m-header-left / -m-header-right / -m-hrm-span / -m-hrm-span-below / -m-custom-menu / -m-extra-content / -m-customfilter 一套，全部挂在 @weapp/ui 的插槽里",
+		"已有 less 样式钩子（别重复写）：style/index.less 写了评论组件整体布局与 PC/移动端外壳尺寸、-pc-container 及三个条件类、-pc-header-info 系列、-header-btns、-customfilter、-title/-title-content 字号、-m-custom-menu、-m-add、-list-card；style/pc.less 写了 -pc-container-part 下的 .ui-list-body[data-id=eb-comment-list] 分隔线、-pc-container-input-only 隐藏 .ui-comment-list、-pc-container-list-only 隐藏 .ui-comment-edit；style/mobile.less 写了 -m-container-input-only / -m-container-list-only、-m-header-info、-m-add、移动端列表与卡片。改这些规则前先看有没有现成的",
+		"不可控区域只给挂载点：@weapp/ui Menu（顶部页签条，Loadable 异步 chunk，首帧可能不存在）、List + ScrollView（列表滚动层级）、富文本编辑（useRichText 打开时替换 textarea-wrap）、SearchAdvanced Panel（搜索面板）、EChart（统计图）、MDialog（移动端路由弹窗，含 -m-add 编辑页）、ListCard（高级显示）。这些内部结构不要写进选择器",
+		"定位建议：一律 #<comId>.ebcom 限域 —— .ui-comment-* / .ui-m-comment-* 在同一页面可以出现多份（放多个评论组件），裸类名会串；评论项优先用 div.ui-comment-item[data-comment-id=...] 精确定位",
+		"常见定位入口速查：标题 → weapp-ui-props-design-comment-title-content；输入框 → ui-comment-textarea-container；提交按钮 → ui-comment-option-submit；列表 → ui-list-body[data-id=eb-comment-list]；单条评论 → ui-comment-item[data-comment-id]；评论正文 → ui-comment-item-text；底部按钮 → ui-comment-item-footer；楼中楼 → ui-comment-reply；点赞 → ui-comment-upvote；移动端单条评论 → ui-m-comment-item"
+	]
+}

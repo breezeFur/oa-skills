@@ -1,0 +1,222 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "a87ccf3b46d74d91be758a4910ebc912",
+        "type": "Bar",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "dd6d4efef9f7460b85f11020dd64c0aa",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "柱状图",
+          "type": "Bar",
+          "title": "柱状图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "d0c60f",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "e0ca61",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [],
+          "height": 360,
+          "barType": "default",
+          "label": {
+            "show": true,
+            "valType": "percent"
+          },
+          "layout": {
+            "i": "d96e0364ddbf43f59a28b1a6969ab893",
+            "x": 8,
+            "y": 38,
+            "w": 4,
+            "h": 34,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 479
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "filterVersion": 1,
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "dd6d4efef9f7460b85f11020dd64c0aa",
+        "type": "Bar",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "a87ccf3b46d74d91be758a4910ebc912",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "柱状图",
+          "type": "Bar",
+          "title": "柱状图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "d0c60f",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "e0ca61",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [],
+          "height": 360,
+          "barType": "default",
+          "label": {
+            "show": true,
+            "valType": "percent"
+          },
+          "layout": {
+            "i": "de11636acdb2420abaacaaae30ca90d1",
+            "adaptive": false,
+            "h": 34,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": [],
+          "filterVersion": 1
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  }
+]

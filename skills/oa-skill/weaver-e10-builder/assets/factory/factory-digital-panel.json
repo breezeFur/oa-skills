@@ -1,0 +1,108 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "b81811b58be24eaaaeb14b3e12683473",
+        "type": "DigitalPanel",
+        "package": "@weapp/ebddatacoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "a2f90b7e27a84f8592031542b09f2dbb",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "数字面板",
+          "type": "DigitalPanel",
+          "title": "标题",
+          "titleEnabled": true,
+          "footerEnabled": false,
+          "panels": [],
+          "showmode": "single",
+          "columns": 3,
+          "layout": {
+            "i": "c3b747997d9f4d3098cc36dc7c114cf8",
+            "x": 6,
+            "y": 27,
+            "w": 6,
+            "h": 13,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 358
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,6",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,PanelStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebddatacoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "a2f90b7e27a84f8592031542b09f2dbb",
+        "type": "DigitalPanel",
+        "package": "@weapp/ebddatacoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "b81811b58be24eaaaeb14b3e12683473",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "数字面板",
+          "type": "DigitalPanel",
+          "title": "标题",
+          "titleEnabled": true,
+          "footerEnabled": false,
+          "panels": [],
+          "showmode": "single",
+          "columns": 3,
+          "layout": {
+            "i": "d6413e6ca1ab4420933d0e21a5c44c44",
+            "adaptive": true,
+            "h": 13,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": []
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,6",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,PanelStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebddatacoms"
+      }
+    ]
+  }
+]

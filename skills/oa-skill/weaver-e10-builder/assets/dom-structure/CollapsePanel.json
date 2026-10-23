@@ -1,0 +1,289 @@
+{
+  "component": "collapse-panel 折叠面板（weapp-ebddatacoms/src/components/collapse-panel，引擎类型 CollapsePanel → 外壳类名 ebcom-collapsepanel）",
+  "usage": "四种场景（运行态/设计态 × PC/移动端）共用同一套面板项骨架，骨架细节全在 shared.panel 里。先按 pickTree 判断落在哪棵树拿到前缀映射，再进 shared.panel 找节点。用户说『改标题』时先确认要改的是标题栏本体（div.ui-collapse-panel__title）、名字（span.ebcoms-collapse-panel-title）、展开图标（span.ebcoms-collapse-panel-title-icon）还是操作按钮区（div.ebcoms-panel-operations-wrap），这四个都在标题栏里平级。",
+  "legend": {
+    "[cls]": "条件class，满足业务条件才挂载",
+    "{a|b}": "多选一class（同一位置按配置换成其中一个）",
+    "a > b": "父子层级压缩写法，冒号左边是右边的父级",
+    "ref": "引用 shared 里的复用片段，写成 ref:shared.xxx",
+    "uncontrolled": "第三方渲染（设计器拖拽层、子组件），内部结构不可控，只给挂载点",
+    "<comId>": "组件实例 id；引擎外壳的 id 与组件根上的 data-id 都是它，官方样式作用域写成 #<comId>.ebcom",
+    "ebcoms-": "组件自己写的类名前缀（clsPrefix='ebcoms'）",
+    "ebcom-": "引擎/框架层的类名前缀（ebcomPrefix='ebcom'），折叠面板源码里搜不到",
+    "ui- / ui-m-": "@weapp/ui 的类名；折叠面板前缀 collapsePrefix='ui-collapse'、mCollapseClsPrefix='ui-m-collapse'，两者结构完全一样，只差前缀"
+  },
+  "pickTree": "两步。① 运行态还是设计态：外壳 class 含 ebcom-view 是页面运行态，含 ebcom-design 是设计器设计态 —— 两者面板内容区完全不同（运行态是 div.content-box.ebcom + 引擎渲染的子组件；设计态是 div.ebcoms-collapse-panel-droppable-warp + 设计器拖拽层）。② 端：page.client==='MOBILE' 走移动端树（源码 view-m / design-m），否则 PC 树。移动端只换前缀：ui-collapse→ui-m-collapse、ebcoms-collapse-panel-content→ebcoms-m-collapse-panel-content、ebcoms-panel-operations-wrap→ebcoms-m-panel-operations-wrap、ebcoms-collapse-panel-droppable-warp→ebcoms-m-collapse-panel-droppable-warp，骨架不变。",
+  "root": {
+    "tag": "div",
+    "id": "<comId>",
+    "class": [
+      "ebcom",
+      "ebcom-collapsepanel",
+      "{ebcom-grid|ebcom-flow|ebcom-excel}",
+      "[ebcom-m]",
+      "{ebcom-view|ebcom-design}",
+      "[has-no-header]",
+      "[event-action-click]",
+      "<布局/设计器追加的类名>"
+    ],
+    "desc": "引擎外壳，由 weapp-ebdcoms 的 createView.renderView（运行态）/ createDesign.renderDesign（设计态）生成，不在本组件源码里。类型名拼成 ebcom-collapsepanel，布局拼成 ebcom-grid/ebcom-flow/ebcom-excel，移动端多一个 ebcom-m，运行态是 ebcom-view、设计态是 ebcom-design。配置了点击事件动作时运行态会加 event-action-click。官方样式作用域就是 #<comId>.ebcom（getCollapsePanelStyles 生成的规则被它限域）。",
+    "tips": [
+      "has-no-header 基本常驻：collapse-panel 的 Design/View defaultOpts 里 titleEnabled 默认 false，且组件没有 renderHeader，所以标题栏不存在、外壳带 has-no-header",
+      "不会出现的类名：content-no-padding（组件没声明 padding=false）、mask（Design.defaultOpts 没开 mask）、standalone",
+      "折叠面板的样式生成器还会接受 .ebcoms-com-collapsepanel 这个作用域类（pretreatCssCode 会把它剥掉），但 DOM 上并没有这个类，别拿它当选择器"
+    ],
+    "children": [
+      {
+        "tag": "div",
+        "class": ["header"],
+        "when": "titleEnabled===true 才有；折叠面板默认 false，通常看不到",
+        "children": [
+          { "tag": "div", "class": ["ebcom-title"], "desc": "引擎渲染的组件标题（有 {xx} 动态语法时换成 TransformContent 的 div，类名同样是 ebcom-title）" },
+          { "tag": "div", "class": ["ebcoms-header-btns"], "desc": "标题栏操作按钮组（wrapClass 传入）" }
+        ]
+      },
+      {
+        "tag": "div",
+        "class": ["content"],
+        "desc": "引擎内容槽（createView.renderContent）。⚠️ 同一层级里还有 .header/.footer，且组件内部也用了 content-box / content 字样的类名，写选择器时注意层级：common/index.less 里 .ebcom-collapsepanel > .content 说的就是这一层",
+        "children": ["ref:shared.comRoot"]
+      },
+      {
+        "tag": "div",
+        "class": ["footer"],
+        "when": "footerEnabled===true 才有；折叠面板 Design.defaultProps 里 footerEnabled:false",
+        "desc": "引擎底部按钮区"
+      }
+    ]
+  },
+  "shared": {
+    "comRoot": {
+      "tag": "div",
+      "class": [
+        "{ebcoms-collapse-panel-content|ebcoms-m-collapse-panel-content}",
+        "ebcoms-collapse-panel-content-distance"
+      ],
+      "desc": "组件根（ViewContent.render 的最外层），PC 是 ebcoms-collapse-panel-content，移动端是 ebcoms-m-collapse-panel-content；两种情况都额外带 content-distance（控制面板间距/圆角）。运行态引擎会在这层写 data-id=<comId>。里面直接就是 @weapp/ui 的 Collapse 根。",
+      "tips": [
+        "自己写的规则建议用 #<comId> 限域，或 #<comId> .ebcoms-collapse-panel-content，别只写 .content（会命中引擎内容槽）",
+        "less 已给这层 padding:0 / flex 竖排 / height:100%，不要重复写"
+      ]
+    },
+    "collapseRoot": {
+      "desc": "折叠面板列表容器（@weapp/ui Collapse）。组件固定传 bordered={false}，没传 type（默认 normal），所以类名恒为 --no-border + -normal；less 里若有 --has-border 的钩子不要照着写。四个场景只差前缀：PC 是 ui-collapse*，移动端是 ui-m-collapse*。",
+      "chain": "div.{ui-collapse|ui-m-collapse}.{ui-collapse--no-border|ui-m-collapse--no-border}.{ui-collapse-normal|ui-m-collapse-normal}",
+      "children": ["ref:shared.panel"]
+    },
+    "panel": {
+      "desc": "一个面板项（@weapp/ui Collapse.Panel），config.panels 里 hide!==true 的项各渲染一个，顺序与配置一致。组件只传了 title / iconPosition，其余由 Collapse 注入（active、isLast、bordered、isClickOnRow 等）。accordion 由 spreadType==='mutex' 决定；parataxis 且 expandAll 时会有多个面板同时 active。",
+      "chain": "div.ui-collapse-panel[.ui-collapse-panel--has-arrow]{--active|--inactive} > div.ui-collapse-panel__title + div.ui-collapse-panel__content-box > div.ui-collapse-panel__content",
+      "tips": [
+        "面板根上 has-arrow 常驻；展开收起只切 --active / --inactive（less 已按它给了标题底色 var(--primary) 和文字/图标颜色），不要自己再写展开态",
+        "--active 时标题栏底色 = var(--primary)、图标 svg 与标题文字 = #fff；--inactive 时底色 #fff、文字 #666 —— 这几条 less 里已经写好",
+        "移动端的 div.ui-m-collapse-panel 类名与 PC 一一对应，把 ui-collapse → ui-m-collapse 即可"
+      ],
+      "children": [
+        {
+          "tag": "div",
+          "class": [
+            "ui-collapse-panel__title",
+            "ui-collapse-panel__title--bg-default",
+            "[mirror-text]"
+          ],
+          "desc": "标题栏（点击整行展开/收起）。--bg-default 来自组件传的 panelTitleBackground='default'；RTL 语言加 mirror-text。⚠️ 同一个 classnames 里还有 --bg-none / 无修饰三种分支，只有 --bg-default 出现。",
+          "children": [
+            {
+              "tag": "span",
+              "class": [
+                "[ui-collapse-panel__arrow-right]",
+                "[needRTL]"
+              ],
+              "desc": "展开/收缩图标的包裹 span，由 @weapp/ui Panel.renderIcon 生成，里面装的是组件 customIconRender 的返回值（操作按钮区 + 图标）。⚠️ 只有 iconPosition==='right' 时才有 ui-collapse-panel__arrow-right（less 里给它 position:absolute;right:0;top:0;bottom:0）。系统样式 2/6/7（getPanelIconPosition 返回 'left'）时 iconPosition==='left'，这个 span 的 class 是空的（只有 needRTL 时是 needRTL），此时定位只能靠 .ebcoms-collapse-panel-title-icon",
+              "children": [
+                {
+                  "tag": "div",
+                  "class": [
+                    "{ebcoms-panel-operations-wrap|ebcoms-m-panel-operations-wrap}",
+                    "[{ebcoms-panel-operations-toright|ebcoms-m-panel-operations-toright}]"
+                  ],
+                  "when": "Content.renderComBtns 的返回值。渲染条件（取反看）：面板不存在 / 面板下没有第一个子组件 / 子组件开了 titleEnabled / 子组件还没 loading 完 / 子组件是新列表 NList 之一不满足时反而会渲染这个空壳；子组件存在且不是 NList 时 renderComBtns 返回空 fragment，这一层不存在",
+                  "desc": "面板标题右侧的自定义操作按钮容器（里面是 ExtraContent，只有事件动作的 NEWTAB_RENDER_EXTRA_CONTENT 注入过内容才有东西）。toright 是 iconPosition==='left' 时挂的反向定位类（less 已给 right:16px 绝对定位）。",
+                  "tips": [
+                    "less 里已有钩子：.ebcoms-panel-operations-wrap .ebcoms-header-btns{position:static;max-width:100%}、.ebcoms-panel-operations-toright{position:absolute;right:16px;top:50%}",
+                    "移动端前缀换成 ebcoms-m-panel-operations-wrap / ebcoms-m-panel-operations-toright"
+                  ]
+                },
+                {
+                  "tag": "span",
+                  "class": ["ui-icon", "ui-icon-wrapper", "ebcoms-collapse-panel-title-icon"],
+                  "desc": "@weapp/ui Icon（size='s'，className 由组件传入，会拼到 wrapper 上）。内部是 svg.ui-icon-svg.ui-icon-s.<图标名>；图标按系统样式 id 取（getPanelPositionIcon）：默认 Icon-Down-arrow01/Icon-Right-arrow01，样式 2/4 是 arrow04，样式 5 是 arrow03，样式 6 是 Icon-reduce01/Icon-add-to01；active 用第一个、inactive 用第二个。RTL 时 wrapper 上多 mirror-text。",
+                  "tips": "改图标颜色写 .ebcoms-collapse-panel-title-icon .ui-icon-svg（less 里两处展开态规则就是这么写的），别写 .ui-icon"
+                }
+              ]
+            },
+            {
+              "tag": "span",
+              "class": ["ebcoms-assets-item", "s", "{ebcoms-assets-svg|ebcoms-assets-icon|ebcoms-assets-img}"],
+              "when": "config.panels[n].icon 存在时才有（引擎的 AssetsItem，size='s' 所以类名里有个裸类 s）",
+              "desc": "面板图标素材。三种形态：icon.path 以 /svg 结尾 → span.ebcoms-assets-svg（内含 react-inlinesvg 的 svg）；以 # 开头 → span.ebcoms-assets-icon（内含 @weapp/ui Icon/AppIcon/IconFont）；其余 → img.ebcoms-assets-img。less 已给 .ebcoms-assets-item{margin-right:4px}。",
+              "tips": "要统一控制尺寸/间距就写 .ebcoms-assets-item（三种形态都有这个类），不要只写 ebcoms-assets-img"
+            },
+            {
+              "tag": "span",
+              "class": ["ebcoms-collapse-panel-title", "[ebcoms-collapse-panel-text-ellipsis]"],
+              "desc": "标题文字容器。text-ellipsis 只在设计态（isDesign）挂上；运行态的省略号靠内层 PanelName 的 div。less 已给：运行态 font-size 12px / max-width 80% / flex 居中，展开时文字变 #fff。",
+              "children": [
+                {
+                  "tag": "div",
+                  "class": ["ebcoms-collapse-panel-name"],
+                  "when": "仅运行态（isDesign=false）。设计态直接渲染纯文本，没有这一层",
+                  "desc": "面板名容器，带 title 属性（鼠标悬浮的完整名称）。里面是 ebdcoms 的 TransformContent：mode 默认 normal，所以渲染 div.ebcoms-collapse-panel-name-item.ebcoms-collapse-panel-text-ellipsis（有同环比等特殊字段时内部还会出 div.ebcoms-transform-content-custom 或按钮组件 div；hasTrans 时 name-item 上多 ebcoms-transform-content-hasTrans）。less 已给 .ebcoms-collapse-panel-name{width:100%} 和 text-ellipsis 三件套。",
+                  "tips": "中文名称、数据集占位符、动态参数都在这层被替换，改文字样式写 .ebcoms-collapse-panel-title 或 .ebcoms-collapse-panel-name-item"
+                },
+                {
+                  "tag": "span",
+                  "class": ["count"],
+                  "when": "面板下第一个子组件开了「显示数量」(showCount) 且计数成功、displayCount>−1 时才有，文案形如 ' (12)'",
+                  "desc": "数量徽标（common/Count.tsx 渲染的裸类名 span.count）。less 已给 .ui-collapse-panel__title .count{padding-left:3px}（PC/移动端各一条）。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "tag": "div",
+          "class": ["ui-collapse-panel__content-box"],
+          "when": "LazyMount 包裹：面板第一次 active 之前 DOM 里完全没有这个节点；active 过一次后即使收起也一直在（只是 height:0 + overflow:hidden）",
+          "desc": "内容区外层，由 AnimateHeight 渲染，行内写死 height（active 时 auto/收起时 0）与 transition: height 160ms、overflow:hidden。less 钩子：组件层已把 padding 归零、background 透明，ui 层默认的 padding 也被覆盖。",
+          "children": [
+            {
+              "tag": "div",
+              "class": ["ui-collapse-panel__content"],
+              "children": ["ref:shared.panelContent"]
+            }
+          ]
+        }
+      ]
+    },
+    "panelContent": {
+      "desc": "面板内容区（放子组件的地方），运行态与设计态是两个完全不同的分支，用 #<comId> .ebcom-collapsepanel.ebcom-view / .ebcom-design 区分。",
+      "branchView": {
+        "when": "运行态（isDesign=false）",
+        "chain": "div.content-box.ebcom[id=<linkedNodes[panelId]>] > 子组件外壳…",
+        "desc": "内容容器，固定类名 content-box + ebcom（classnames(`content-box ${ebcomPrefix}`)），id 取 config.flow.linkedNodes[panelId]（没关联时是空 id）。里面由 @weapp/designer 的 DroppableView 直接渲染子组件（不可控），每个子组件是引擎外壳 div#<childComId>.ebcom.ebcom-<type>。⚠️ RTL 时 less 给 .content-box.ebcom 做了 scaleX(-1)，别在内部再翻一次。",
+        "tips": "用户说『面板内容区/子组件区域』时指的就是这层；要改内边距写 #<comId> .content-box，less 里 .ui-collapse-panel__content 已经被组件置为 padding:0"
+      },
+      "branchDesign": {
+        "when": "设计态（isDesign=true）",
+        "chain": "div.ebcoms-collapse-panel-droppable-warp[.panelEmpty] > 设计器拖拽层",
+        "desc": "设计态的拖拽包裹层（PC 是 ebcoms-collapse-panel-droppable-warp，移动端是 ebcoms-m-collapse-panel-droppable-warp），panelEmpty 在面板容器下没有任何子组件时挂上。里面的 Droppable 由设计器渲染（uncontrolled），不保证内部结构；空面板时它内部会渲染 div.weapp-ebde-droppable-empty（less 已给字号/颜色/圆角/min-height:178px 的样式钩子）。less 里 .ebcoms-collapse-panel-droppable-warp > div:first-child{height:auto!important} 正好作用在这层。",
+        "tips": [
+          "条件分支：只有 props.Droppable 不是函数时才渲染上面这条链；否则渲染空的 div.ebcoms-collapse-panel-demoManage（less 给 min-height:150px），DOM 里没有拖拽层",
+          "设计态另一种空态提示在移动端：.ebcom-collapsepanel.ebcom-design .weapp-ebde-droparea-m .ebcoms-empty.ebcoms-empty-text（less 已定义）"
+        ]
+      }
+    },
+    "state": {
+      "desc": "运行期动态变化（初始 render 里没有），写样式时按「可能出现」对待",
+      "list": [
+        {
+          "condition": "展开/收起某个面板（点标题栏行，或事件动作调 doActive/doInactive、切换 spreadType）",
+          "targetSelector": "对应 div.ui-collapse-panel",
+          "addClass": "ui-collapse-panel--active / ui-collapse-panel--inactive",
+          "note": "纯 state 切换（contextApi 不做 DOM 操作）；首次展开才会挂载 content-box"
+        },
+        {
+          "condition": "面板 active 且首次展开",
+          "targetSelector": "div.ui-collapse-panel__content-box",
+          "addClass": "（新增节点）",
+          "note": "AnimateHeight 动画期间 height 在 0→实际值→auto 之间变化，transition/overflow 是行内样式，别在 CSS 里覆盖 height"
+        },
+        {
+          "condition": "子列表计数刷新（count.updateRefresh）/ 筛选条件变化",
+          "targetSelector": "span.ebcoms-collapse-panel-title .count",
+          "addClass": "（文本变化，无类名变化）"
+        },
+        {
+          "condition": "组件被事件动作隐藏",
+          "targetSelector": "引擎外壳 #<comId>",
+          "addClass": "ebcom-display-none",
+          "note": "同时写 style.display='none'"
+        }
+      ]
+    }
+  },
+  "view-pc": {
+    "when": "页面运行态（外壳含 ebcom-view）且 page.client!=='MOBILE'；源码 view/View.tsx → view/Content.tsx → view/ViewContent.tsx",
+    "tree": [
+      "div.content（引擎内容槽）",
+      "ref:shared.comRoot → class 为 ebcoms-collapse-panel-content ebcoms-collapse-panel-content-distance",
+      "ref:shared.collapseRoot → div.ui-collapse.ui-collapse--no-border.ui-collapse-normal",
+      "ref:shared.panel（每个面板项一个）",
+      "ref:shared.panelContent.branchView（运行时面板内容区）"
+    ],
+    "diffs": [
+      "这里的内容区是 div.content-box.ebcom，直接装子组件外壳；没有拖拽层、没有 droppable-empty",
+      "isClickOnRow=true：点击整行切换，标题栏 div 上带 role=\"button\"、aria-expanded=<active>"
+    ]
+  },
+  "view-mobile": {
+    "when": "页面运行态且 page.client==='MOBILE'；源码 view-m/View.tsx → view-m/Content.tsx → view-m/ViewContent.tsx",
+    "tree": [
+      "div.content（引擎内容槽，与 PC 相同）",
+      "ref:shared.comRoot → class 换成 ebcoms-m-collapse-panel-content ebcoms-collapse-panel-content-distance",
+      "div.ui-m-collapse.ui-m-collapse--no-border.ui-m-collapse-normal",
+      "ref:shared.panel → 把 ui-collapse-* 全部换成 ui-m-collapse-*",
+      "ref:shared.panelContent.branchView（内容区相同：div.content-box.ebcom）"
+    ],
+    "diffs": [
+      "前缀替换：ui-collapse→ui-m-collapse（含 --no-border / -normal / __title / __content-box / __content / __arrow-right）",
+      "组件类名：ebcoms-m-collapse-panel-content、ebcoms-m-panel-operations-wrap、ebcoms-m-panel-operations-toright；而标题文字 span.ebcoms-collapse-panel-title、图标 span.ebcoms-collapse-panel-title-icon、名称 div.ebcoms-collapse-panel-name 不加 m（PC/移动端共用）",
+      "外壳多一个 ebcom-m（class ebcom ebcom-collapsepanel ebcom-m ebcom-mgl ebcom-view）",
+      "less 已单独给移动端写好标题 padding（10px 0 10px 10px）、图标 margin-right:8px 等，不要用 PC 的规则覆盖"
+    ]
+  },
+  "design-pc": {
+    "when": "设计器设计态且 page.client!=='MOBILE'；源码 design/Design.tsx → design/Content.tsx → view/ViewContent.tsx（isDesign=true）",
+    "tree": [
+      "引擎外壳 div#<comId>.ebcom.ebcom-collapsepanel.ebcom-grid.ebcom-design.has-no-header（createDesign.renderDesign，设计器还会追加自己的类）",
+      "div.content（引擎内容槽，与运行态同一套 ViewContent 包装）",
+      "ref:shared.comRoot → ebcoms-collapse-panel-content ebcoms-collapse-panel-content-distance",
+      "ref:shared.collapseRoot → div.ui-collapse.ui-collapse--no-border.ui-collapse-normal（同一套 @weapp/ui 组件）",
+      "ref:shared.panel",
+      "ref:shared.panelContent.branchDesign（设计态拖拽层）"
+    ],
+    "diffs": [
+      "标题文字不再走 PanelName：span.ebcoms-collapse-panel-title 里直接是纯文本 + ebcoms-collapse-panel-text-ellipsis（没有 div.ebcoms-collapse-panel-name / name-item）",
+      "内容区换成 div.ebcoms-collapse-panel-droppable-warp[.panelEmpty] + 设计器拖拽层；空面板可见 div.weapp-ebde-droppable-empty",
+      "isClickOnRow=false：标题栏没有 role=\"button\"，点标题本体不切换，只有点展开图标 span 才切换（避免误触选中组件）",
+      "less 有 .ebcom-collapsepanel.ebcom-design 下的专属规则（拖拽空态样式）"
+    ]
+  },
+  "design-mobile": {
+    "when": "设计器设计态且 page.client==='MOBILE'；源码 design-m/Design.tsx → design-m/Content.tsx → view-m/ViewContent.tsx（isDesign=true）",
+    "tree": [
+      "引擎外壳 div#<comId>.ebcom.ebcom-collapsepanel.ebcom-m.ebcom-mgl.ebcom-design（class 里的布局段按实际布局）",
+      "div.content",
+      "ref:shared.comRoot → ebcoms-m-collapse-panel-content ebcoms-collapse-panel-content-distance",
+      "div.ui-m-collapse…（同 view-mobile）",
+      "ref:shared.panel",
+      "设计态内容区：div.ebcoms-m-collapse-panel-droppable-warp[.panelEmpty] + 设计器拖拽层"
+    ],
+    "diffs": [
+      "把 design-pc 与 view-mobile 的差异叠加：ui-m-* 前缀 + 设计态内容区 + 设计态标题（纯文本）",
+      "移动端设计器空态：.ebcom-collapsepanel.ebcom-design .weapp-ebde-droparea-m .ebcoms-empty.ebcoms-empty-text（less 已定义）"
+    ]
+  },
+  "notes": [
+    "三类前缀要分清：ebcoms-* 是组件自己写的；ebcom-* 是引擎外壳（本组件源码里搜不到）；ui-collapse-* / ui-m-collapse-* 来自 @weapp/ui 的 Collapse + Collapse.Panel，组件只传了 title / iconPosition / panelTitleBackground。",
+    "最常踩的定位错误是 content 系列：引擎内容槽是 div.content，面板内容区是 div.content-box.ebcom，@weapp/ui 的内容节点是 div.ui-collapse-panel__content / __content-box，组件根是 div.ebcoms-collapse-panel-content。四者名字都含 content，写选择器必须带前缀或 #<comId> 限域。",
+    "标题栏四个平级部件（从左到右）：展开图标包裹 span → 面板图标 span.ebcoms-assets-item → 标题文字 span.ebcoms-collapse-panel-title（内含名称 div.ebcoms-collapse-panel-name / name-item 与数量 span.count）→ 操作按钮 div.ebcoms-panel-operations-wrap。图标包裹 span 是绝对定位（ui-collapse-panel__arrow-right 只有 iconPosition='right' 才有），所以它视觉上在右侧但 DOM 里排在最前。",
+    "iconPosition 由系统样式决定：getPanelIconPosition 对样式 2/6/7 返回 'left'（其余 'right'）。left 时展开图标包裹 span 没有 ui-collapse-panel__arrow-right 类，且操作按钮容器多 ebcoms-panel-operations-toright；改定位要按这两条分支分别写，或统一抓 .ebcoms-collapse-panel-title-icon。",
+    "内容区只在面板 active 过之后才存在（LazyMount），收起时节点仍保留但 height:0 + overflow:hidden（行内样式，AnimateHeight 控制）。想给「收起的面板内容区」写样式基本没意义，想给展开态写要带 .ui-collapse-panel--active。",
+    "less 里已有的钩子不要重复写：#<comId> 外壳 border:none、.ebcom-collapsepanel > .content 的 flex 竖排/padding:0、.ebcoms-collapse-panel-content（flex 竖排 + height:100%）、面板间距与圆角（.ebcoms-collapse-panel-content-distance）、展开/收起底色与文字色、标题 padding 与 max-width、图标 margin、.count 的内边距、拖拽空态样式。",
+    "系统样式库（7 个内置 id）与自定义样式走 getCollapsePanelStyles 生成，作用域是 #<comId>.ebcom，生成的规则会同时命中 PC 的 .ui-collapse-panel* 与移动端的 .ui-m-collapse-panel*（源码里两套选择器成对拼出）。自定义样式里直接用组件类名即可，不需要自己套外壳。",
+    "改文字/图标颜色优先利用展开态钩子：.ui-collapse-panel--active .ebcoms-collapse-panel-title 与 .ui-collapse-panel--active .ebcoms-collapse-panel-title-icon .ui-icon-svg 已分别是 #fff，覆盖时注意选择器权重别低于它。",
+    "设计态与运行态的 DOM 差异很大（外壳 ebcom-design、面板内容区换成拖拽层、标题去 PanelName），在页面运行态验证选择器时不要参考设计器里的结构；反之亦然。",
+    "反查源码：外壳与内容槽在 weapp-ebdcoms/src/components/core/view/createView.tsx（renderView/renderContent）与 design/createDesign.tsx（renderDesign/renderContent，同一套 view/Content.tsx 包装）；面板项骨架在 weapp-ui/src/components/collapse/Panel.tsx 与 Collapse.tsx；面板内容区两分支在 view/ViewContent.tsx 的 getPanels（!isDesign / isDesign）；标题名称在 common/PanelName.tsx、数量在 common/Count.tsx；已有样式在 view/index.less、view-m/index.less、common/index.less；样式生成器在 common/getCollapsePanelStyles.ts。"
+  ]
+}

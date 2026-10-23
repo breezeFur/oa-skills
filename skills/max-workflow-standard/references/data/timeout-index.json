@@ -1,0 +1,115 @@
+[
+  {
+    "embedding": "oleObject1.bin",
+    "sheet": "20250928-141802",
+    "range": "A1:I2456",
+    "rows_including_metadata": 2456,
+    "header_preview": [
+      [
+        "流程节点标准时效维护:节点标准时效",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "创建日期:2025-09-28 14:18:02",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "制表信息:信息部/流程管理组//胡保呈",
+        "标题：数据视图[节点标准时效维护](2025-07-20 14:08:22)",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "PROCESS_NAME<流程名称>(*)",
+        "PROCESSVERSION<流程版本>",
+        "PROCESSID<流程ID>",
+        "PROCESS_GROUPNAME<流程组名称>",
+        "PROCESS_GROUPID<流程组ID>",
+        "ACTIVITYNAME<节点名称>(*)",
+        "ACTIVITYID<节点ID>",
+        "BELONGING_STAGE<阶段>",
+        "STANDARD_FAILURE<标准时效>"
+      ],
+      [
+        "IT信息类合同评审流程",
+        "1",
+        "obj_c9880dfc3e7d408383eb1fa1e565792c",
+        "其他类合同评审",
+        "obj_dca1f30a12594d8ea46d16b5cb7cc23d",
+        "部门经理",
+        "obj_cacc145f18000001878d18923ba61067",
+        "审核阶段",
+        "4"
+      ]
+    ],
+    "data_json": "timeout-nodes.json"
+  },
+  {
+    "embedding": "oleObject2.bin",
+    "sheet": "20250928-141703",
+    "range": "A1:F283",
+    "rows_including_metadata": 283,
+    "header_preview": [
+      [
+        "流程标准时效维护:流程标准时效",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "创建日期:2025-09-28 14:17:03",
+        "",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "制表信息:信息部/流程管理组//胡保呈",
+        "标题：数据视图[流程标准时效维护](2025-07-20 13:54:27)",
+        "",
+        "",
+        "",
+        ""
+      ],
+      [
+        "PROCESS_NAME<流程名称>",
+        "PROCESSVERSION<流程版本>",
+        "PROCESSID<流程ID>",
+        "PROCESS_GROUPNAME<流程组名称>",
+        "PROCESS_GROUPID<流程组ID>",
+        "STANDARD_FAILURE<标准时效(小时)>(*)"
+      ],
+      [
+        "成本数据申请",
+        "1",
+        "obj_e648b93a157942e98c844cb6d6c4fb3e",
+        "成本数据申请",
+        "obj_74da43c1981647f5b34b3b330d2e7944",
+        "38"
+      ]
+    ],
+    "data_json": "timeout-workflows.json"
+  }
+]

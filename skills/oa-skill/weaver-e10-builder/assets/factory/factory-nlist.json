@@ -1,0 +1,112 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "d9c727071acc4b03b8f3bf930ce7c43d",
+        "type": "NList",
+        "package": "@weapp/ebdcontainercoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "b540305df43243328b1e373f340bb23d",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "列表",
+          "type": "NList",
+          "mode": "9",
+          "pageMode": "part",
+          "title": "标题",
+          "titleEnabled": true,
+          "footerEnabled": false,
+          "pageSize": 10,
+          "layout": {
+            "i": "c2fc87dd3d404d37bf6c4f5ab257987a",
+            "x": 0,
+            "y": 27,
+            "w": 6,
+            "h": 30,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 358
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "headMerge": true,
+          "listVersion": 5,
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,920166188898271271",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ListStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdcontainercoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "b540305df43243328b1e373f340bb23d",
+        "type": "NList",
+        "package": "@weapp/ebdcontainercoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "d9c727071acc4b03b8f3bf930ce7c43d",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "列表",
+          "type": "NList",
+          "mode": "9",
+          "pageMode": "part",
+          "title": "标题",
+          "titleEnabled": true,
+          "footerEnabled": false,
+          "pageSize": 10,
+          "layout": {
+            "i": "d4d76d3f0ca24ff6bcc4d82f94a00d3c",
+            "adaptive": true,
+            "h": 30,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": [],
+          "headMerge": true,
+          "listVersion": 5
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,920166188898271271",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ListStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdcontainercoms"
+      }
+    ]
+  }
+]

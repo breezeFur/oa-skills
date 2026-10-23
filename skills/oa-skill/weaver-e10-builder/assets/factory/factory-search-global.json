@@ -1,0 +1,104 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "b027dd7f044342af9e764ac82d3f821e",
+        "type": "SearchGlobal",
+        "package": "@weapp/ebdothercoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "c5dd268c2d12490391fb4a6227b0f470",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "搜索框",
+          "type": "SearchGlobal",
+          "title": "搜索框",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "fixedArea": "0",
+          "layout": {
+            "i": "c92e2560a97e41a9a8699ad4631063fb",
+            "x": 6,
+            "y": 139.5590909090909,
+            "w": 4,
+            "h": 8,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1596
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "c5dd268c2d12490391fb4a6227b0f470",
+        "type": "SearchGlobal",
+        "package": "@weapp/ebdothercoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "b027dd7f044342af9e764ac82d3f821e",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "搜索框",
+          "type": "SearchGlobal",
+          "title": "搜索框",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "fixedArea": "0",
+          "layout": {
+            "i": "d9ae115158ba4bc9b7ffb39c96ce0e71",
+            "adaptive": true,
+            "h": 8,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": []
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms"
+      }
+    ]
+  }
+]

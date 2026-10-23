@@ -1,0 +1,712 @@
+{
+	"component": "nlist 列表（weapp-ebdcontainercoms/src/components/nlist；组件导出名 NList，外壳类名 ebcom-nlist）。本文档只覆盖『基础 nlist』：base/view 下的列表式/表格式/简约列表/Excel表格及它们的图片、宫格变体。plugin-packages 里二次封装的 eblist、workflow、work-task、doc-list、rss-reader、statpage-list、ebbrowser-list、cowork/customer 等以及 list-standalone 的 doc/workflow-list-standalone 都不在本文档范围。",
+	"usage": "用户说『把这个列表的某部分设样式』时：① 先按样式面板『列表样式』(config.mode) 选分树（见 pickTree）；② 组件根往上的固定在 root；③ 标题/工具区/分页/空数据/操作列/勾选框这些跨样式通用部位在 shared；④ 再落到具体树里的行与字段。最稳的写法是一律用 #<comId> 限域，例如 #<comId>.ebcom .ebcoms-nlist-card。",
+	"legend": {
+		"[cls]": "条件class，满足业务条件才挂载",
+		"{a|b}": "多选一class（同一位置按配置换成其中一个）",
+		"a > b": "父子层级压缩写法，冒号左边是右边的父级",
+		"ref": "引用 shared 里的复用片段，写成 ref:shared.xxx",
+		"uncontrolled": "第三方渲染（@weapp/ui 的 Table/List/Scroller、excel 表格、ExcelTable 页面），内部结构不在 nlist 源码里，只给会用到的层与挂载点",
+		"<comId>": "组件实例 id；引擎外壳的 id 与官方样式作用域里的都是它，作用域写成 #<comId>.ebcom",
+		"ebcoms-": "组件/ebdcoms 自己写的类名前缀（clsPrefix='ebcoms'）",
+		"ebcom-": "引擎/框架层的类名前缀（ebcomPrefix='ebcom'），组件源码里搜不到",
+		"ui-": "@weapp/ui 的类名（ui-table-grid-* / ui-list* / ui-scroller__* / ui-pagination 等），由第三方组件追加"
+	},
+	"pickTree": "看样式面板『列表样式』对应的 config.mode，再叠加 page.client。① mode '1' → table 树（表格）；② mode '2' → list 树（普通列表/卡片）；③ mode '12' → simple 树（简约列表）；④ mode 8/9/11 → excel 树（Excel 表格，由引擎页面渲染）；⑤ mode 3/13（左图）、5/15（上图）、4/14（横排）、7/17（宫格）都是 list 或 simple 树 + 一个插件，差异集中在 list 树末尾的 diffs 里，不用另建树。PC/移动端（page.client==='MOBILE'）与运行态/设计态都不换骨架，只是多处挂 mobile / ebcom-m / ebcom-design 类并有两套分页实现。",
+	"root": {
+		"tag": "div",
+		"id": "<comId>",
+		"class": [
+			"ebcom",
+			"ebcom-nlist",
+			"[ebcom-<pluginResourceType>]",
+			"[ebcom-m]",
+			"{ebcom-grid|ebcom-flow|ebcom-excel}",
+			"{ebcom-view|ebcom-design}",
+			"[has-no-header]",
+			"[standalone]",
+			"[content-no-padding]",
+			"[event-action-click]",
+			"[mask]",
+			"<布局/设计器追加的类名>"
+		],
+		"desc": "引擎外壳，由 weapp-ebdcoms 的 createView.renderView（运行态，src/components/core/view/createView.tsx#renderView）/ createDesign.renderDesign（设计态）生成，不在 nlist 源码里。类型段固定 ebcom-nlist（compUtils.getClassName 用 `ebcom-${type.toLowerCase()}`，type=NList）；布局段 ebcom-grid/ebcom-flow/ebcom-excel；运行态 ebcom-view、设计态 ebcom-design（多一个 mask）；移动端多一个 ebcom-m。",
+		"tips": [
+			"⚠️ has-no-header 在 nlist 上恒为 true：showHeader 的判定是 titleEnabled && !Component.renderHeader，而 nlist 在 createListView 里给自己挂了 renderHeader（ListTitle），所以引擎的默认 div.header 永远不渲染 —— 标题实际是 ListTitle 输出的 div.header.nlist-header（见 shared.title），别因为看到 has-no-header 就以为没有标题",
+			"组件配置面板里的骨架类（mask、content-no-padding、standalone）都来自 defaultOpts，nlist 未声明 standalone，所以 standalone 一般不出现在页面里",
+			"引擎除了把外壳类串放在这个 div 上，还会把它当 className 传给组件；列表式会继续拼到 div.ebcoms-list-container，简约式拼到 div.ebcoms-simple-list-container，表格式没有下沉到内部 DOM（只在设计器样式作用域里按 #<comId> 命中）"
+		],
+		"children": [
+			"ref:shared.title | (标题与搜索按钮合并时此处为空，见 shared.toolbar)",
+			"ref:shared.shellContent",
+			{
+				"tag": "div",
+				"class": [
+					"footer"
+				],
+				"when": "footerEnabled 为真且开启了底部按钮；nlist 默认 config 不含 footerEnabled，通常看不到",
+				"desc": "引擎底部按钮区（wrapClass=ebcoms-footer-btns），不在 nlist 源码里"
+			}
+		]
+	},
+	"shared": {
+		"title": {
+			"tag": "div",
+			"class": [
+				"header",
+				"nlist-header",
+				"[leftWholeLine]"
+			],
+			"desc": "nlist 自己的标题行，由 ListTitle（components/nlist/view/widgets/title/ListTitle.tsx）渲染，直接挂在 #<comId> 下（引擎层 has-no-header 恒真，这里是唯一标题 DOM）。左WholeLine = 无快速搜索且无右上角按钮时占满整行。",
+			"tips": [
+				"开启『按钮和搜索合并到标题』后 ListTitle 以 isContent 形态改到列表内部渲染（shared.toolbar 里），此时这层不存在",
+				"less 已写钩子：plugins/render-header-merge/index.less 里大量 .ebcom-nlist 下的 .ebcoms-nlist-header-title / -wrapper / -left-wrap / -right-wrap / -left-icon-btn-wrap / -group 规则，改标题行前先看它"
+			],
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ebcoms-nlist-header-title-wrapper"
+					],
+					"desc": "标题主体外层，内含 TransformContent 渲染的标题"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ebcom-title",
+						"ebcoms-nlist-header-title"
+					],
+					"when": "标题走自定义容器渲染时（TransformContent 的 customRenderContent / customRenderHtmlContent）；设计态还多一个 ebcom-title-design",
+					"desc": "标题文本层，内层 div.ebcoms-nlist-header-title-content 才是文字；用 {xx} 动态语法时外层还会带 ebcoms-nlist-transform-content-title"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ebcoms-nlist-header-count"
+					],
+					"when": "开启『显示数据条数』(showCount)",
+					"ref": "shared.count"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ebcoms-nlist-header-right-wrap"
+					],
+					"when": "右上角按钮或视图切换按钮存在（OperationBtns，wrapClass 由引擎给的是 ebcoms-header-btns）",
+					"desc": "右上角操作按钮区；移动端按钮组是 div.ebcoms-nlist-m-button-group"
+				}
+			]
+		},
+		"count": {
+			"tag": "span",
+			"class": [
+				"ebcoms-nlist-header-count"
+			],
+			"when": "config 里开启了标题显示条数",
+			"desc": "标题后面的 (总数)，内容是 `({total})`，要改颜色/字号写这一层"
+		},
+		"toolbar": {
+			"tag": "div",
+			"class": [
+				"ebcoms-nlist-content-header",
+				"[mobile]",
+				"[ebcom-header-wrap]",
+				"[hide]",
+				"[leftWholeLine]",
+				"[hasLeftDom]",
+				"[hasRightDom]"
+			],
+			"desc": "列表内部工具区（render-content-header 插件注入，TopCom 渲染），位于列表容器之上、不属于引擎层。左半是搜索条件/视图切换，右半是按钮组；hide = 左右都为空；ebcom-header-wrap = 开启『按钮和搜索合并到标题』（此时标题 ListTitle 以 isContent 形态渲染进这里）。",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ebcoms-nlist-content-header-left"
+					],
+					"desc": "左侧：快速搜索 div.ebcoms-nlist-search-quick[.hasQuick]、条件分组 div.ebcoms-nlist-group、搜索组 div.ebcoms-nlist-search-group-top / -layout / -left"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ebcoms-nlist-content-header-right"
+					],
+					"desc": "右侧：按钮组 div.ebcoms-button-group[.isDesign][.mobile]（移动端 div.ebcoms-nlist-m-button-group）；高级搜索面板 div.ebcoms-listView-adsearch-panel 挂在下拉里"
+				}
+			],
+			"tips": [
+				"高级搜索面板 .ebcoms-listView-adsearch-panel 自带 ui-searchAdvanced-condition-hide 隐藏态，list/index.less 里已用 :has() 处理它配合 enableSpreadTop 的滚动行为"
+			]
+		},
+		"shellContent": {
+			"tag": "div",
+			"class": [
+				"content"
+			],
+			"desc": "引擎内容槽（createView.renderContent）：`<div className={contentClass + ' content'}>`，是组件根的直接父级；点击事件绑在这层。⚠️ 它和组件自己的 div.ebcoms-nlist-content-wrap / div.ebcoms-*-container 是不同元素。",
+			"tips": [
+				"nlist 的 less 写了 .ebcom-nlist > .content.content{padding:0} —— 这层默认 padding 被清掉，改列表内外边距不要在 .content 上加，要在列表容器上写",
+				"padding:10px 15px / flex:1 1 auto / overflow:auto 是 design/common.less 给所有引擎外壳 >.content 的默认值（nlist 覆盖了 padding）"
+			],
+			"children": [
+				"ref:table.tree | ref:list.tree | ref:simple.tree | ref:excel.tree"
+			]
+		},
+		"empty": {
+			"tag": "div",
+			"class": [
+				"ebcoms-config-noData",
+				"[ebcoms-list-container]",
+				"[ebcoms-simple-list-container]"
+			],
+			"when": "非加载中、数据为空、非初始化中，且没开启分组（或只有空分组）",
+			"desc": "空数据占位，由 list-view 插件在 renderContent 里替换整个列表内容（components/nlist/plugins/list-view/index.tsx）。两个附加类是「借用同名容器类」，让空数据也能吃到列表容器的样式；里面是 @weapp/ui Empty 的 DOM（ui-empty 及图标 span），要改文案/图标走 emptyTips 配置。",
+			"tips": [
+				"list/index.less 已给 .ebcoms-config-noData 写了 background-color: var(--base-white)，别重复",
+				"配置了自定义空数据（emptyCustomData 且 showForNoData）时改为渲染 EmptyCustom 组件，不再有 ebcoms-config-noData"
+			]
+		},
+		"configEmpty": {
+			"tag": "div",
+			"class": [
+				"ebcoms-config-empty"
+			],
+			"when": "设计态未配置列表字段/数据源时",
+			"desc": "『请设置列表配置项』『请选择分组字段』类占位，只在设计态出现，写页面样式时不要引用"
+		},
+		"pagination": {
+			"tag": "div",
+			"class": [
+				"ui-pagination",
+				"[ebcoms-nlist-table-pagination]"
+			],
+			"when": "pageMode==='part'（页码分页）",
+			"desc": "页码分页器，@weapp/ui 组件（uncontrolled），列表式里由 ui List 内部渲染，表格/简约式由组件直接渲染 div.ui-pagination。表格里附带 div.ebcoms-nlist-table-pagination-total。",
+			"tips": [
+				"list/index.less 已写 .ui-list-pagination{margin-top:unset;padding:8px 0} 和 .ui-pagination{text-align:right}",
+				"简约列表的页码分页在 components/simple-list/components/Pagination.tsx，加载更多在 MorePagination.tsx（见 simple 树）"
+			]
+		},
+		"operate": {
+			"tag": "div",
+			"class": [
+				"ebcoms-nlist-table-body-row-operate",
+				"[isDesign]"
+			],
+			"desc": "行操作列（按钮配置的行上按钮 + 行末下拉），三种样式通用，通常作为字段单元格 div.ebcoms-(nlist|slist)-card-layout-row-cell 或 div.ebcoms-container-table-column 的最后一个子节点。",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"tableView-operate"
+					],
+					"desc": "⚠️ 裸类名（无 ebcoms 前缀，camelCase），是 ListOperate 内部写死的。里面是按钮 div > ui-btn、分隔条 span.ebcoms-nlist-divider.ebcoms-nlist-divider-vertical、更多按钮的下拉。要改操作按钮间距/颜色写这层或 .ebcoms-nlist-table-body-row-operate"
+				}
+			],
+			"tips": [
+				"less 已有：common/ListOperate/index.less（.ebcoms-nlist-table-body-row-operate padding:0 12px / flex 居中，.tableView-operate 内 .ui-menu、.ui-btn 布局）；table/index.less 与 excel-table/index.less 里还有按字段宽度分支的 .ebcoms-nlist-table-body-row-operate 规则（L200/L213/L230）"
+			]
+		},
+		"check": {
+			"tag": "div",
+			"class": [
+				"ebcoms-nlist-item-check"
+			],
+			"when": "开启勾选框/单选（列表式、简约式；移动端用 MobileCheckbox 类组件）",
+			"desc": "列表/简约卡片行首的勾选控件（plugins/list-selection/CheckBoxCom.tsx、RadioCom.tsx 传入 className，@weapp/ui Checkbox/Radio 会再追加 ui-checkbox / ui-radio 类）。表格不用它 —— 表格是 ui-table-grid-th-selection / ui-table-grid-td-selection 单元格。",
+			"tips": [
+				"less 已有：plugins/list-selection/index.less（含 .ebcoms-nlist-item-check ~ .ebcoms-slist-card-layout 的间距规则），另外 list/index.less 里去掉了移动端 .ui-m-checkbox-wrapper 的默认背景色"
+			]
+		},
+		"field": {
+			"tag": "div",
+			"class": [
+				"ebcoms-nlist-ellipsis"
+			],
+			"desc": "字段内容的截断容器（列表/简约式由 getCellStyle 生成 childCls 挂在字段渲染层上，表格式不加这类）。只要字段宽度不是『根据内容宽度』或未开启换行就会出现；开启换行且设置按行截断时改为 div.ebcoms-nlist-grid-cell-overflow（多行 line-clamp）。",
+			"tips": [
+				"更里层是各字段渲染器：纯文本 span、显示转换 .edc-trans-data、富文本 .ui-textarea.is-readonly、脱敏 div.ui-encry、自定义渲染 div.ebcoms-grid-cell-custom",
+				"list/index.less 已给 .ebcoms-nlist-ellipsis（含 >div、显示转换、富文本）与 .ebcoms-nlist-grid-cell-overflow 写好截断，别重复写省略号"
+			]
+		}
+	},
+	"table": {
+		"when": "config.mode==='1'（列表样式=表格）；page.client==='MOBILE' 时同一套 DOM，只是多 mobile 类、关闭列宽拖拽（resizable=false）",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-table-com",
+					"[enable]",
+					"[mergeheaderenable]",
+					"[enableSpreadTop]"
+				],
+				"desc": "表格布局最外层（base/view/components/table/index.tsx 的 renderList）。enable = 列表启用了内容头部（搜索/按钮），mergeheaderenable = 开了『按钮和搜索合并到标题』，enableSpreadTop = 开了『展开至顶部』。",
+				"children": [
+					"ref:shared.toolbar",
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-container"
+						],
+						"desc": "表格内容容器（table/index.tsx renderContent），less 已写 border:none / 100% 尺寸 / overflow:hidden / position:relative",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-container-table",
+									"{ebcoms-spread}",
+									"[moreLoading]",
+									"[hasEventAction]",
+									"[mobile]",
+									"<tableClass>",
+									"ui-table-grid",
+									"[ui-table-grid-bordered]",
+									"[ui-table-grid-no-pagination]",
+									"[ui-table-grid-resizable]",
+									"[ui-table-grid-table-sticky]",
+									"[ui-table-grid-table__fixed]",
+									"[ui-table-grid-table__virtual]",
+									"[ui-table-grid-table__mobile]",
+									"[ui-table-grid-scroll-position-left]",
+									"[ui-table-grid-scroll-position-right]"
+								],
+								"desc": "⚠️ @weapp/ui Table 的根节点（uncontrolled）：nlist 传入的 className=ebcoms-container-table 与 ui 自己的 ui-table-grid 拼在同一个 div 上，所以『表格本体』用 .ebcoms-container-table 就能选中。moreLoading = 加载更多分页且非首页时的加载中；ebcoms-spread = 开启展开行（行高变化）。",
+								"tips": [
+									"表格内部的 ui-table-grid-* 全部来自 @weapp/ui（weapp-ui/src/components/table），不要试图在 nlist 里改它们的源码",
+									"列宽拖拽手柄、排序图标、汇总行等都在这一层内部，见下面的节点"
+								],
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ui-table-grid-header-warp"
+										],
+										"when": "isShowHead（隐藏表头配置 hideTableHeader 打开时不渲染）",
+										"children": [
+											{
+												"tag": "div",
+												"class": [
+													"ui-table-grid-header"
+												],
+												"children": [
+													{
+														"tag": "div",
+														"class": [
+															"ui-table-grid-thead",
+															"[ui-table-grid-thead-bordered]"
+														],
+														"children": [
+															{
+																"tag": "div",
+																"class": [
+																	"ui-table-grid-tr"
+																],
+																"children": [
+																	{
+																		"tag": "div",
+																		"class": [
+																			"ui-table-grid-th",
+																			"[ui-table-grid-th-small]",
+																			"[ui-table-grid-th-sticky]",
+																			"[ui-table-grid-th-sticky-left]",
+																			"[ui-table-grid-th-sticky-right]",
+																			"[ui-table-grid-th-selection]",
+																			"[ui-table-grid-th-expand]",
+																			"[ui-table-grid-th-order]",
+																			"[ebcoms-nlist-table-th-custom]",
+																			"[ebcoms-nlist-table-th-autowrap]"
+																		],
+																		"desc": "表头单元格。selection = 勾选框列（表头全选，内部下拉 UI 挂 ui-table-grid-th-selection-select-warp），expand = 展开列 (ui-table-grid-th-expand)，order = 排序/序号列带 ui-table-grid-thead-sort 与 ui-table-grid-thead-sort-btn。nlist 的字段自定义表头（TableColumnViewPlugin）会给它加 ebcoms-nlist-table-th-custom，字段开了标题换行再加 ebcoms-nlist-table-th-autowrap。",
+																		"tips": [
+																			"自定义表头里的备注图标是裸类名 nlist-table-th-custom-remark-icon / nlist-table-th-custom-remark-content（plugins/table-column-view/ThRemark.tsx），没有 ebcoms 前缀"
+																		]
+																	}
+																]
+															}
+														]
+													}
+												]
+											}
+										]
+									},
+									{
+										"tag": "div",
+										"class": [
+											"ui-table-grid-body-outer"
+										],
+										"children": [
+											{
+												"tag": "div",
+												"class": [
+													"ui-table-grid-body"
+												],
+												"children": [
+													{
+														"tag": "div",
+														"class": [
+															"ui-table-grid-scroll"
+														],
+														"when": "存在固定列或按表格滚动时多包一层，固定列的表格副本在 div.ui-table-grid-fixed-left / div.ui-table-grid-fixed-right 里",
+														"children": [
+															{
+																"tag": "div",
+																"class": [
+																	"ui-table-grid-tbody"
+																],
+																"children": [
+																	{
+																		"tag": "tr",
+																		"class": [
+																			"ui-table-grid-tr",
+																			"ebcoms-container-table-row",
+																			"[<rowClassName>]"
+																		],
+																		"desc": "数据行。nlist 的 rowClassName=ebcoms-container-table-row 固定挂在每行上（也有行自定义类时一并拼上）；行上是否可点由 hasEventAction 控制，鼠标样式写在 .ebcoms-container-table-row 或外层 .ebcoms-container-table.hasEventAction",
+																		"children": [
+																			{
+																				"tag": "td",
+																				"class": [
+																					"ui-table-grid-td",
+																					"[ui-table-grid-td-small]",
+																					"[ui-table-grid-td-sticky]",
+																					"[ui-table-grid-td-sticky-left]",
+																					"[ui-table-grid-td-sticky-right]",
+																					"[ui-table-grid-td-selection]",
+																					"[ui-table-grid-td-expand]",
+																					"[ui-table-grid-td-primary]",
+																					"[ui-table-grid-td-multiple-row]"
+																				],
+																				"desc": "单元格。sticky-left/right = 固定列（改固定列背景要写 ui-table-grid-td-sticky，less 里已有 mobile 相关的 sticky 规则）",
+																				"children": [
+																					{
+																						"tag": "div",
+																						"class": [
+																							"ebcoms-container-table-column",
+																							"[hasEventActions]",
+																							"[ebcoms-nlist-flex-1]",
+																							"[ebcoms-nlist-grid-cell-align-{left|center|right}]",
+																							"[ebcoms-nlist-grid-cell-overflow]",
+																							"[text-align-{left|center|right}]",
+																							"[<字段/列自定义 classList>]"
+																						],
+																						"desc": "nlist 的字段容器（table/Column.tsx），用户说『改某列文字/内边距/对齐』就写这一层。hasEventActions = 该字段配了点击事件（整列变成主色 + hover 手型，less 已写）；ebcoms-nlist-flex-1 = 字段宽度选『填充』；grid-cell-align-* + text-align-* = 字段水平对齐；grid-cell-overflow = 开了按行截断；table/index.less 已给它写 padding:6px 12px / height:100% / flex 居中。",
+																						"tips": [
+																							"这一层还带 getColumnStyle 生成的 inline width/文本对齐，想改列宽优先改字段配置",
+																							"less 已写 .ebcoms-container-table-column > span{width:100%;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:pre} —— 纯文本列不用再写省略号"
+																						],
+																						"children": [
+																							{
+																								"tag": "span",
+																								"class": [
+																									"ebcoms-nlist-ellipsis"
+																								],
+																								"when": "字段未开启换行或宽度为『根据内容宽度』",
+																								"ref": "shared.field"
+																							},
+																							"ref:shared.operate"
+																						]
+																					}
+																				]
+																			}
+																		]
+																	}
+																]
+															}
+														]
+													},
+													{
+														"tag": "div",
+														"class": [
+															"ui-table-grid-empty"
+														],
+														"when": "无数据（且 nlist 未替换成 ebcoms-config-noData）",
+														"desc": "表格自带的空数据层（uncontrolled），文案来自 emptyLabel『暂无数据』"
+													}
+												]
+											}
+										]
+									},
+									{
+										"tag": "div",
+										"class": [
+											"ui-table-grid-tfoot",
+											"[ui-table-grid-tfoot-empty]"
+										],
+										"desc": "表格底部：加载更多（div.ui-table-grid-tfoot-more[.ui-table-grid-tfoot-loading|.ui-table-grid-tfoot-all]）与分页（div.ui-table-grid-tfoot-page > div.ui-pagination）；开启统计行时这里是汇总行，配合 div.ebcoms-nlist-column-statistic-pop（列统计浮层，less 已有）",
+										"tips": [
+											"更多分页加载中 nlist 用 .ebcoms-container-table.moreLoading 控制 spin 显隐（table/index.less L40-58）"
+										]
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		],
+		"diffs": [
+			"上下级展开（table-expand）：展开行内容用 div.ebcoms-nlist-expand / div.ebcoms-nlist-table-expand，分页是 div.ui-pagination.ebcoms-nlist-table-pagination + div.ebcoms-nlist-table-pagination-total；子表行落在展开区里",
+			"字段合并/明细字段合并：div.ebcoms-nlist-table-fields-merge（plugins/table-detail-fields-merge）",
+			"表头操作区（excel-table-header-operation 复用）：div.ebcoms-nlist-table-operation-header > -left / -right，里面还有列父级 div.ebcoms-nlist-column-parent",
+			"移动端：行 hover 背景被 list/index.less 与 table/index.less 关掉（.mobile:not(.hasEventAction)），分页收起 pageSize 选择，列宽拖拽关闭",
+			"设计态：值渲染仍走同一套 DOM，但空数据/占位文案换成 ebcoms-config-empty"
+		]
+	},
+	"list": {
+		"when": "config.mode==='2'（普通列表/卡片）；mode 3/13、5/15、4/14、7/17 是同一条树 + 一个插件，看 diffs",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-list-com",
+					"[enable]",
+					"[mergeheaderenable]",
+					"[enableSpreadTop]",
+					"[<插件追加的 wrapClass>]"
+				],
+				"desc": "列表布局最外层（base/view/components/list/index.tsx 的 renderList）。enable = 启用了列表内部工具区；mergeheaderenable = 开了『按钮和搜索合并到标题』；enableSpreadTop = 开了『展开至顶部』（高度 calc(100% - 30px)）。less 已写 height/width 100% + overflow:hidden，以及 enable 时的纵向 flex。",
+				"children": [
+					"ref:shared.toolbar",
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-list-container",
+							"[initLoading]",
+							"[page{pageMode}]",
+							"[flow]",
+							"[mobile]",
+							"[<引擎 className：ebcom ebcom-nlist ebcom-grid ebcom-flow ebcom-view …>]"
+						],
+						"desc": "列表内容容器（index.tsx renderContent）。page{pageMode} → pagenone（无分页）/pagepart（页码分页）/pagescroll（滚动加载）/pagemore（加载更多）；initLoading = 首屏加载中；flow = 流式布局（父级 flow.parent）下高度自适应，min-height:50px。⚠️ 引擎外壳类串会拼在这一层上，所以 DOM 里 .ebcom-nlist 可能同时出现在 #<comId> 和这里。",
+						"tips": [
+							"list/index.less 已针对 page* / initLoading / mobile / flow 写了大量规则（滚动条、分页下拉高度、移动端卡片 padding 10px 20px、ui-list-body 宽度等），改这些场景先看它"
+						],
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ui-list",
+									"[hasEventAction]",
+									"[<listClass>]"
+								],
+								"desc": "⚠️ @weapp/ui 的 List（uncontrolled，base/view/components/list/List.tsx 渲染）。hasEventAction = 行上配了点击事件（less 用它做 hover 背景与手型）。分页、滚动容器都在它内部：div.ui-scroller__wrap > div.ui-scroller__view（min-height:100%）> div.ui-list-scrollview（overflow:initial）/ div.ui-list-body（display:inline-block;min-width:100%），分页是内部的 .ui-list-pagination。",
+								"tips": [
+									"less 已写布局：pagescroll 下 .ui-scroller__wrap 横向 auto、.ui-list-scrollview overflow:initial；pagenone 下 .ui-list{display:block} 且隐藏 .ui-list-footer；移动端 .ui-list-body{display:block} 且禁止横向滚动；桌面端 .ui-list-body{width:max-content}",
+									"自定义滚动条：.ui-scroller__wrap::-webkit-scrollbar 已 display:none（只留虚拟滚动条），.ui-scroller__bar 的 hover 放大也被取消"
+								],
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-nlist-card",
+											"[edc-trans-data-row{color|fontSize|fontWeight|fontStyle}]"
+										],
+										"desc": "一行数据卡片（list/Card.tsx），用户说『改行背景/行内边距/行间距』就写这一层。edc-trans-data-row* = 行级显示转换带下来的字体/颜色（inline + 这些类），less 用 !important 让卡片文字 inherit，改行文字样式时要留意这两个来源。",
+										"tips": [
+											"less 已写：padding:10px 0 10px 20px、非最后一个 child 有 1px 下边框（var(--diviling-line-color)）、hover 背景 #f5f5f5（移动端与 ui-list.hasEventAction 分别处理）",
+											"inline：cardStyle（显示转换/字段扩展可能给行注入样式）直接写在这层，CSS 覆盖要加 #<comId> 前缀提高优先级"
+										],
+										"children": [
+											{
+												"tag": "div",
+												"class": [
+													"ebcoms-nlist-card-layout-wrap"
+												],
+												"desc": "卡片内容包裹层（less 已写 flex + min-width:100% + 字号 var(--font-size-sm) + color:#000），左侧勾选框 div.ebcoms-nlist-item-check 与它平级/在它前面"
+											},
+											{
+												"tag": "div",
+												"class": [
+													"ebcoms-nlist-card-layout",
+													"[fixed]",
+													"[main]",
+													"[flex1]",
+													"[<插件 className>]"
+												],
+												"desc": "卡片内的一列布局（list/Layout.tsx，一个卡片可有多个 layout：图片区/主区）。fixed = 该列设置了固定宽度（inline width，flex-grow:0;flex-shrink:0）；main = 主内容列；main.flex1 = 主列还带『填充』（width:0）。less 已写纵向 flex。",
+												"children": [
+													{
+														"tag": "div",
+														"class": [
+															"ebcoms-nlist-card-layout-row"
+														],
+														"desc": "布局内的一行（list/Row.tsx），less 已写 flex + line-height:1.4 + 非最后一个 child 的 margin-bottom:3px（行间距改这里）",
+														"children": [
+															{
+																"tag": "div",
+																"class": [
+																	"ebcoms-nlist-card-layout-row-main"
+																],
+																"desc": "一行内的字段集合（overflow:hidden），inline 带 align-items（行设置或默认 center）",
+																"children": [
+																	{
+																		"tag": "div",
+																		"class": [
+																			"ebcoms-nlist-card-layout-row-cell",
+																			"[hasEventActions]",
+																			"[ebcoms-nlist-flex-1]",
+																			"[ebcoms-nlist-grid-cell-align-{left|center|right}]",
+																			"[ebcoms-nlist-grid-cell-overflow]",
+																			"[text-align-{left|center|right}]",
+																			"[<字段 classList>]"
+																		],
+																		"desc": "单个字段单元格（list/Cell.tsx），用户说『改字段文字/间距/对齐』写这一层。条件类含义与表格列一致（填充/对齐/按行截断）；hasEventActions = 字段配了点击事件（主色 + 手型，less 已写）。inline 带 width/padding/对齐/white-space，全部来自字段配置。",
+																		"children": [
+																			{
+																				"tag": "div",
+																				"class": [
+																					"ebcoms-nlist-ellipsis"
+																				],
+																				"when": "未开换行或宽度为『根据内容宽度』",
+																				"ref": "shared.field"
+																			},
+																			"ref:shared.operate"
+																		]
+																	}
+																]
+															}
+														]
+													}
+												]
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		],
+		"diffs": [
+			"左图/上图（mode 3/13、5/15，list-left-pic / list-top-pic 插件）：卡片首列变成图片列，渲染 div.ebcoms-nlist-swiperimgs[.contain|.fill|.cover|.none]（imageMode 决定），内部是引擎 Carousel/ImageEffect（uncontrolled）。简约列表下的左图还会多包一层 div.ebcoms-simple-left-list。要改图片圆角/尺寸写 .ebcoms-nlist-swiperimgs",
+			"上图（top-pic）与左图的差别只在卡片 layout 顺序（图片 layout 排在主 layout 之前），DOM 类名相同",
+			"横排（mode 4/14，list-horizontal 插件）：ui List 的 className 多一个 ebcoms-nlist-cross-list，并开启横向滚动；list/index.less 的 .horizontal-list 分支把主列 width 恢复成 unset",
+			"宫格（mode 7/17，list-grid 插件）：list 根多类 ebcoms-nlist-grid-list（mode 17 → ebcoms-slist-grid-list），内容容器额外带 gridList / grid-list / multiCol / gridList-more；宫格每项是 ui-list-item，加载更多在 div.ebcoms-nlist-grid-list .gridList-more",
+			"上下级展开（list-expand 插件）：上级卡片带 ebcoms-nlist-list-superiorField，展开区有 div.ebcoms-nlist-list-expand 与文件夹路径 div.ebcoms-nlist-folder-path，展开图标是 div.ebcoms-nlist-expand-icon",
+			"分组（list-group / new-list-group 插件）：分组标题 div.ebcoms-nlist-list-group-title > -left / -right，计数 .ebcoms-nlist-list-group-count，分组体 div.ebcoms-nlist-list-group-body / -content / -empty / -loading，页脚 div.ebcoms-nlist-list-group-footer[-loading|-all|-more]；整体容器 div.ebcoms-nlist-list-group > div.ebcoms-nlist-list-group-container > -header/-body",
+			"行前缀圆点：div.ebcoms-nlist-list-prefix-dot（plugins/render-list-cell-before）"
+		]
+	},
+	"simple": {
+		"when": "config.mode==='12'（列表样式=简约列表）；左图简约（mode 13）也是这条树 + 图片插件",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-simple-list-com",
+					"[enable]",
+					"[mergeheaderenable]",
+					"[<插件 wrapClass>]"
+				],
+				"desc": "简约列表最外层（base/view/components/simple-list/index.tsx 的 renderList），与 list 树的 ebcoms-list-com 同级同义",
+				"children": [
+					"ref:shared.toolbar",
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-simple-list-container",
+							"[initLoading]",
+							"[page{pageMode}]",
+							"[flow]",
+							"[mobile]",
+							"[<引擎 className>]"
+						],
+						"desc": "简约列表内容容器，条件类与 ebcoms-list-container 完全一致（引擎外壳类串同样会拼到这一层）",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"ebcoms-simple-list",
+									"[hasEventAction]",
+									"[<listClass>]"
+								],
+								"desc": "列表根（components/simple-list/components/SimpleList.tsx）。普通模式直接列卡片；开启分组时改成分组结构（见 diffs），两者都在这层内部。",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-simple-list-body",
+											"[enableGroup]"
+										],
+										"desc": "列表主体；enableGroup = 开启分组。滚动/分页在它内部或之后。"
+									},
+									{
+										"tag": "div",
+										"class": [
+											"ebcoms-slist-card",
+											"[<listItemCls>]"
+										],
+										"when": "非分组模式的一行数据（components/SimpleCard/SCard.tsx）",
+										"desc": "简约列表卡片。内部层级与 list 树完全对应，只是前缀从 ebcoms-nlist 换成 ebcoms-slist：div.ebcoms-slist-card-layout-wrap > div.ebcoms-slist-card-layout[.fixed][.main] > div.ebcoms-slist-card-layout-row > div.ebcoms-slist-card-layout-row-main > div.ebcoms-slist-card-layout-row-cell[.hasEventActions][+字段 classList]。字段截断层仍是 div.ebcoms-nlist-ellipsis（共用）。",
+										"tips": [
+											"未开换行的纯文本仍用 .ebcoms-nlist-ellipsis，但自定义渲染块用 div.ebcoms-grid-cell-custom（RenderHtml/RenderCustomerField 里写死），没有 slist 前缀",
+											"less 已有：components/SimpleCard/card.less、components/SimpleCard/index.less、components/simple-list/index.less"
+										]
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		],
+		"diffs": [
+			"分页：页码分页是 div.ui-pagination（components/Pagination.tsx）；加载更多/滚动加载是 div.ebcoms-simple-list-more-pagination[.is-scroll-more] > div.ebcoms-simple-list-more-pagination-btn，加载完是 div.ebcoms-simple-list-nomore",
+			"分组（enableGroup）：div.ebcoms-simple-list-group-container > div.ebcoms-simple-list-group-title[.active]（内含 -title-before、span.group-title、头像 span.user-avatar、加载 span.user-avatar-loading）/ div.ebcoms-simple-list-group-body / div.ebcoms-simple-list-group-pagination / div.ebcoms-simple-list-group-loading / div.ebcoms-simple-list-group-empty",
+			"宫格（mode 17）：卡片类换成 div.ebcoms-slist-grid-list-item，容器类 ebcoms-slist-grid-list",
+			"左图简约（mode 13）：卡片前插图片列，外层再包 div.ebcoms-simple-left-list，图片本体仍是 div.ebcoms-nlist-swiperimgs",
+			"插件中心卡片（SimpleCardWithPluginCenter / SimpleListCard）各自有独立的 index.less，卡片类沿用 ebcoms-slist-card"
+		]
+	},
+	"excel": {
+		"when": "config.mode 为 8/9/11（Excel 表格样式）",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-excel-table-com",
+					"[enable]",
+					"[mergeheaderenable]"
+				],
+				"desc": "Excel 表格最外层（base/view/components/excel-table/index.tsx），与 ebcoms-table-com 同级同义；结构里还有 div.ebcoms-container 与 div.ebcoms-nlist-content-wrap",
+				"children": [
+					"ref:shared.toolbar",
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-container-excel-table",
+							"[ebcoms-spread]",
+							"[hasEventAction]",
+							"[mobile]",
+							"[loading]",
+							"[<tableClass>]"
+						],
+						"desc": "⚠️ 挂载点是这里（ExcelTable.tsx 把 className 传给 CorsComponent app=\"@weapp/ebdcoms\" compName=\"ExcelTable\"）。真正渲染 Excel 表格的是 weapp-ebdcoms 的 pages/excel-table（内部还有 VirtualTable / TreeTable / Corner / ContextMenu 等），不属于 nlist 源码，uncontrolled。",
+						"tips": [
+							"能用的覆盖钩子：容器 .ebcoms-container-excel-table 与行 .ebcoms-container-excel-table-row；表格内部通用类是 weapp-exceltable-*（例如 less 里用到的 .weapp-exceltable-table-body-td、.weapp-exceltable-footer-wrap）",
+							"excel-table/index.less 还按字段宽度分支覆盖了 .ebcoms-nlist-table-body-row-operate > .tableView-operate（L222/L232/L251），操作列样式改这里"
+						]
+					}
+				]
+			}
+		],
+		"diffs": [
+			"Excel 表格的表头/表体/行列内部 DOM 由 @weapp/ebdcoms 页面渲染，本文档不展开；写样式只用上面的容器类 + #<comId> 限域，或直接用 weapp-exceltable-* 通用类",
+			"表头操作区（ExcelTableHeaderOperationPlugin）在 nlist 侧：div.ebcoms-nlist-table-operation-header > -left / -right，排序下拉是 div.ebcoms-nlist-table-operation-header-order-list[-item|-select]",
+			"自动滚动 / 数据同步 / 表头筛选等插件只改 props 与行为，不额外产出需要定位的 class"
+		]
+	},
+	"notes": [
+		"命名坑：组件 type 是 NList，所以外壳类名是 ebcom-nlist；clsPrefix='ebcoms' 是组件自身类前缀（ebcoms-container-table、ebcoms-nlist-card…），两者别混。源码里搜不到 ebcom-nlist 的拼接处（它由引擎 compUtils.getClassName 生成）",
+		"两个（三个）content 别混：引擎内容槽 div.content（#<comId> 直接子级，已 padding:0）≠ 列表工具区 div.ebcoms-nlist-content-header ≠ 插件包一层的 div.ebcoms-nlist-content-wrap。定位列表主体一律用 ebcoms-(list|simple-list|table|container)-* 容器类",
+		"mode → 组件映射（hooks/useListComponent.tsx）：1=TableView、2=NormalListView、3/13=LeftPicListView、4/14=HorizontalListView、5/15=TopPicListView、7/17=GridListView、8/9/11=ExcelTableView、12=SimpleListView；这些之外的自定义 mode 由插件包 getResolverComponent 提供（eblist/workflow 等二次封装组件），不在本文档。图片/横排/宫格之所以不单独建树：它们只是 NormalListView 或 SimpleListView 再挂一个插件（leftpic-list/toppic-list 的 index.tsx 里能直接看到 `Com = config.mode==='13' ? SimpleListView : NormalListView`），DOM 骨架只有 list 与 simple 两套",
+		"操作列是裸类名 div.tableView-operate（camelCase，无 ebcoms 前缀，写死在 ListOperate 里），外层才是 div.ebcoms-nlist-table-body-row-operate；表头备注同理是 nlist-table-th-custom-remark-*。别按前缀规律猜 ebcoms-nlist-table-operate",
+		"三种样式的表格/列表实现来源不同：表格用 @weapp/ui Table（ui-table-grid-*）、列表与简约列表用 @weapp/ui List + Scroller（ui-list / ui-list-body / ui-list-scrollview / ui-scroller__wrap / ui-scroller__view）、Excel 用 @weapp/ebdcoms 页面。ui-* 的 DOM 不可改，只能在外层 nlist 类上覆盖",
+		"已有 less 钩子（别重复写）：list/index.less —— ebcoms-list-com / ebcoms-list-container 的 page*、initLoading、mobile、flow 分支，ebcoms-nlist-card（padding/下边框/hover）、-card-layout-wrap/-layout/-row/-cell、ebcoms-nlist-ellipsis、ebcoms-nlist-grid-cell-* 对齐与截断、ui-list-* 与 ui-scroller_* 布局、ui-pagination 右对齐；table/index.less —— ebcoms-table-com / ebcoms-container 尺寸、ebcoms-container-table 的 moreLoading、mobile:not(.hasEventAction)、hasEventAction、ebcoms-container-table-column（padding 6px 12px + >span 省略号）、展开与换行分支；simple-list/index.less + SimpleCard/card.less —— ebcoms-simple-list-com 的 enable/mergeheaderenable、ui-pagination 样式；common/ListOperate/index.less —— 操作列；plugins/render-header-merge/index.less —— 合并标题时的 ebcom-nlist 下一整套标题/按钮/搜索布局；view/index.less —— .ebcom-nlist > .content.content{padding:0} 与 IE 下的滚动条修正",
+		"inline 样式多的部位（改 CSS 无效时要想到）：卡片 cardStyle（行级显示转换/扩展字段注入）、字段单元格的 width/padding/对齐/white-space（来自字段配置）、卡片 layout 与行的固定宽高（字段宽度、行高设置）、表格列宽与固定列宽、图片列表的宽高",
+		"分页四套写法：pageMode='part' 用 ui-pagination；'more'/'scroll' 用加载更多（列表走 ui-list-footer 或 ebcoms-simple-list-more-pagination，表格走 ui-table-grid-tfoot-more）；'none' 无分页；pageMode 值会以 page{值} 类出现在容器上，可直接按容器分支写样式",
+		"行/字段点击态：容器上 hasEventAction（列表/表格都有，表格在 .ebcoms-container-table 上）、字段上 hasEventActions（配了点击事件的字段变主色 + 手型），less 已写，别重复；行 hover 背景在移动端被特意关掉",
+		"设计态特有：ebcoms-config-empty、ebcoms-config-noData 的占位、各类 isDesign 类（如操作列 .isDesign{pointer-events:none}）；写页面样式时不要引用这些"
+	]
+}

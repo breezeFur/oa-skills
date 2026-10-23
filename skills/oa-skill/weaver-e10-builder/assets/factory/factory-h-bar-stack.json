@@ -1,0 +1,328 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "f8051e784a1847e8bbcb63e3212e7ca2",
+        "type": "HBarStack",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "f0ab781466024c508909b7bdc5a2f2ee",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "堆积条图",
+          "type": "HBarStack",
+          "title": "横向堆叠柱图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "f7438d",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "be2dc8",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [],
+          "height": 360,
+          "chartType": "HBarStack",
+          "label": {
+            "show": false,
+            "valType": "percent"
+          },
+          "layout": {
+            "i": "c11a1a2961c34c34a51262b18dc8aa58",
+            "x": 0,
+            "y": 22,
+            "w": 4,
+            "h": 34,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 303
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "filterVersion": 1,
+          "hasCssCache": true,
+          "measureName": "",
+          "minMeasures": [],
+          "maxMeasures": [],
+          "yoyDimensions": [],
+          "graphNodeName": {},
+          "graphRelation": {},
+          "graphGroupBy": {},
+          "graphNodeSize": {},
+          "scatterColor": {},
+          "scatterSize": {},
+          "xAxis": {
+            "type": "measures",
+            "data": {}
+          },
+          "yAxis": {},
+          "filter": {},
+          "dataset": {
+            "id": "",
+            "text": "",
+            "type": "LOGIC",
+            "groupId": "weaver-ebuilder-form-service",
+            "isPhysical": true,
+            "usage": "all",
+            "detailTable": false,
+            "objType": "physical",
+            "module": "ebuilder",
+            "appId": "",
+            "isFormModuleSelected": true
+          },
+          "searchConditions": {
+            "commonSearchType": "0",
+            "commonFilters": [],
+            "conditionId": ""
+          },
+          "eventGroup": [],
+          "url": [],
+          "markLine": {
+            "average": false,
+            "fixed": "",
+            "currentDataSetId": ""
+          },
+          "choseLabels": [
+            "fff2d20",
+            "ff808cc"
+          ],
+          "addToolTip": {
+            "addContent": "",
+            "addFields": []
+          },
+          "dataListDisplay": {
+            "fieldList": []
+          },
+          "nodesShowRange": {}
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "f0ab781466024c508909b7bdc5a2f2ee",
+        "type": "HBarStack",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "f8051e784a1847e8bbcb63e3212e7ca2",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "堆积条图",
+          "type": "HBarStack",
+          "title": "横向堆叠柱图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "f7438d",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "be2dc8",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [],
+          "height": 360,
+          "chartType": "HBarStack",
+          "label": {
+            "show": false,
+            "valType": "percent"
+          },
+          "layout": {
+            "i": "b818fcf2b5a640628a0d7a489da83e95",
+            "adaptive": false,
+            "h": 34,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": [],
+          "filterVersion": 1,
+          "measureName": "",
+          "minMeasures": [],
+          "maxMeasures": [],
+          "yoyDimensions": [],
+          "graphNodeName": {},
+          "graphRelation": {},
+          "graphGroupBy": {},
+          "graphNodeSize": {},
+          "scatterColor": {},
+          "scatterSize": {},
+          "xAxis": {
+            "type": "measures",
+            "data": {}
+          },
+          "yAxis": {},
+          "filter": {},
+          "dataset": {
+            "id": "",
+            "text": "",
+            "type": "LOGIC",
+            "groupId": "weaver-ebuilder-form-service",
+            "isPhysical": true,
+            "usage": "all",
+            "detailTable": false,
+            "objType": "physical",
+            "module": "ebuilder",
+            "appId": "",
+            "isFormModuleSelected": true
+          },
+          "searchConditions": {
+            "commonSearchType": "0",
+            "commonFilters": [],
+            "conditionId": ""
+          },
+          "eventGroup": [],
+          "url": [],
+          "markLine": {
+            "average": false,
+            "fixed": "",
+            "currentDataSetId": ""
+          },
+          "choseLabels": [
+            "fff2d20",
+            "ff808cc"
+          ],
+          "addToolTip": {
+            "addContent": "",
+            "addFields": []
+          },
+          "dataListDisplay": {
+            "fieldList": []
+          },
+          "nodesShowRange": {}
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  }
+]

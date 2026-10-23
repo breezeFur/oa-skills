@@ -1,0 +1,169 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "ea4f37edea144f5191694b0cc72159b9",
+        "type": "Picture",
+        "package": "@weapp/ebdbasecoms",
+        "category": "2",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "bf75a3142d184b5c992a13d3745efbc3",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "图片",
+          "type": "Picture",
+          "title": "图片",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "width": "100%",
+          "height": "100%",
+          "path": {
+            "url": "/build/ebdcoms/images/cover/cover_1.png",
+            "type": "assets"
+          },
+          "position": "static",
+          "float": false,
+          "lockStatus": false,
+          "rotate": 0,
+          "opacity": 100,
+          "zIndex": 1,
+          "horizontal": {
+            "shifting": 0,
+            "basis": "left"
+          },
+          "vertical": {
+            "shifting": 0,
+            "basis": "top"
+          },
+          "scale": "",
+          "imageMode": "cover",
+          "imgFormat": "imagePreview",
+          "textTitle": "标题",
+          "textDescribe": "描述",
+          "styles": [
+            {
+              "category": "",
+              "id": "",
+              "useComStyle": true,
+              "customType": "",
+              "themeId": ""
+            }
+          ],
+          "layout": {
+            "i": "a4983a1c0c124a09abc48f4ae5711831",
+            "x": 6,
+            "y": 22,
+            "w": 3,
+            "h": 24,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 303
+          },
+          "flow": {},
+          "disabled": {},
+          "openComStyle": false,
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,1218870220785048537",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,PictureStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdbasecoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "bf75a3142d184b5c992a13d3745efbc3",
+        "type": "Picture",
+        "package": "@weapp/ebdbasecoms",
+        "category": "2",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "ea4f37edea144f5191694b0cc72159b9",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "图片",
+          "type": "Picture",
+          "title": "图片",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "width": "100%",
+          "height": "100%",
+          "path": {
+            "url": "/build/ebdcoms/images/cover/cover_1.png",
+            "type": "assets"
+          },
+          "position": "static",
+          "float": false,
+          "lockStatus": false,
+          "rotate": 0,
+          "opacity": 100,
+          "zIndex": 1,
+          "horizontal": {
+            "shifting": 0,
+            "basis": "left"
+          },
+          "vertical": {
+            "shifting": 0,
+            "basis": "top"
+          },
+          "scale": "",
+          "imageMode": "cover",
+          "imgFormat": "imagePreview",
+          "textTitle": "标题",
+          "textDescribe": "描述",
+          "styles": [
+            {
+              "category": "",
+              "id": "",
+              "useComStyle": true,
+              "customType": "",
+              "themeId": ""
+            }
+          ],
+          "layout": {
+            "i": "e0d70e127d5b4993b7330d07da941051",
+            "adaptive": false,
+            "h": 24,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {}
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,1218870220785048537",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,PictureStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdbasecoms"
+      }
+    ]
+  }
+]

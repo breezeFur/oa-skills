@@ -1,0 +1,36 @@
+{
+  "_comment": "快速构建-列表式 QuicklyParam 示例。替换 sourceId/字段后用于 edc-report create quick --quickly-file",
+  "dataSetList": [
+    {
+      "id": "tmp-ds-001",
+      "sourceType": "1",
+      "sourceId": "REPLACE_SOURCE_ID",
+      "sourceName": "示例表单",
+      "sourceGroup": ""
+    }
+  ],
+  "showField": [
+    {
+      "dataSetId": "tmp-ds-001",
+      "tableId": "main",
+      "name": "REPLACE_FIELD_KEY",
+      "text": "示例列"
+    }
+  ],
+  "fieldConfig": {
+    "tmp-ds-001.main.REPLACE_FIELD_KEY": {
+      "colName": "示例列",
+      "colWidth": "170",
+      "vAlign": "1",
+      "hAlign": "1",
+      "group": "0",
+      "hideCol": "0",
+      "lockCell": "0",
+      "textWrap": "0"
+    }
+  },
+  "theme": "-1",
+  "sheetIndex": 0,
+  "startRow": 0,
+  "startCol": 0
+}

@@ -1,0 +1,242 @@
+{
+  "component": "fast-create 快速新建（weapp-ui-props-design/src/components/fast-create，引擎类型 FastCreate → 外壳类名 ebcom-fastcreate）",
+  "usage": "先按 pickTree 判断落在哪棵树（运行态 / 设计态），两棵树的内容骨架完全一样：一个「输入框 + 加号按钮」的组合框，加一个可选的日期选择器。用户 90% 的需求落在 shared.picker / shared.appendBtn / shared.datePicker 三段里。最大的坑是组件自己写了一批**没有前缀的裸类名**（icon-wrapper、icon-icon-add、icon-icon-date、custom-render-com*、fast-input-main），写选择器必须用 #<comId> 或 .weapp-ui-props-design-fast-create-view 限域。",
+  "legend": {
+    "[cls]": "条件class，满足配置/运行状态才挂载",
+    "{a|b}": "多选一class（同一位置按配置换成其中一个）",
+    "a > b": "父子层级压缩写法，冒号左边是右边的父级",
+    "ref": "引用 shared 里的复用片段，写成 ref:shared.xxx",
+    "uncontrolled": "第三方渲染（@weapp/ui 的弹层/门户/拖拽层），内部结构不保证，只给挂载点",
+    "<comId>": "组件实例 id；引擎外壳的 id 与组件根上的 data-id 都是它，官方样式作用域写成 #<comId>",
+    "weapp-ui-props-design-fast-create": "组件自己写的类名前缀（源码里叫 fastCreateClsPrefix）",
+    "ebcom-": "引擎/框架层类名前缀（ebcomPrefix），本组件源码里搜不到",
+    "ebcoms-": "引擎属性配置面板层类名前缀（weapp-ebdcoms 的 clsPrefix='ebcoms'）",
+    "ui- / ui-m-": "@weapp/ui 的类名；本组件用到的有 ui-input* / ui-date-picker* / ui-icon* / ui-select / ui-form* / ui-trigger*"
+  },
+  "pickTree": "一步判断：外壳 class 含 ebcom-view 是页面运行态 → view-pc；含 ebcom-design 是设计器设计态 → design-pc。两者内容骨架共用 shared.*，只差外壳 class 和一层包裹 div。组件 index.tsx 只导出了 Design / View / Config 三个入口（没有 MDesign / MView / MConfig），所以不存在独立的移动端实现；在移动端设计器里引擎取不到组件，也就没有移动端树。另外组件还有一个与这两棵树无关的「配置面板」DOM（config-panel），那是设计器右侧属性栏，不在页面里。",
+  "root": {
+    "tag": "div",
+    "id": "<comId>",
+    "class": [
+      "ebcom",
+      "ebcom-fastcreate",
+      "{ebcom-grid|ebcom-flow|ebcom-excel}",
+      "{ebcom-view|ebcom-design}",
+      "[mask]",
+      "[content-no-padding]",
+      "[standalone]",
+      "[event-action-click]",
+      "[has-no-header]",
+      "<设计器追加的类名>"
+    ],
+    "desc": "引擎外壳。运行态由 weapp-ebdcoms createView.renderView 生成，设计态由 createDesign.renderDesign 生成，都不在本组件源码里。类型名拼成 ebcom-fastcreate，布局拼成 ebcom-grid/ebcom-flow/ebcom-excel，运行态是 ebcom-view、设计态是 ebcom-design。配置了点击事件动作时运行态会加 event-action-click。",
+    "tips": [
+      "has-no-header 常驻：组件没有 renderHeader，createView 里 showHeader 完全等于 config.titleEnabled，而 Design.defaultProps.config 只给了 title 文案、没给 titleEnabled，所以默认就是 has-no-header。在配置面板打开「显示标题」后这一层才变成 div.header",
+      "mask 只在设计态出现（Design.defaultOpts.mask=true）；运行态没有 mask",
+      "content-no-padding 不会出现（组件没声明 padding=false）；footer 也不会出现（Config.tsx 里 footer:false）",
+      "设计器还会在这个外壳上追加自己的类名（拖拽/选中态等，如 weapp-designer 的 DesignTags 会按 [id=<comId>].ebcom-design 找它），本文档不展开"
+    ],
+    "children": [
+      {
+        "tag": "div",
+        "class": ["header"],
+        "when": "config.titleEnabled===true 才有；默认不出现",
+        "children": [
+          { "tag": "div", "class": ["ebcom-title", "[ebcom-title-design]", "[ebcom-title-richtext]"], "desc": "引擎渲染的组件标题（引擎 createView.renderTitle / createDesign.renderTitle 生成，ebcom-title-design 是设计态专属）。有 {xx} 动态语法时会换成 TransformContent 的 div，类名同样是 ebcom-title" },
+          { "tag": "div", "class": ["ebcoms-header-btns"], "desc": "标题栏操作按钮组（wrapClass 传入），只有配了顶部操作按钮时才有" }
+        ]
+      },
+      {
+        "tag": "div",
+        "class": ["content"],
+        "desc": "引擎内容槽（createView.renderContent / createDesign.renderContent，同一套 view/Content.tsx 包装）。运行态这层绑 onClick 触发组件点击事件动作。⚠️ 这是个通用名，写外层样式别用裸 .content 选择器",
+        "children": ["ref:shared.comRoot"]
+      },
+      {
+        "tag": "div",
+        "class": ["footer"],
+        "when": "footerEnabled===true 才有；本组件 Config.tsx 里 footer:false，永远看不到",
+        "desc": "引擎底部按钮区"
+      }
+    ]
+  },
+  "shared": {
+    "comRoot": {
+      "desc": "组件根（common/index.tsx 的 render 最外层）。运行态由引擎在本层写 data-id=<comId>（createView.onDomMountEvent 的 findDOMNode）。less 已给 margin 与 position:relative，不要重复写。",
+      "chain": "div.weapp-ui-props-design-fast-create-view[.weapp-ui-props-design-fast-create-view-focused]",
+      "tips": [
+        "自己写的规则建议 #<comId> 限域，或 #<comId> .weapp-ui-props-design-fast-create-view",
+        "less 已有：#<comId> 根层 margin: var(--v-spacing-lg) 14px var(--v-spacing-md) 14px、position:relative；-focused 变体（见 shared.state）",
+        "设计态下这一层外面还多一个 ebMiddleware 的裸 div（见 design-pc）"
+      ],
+      "children": ["ref:shared.picker", "ref:shared.datePicker"]
+    },
+    "picker": {
+      "when": "恒定存在（组件必渲染一个输入框）",
+      "desc": "输入框组合（@weapp/ui Input / Input.InputAt）+ 右侧加号按钮。两种形态骨架相同，只有外层类名与「@ 提及弹层」不同：config.relatedPersonnel && config.setPersonnel 同时为真 → InputAt；否则普通 Input。默认数据 moduleType='goal'、relatedPersonnel=false，所以默认渲染的是普通 Input；切到 task 并勾上「@相关人员」才是 InputAt。",
+      "chain": "div.ui-input-group.ui-input-group-append[.{at-input<随机串>}].fast-input-main > div.ui-input-wrap.ui-input-suffix-wrap[.is-focus] > input.ui-input + span.ui-input-suffix > span.ui-input-clear > ref:shared.iconBase … 同层末尾 span.ui-input-append > ref:shared.appendBtn",
+      "tips": [
+        "组件传了 append，@weapp/ui InputWrap 因此把 className 挂到「组合框根 div」上而非 ui-input-wrap 上 —— fast-input-main 一定在 div.ui-input-group 上；反之 div.ui-input-wrap 上不会出现它",
+        "组合框根还带行内 style=\"width:100%\"",
+        "allowClear 让 hasAffix 恒真，所以 ui-input-wrap.ui-input-suffix-wrap 这层恒定存在（哪怕 clear 图标没渲染）；ui-input-clear 只在输入框有内容时才出现",
+        "InputAt 形态下 div.ui-input-group 上会多一个随机类 at-input<随机数>（InputAt 的 comUQClass，用于定位 @ 弹层），不要拿它当选择器；它后面还跟着一个兄弟节点 AtInputPopup（@ 提及弹层，uncontrolled，只给挂载点）",
+        "input.ui-input 上的 data-id 不是 <comId>，是 @weapp/ui Input 自己生成的值 —— 想按实例限域只能用外壳的 #<comId>"
+      ]
+    },
+    "input": {
+      "tag": "input",
+      "class": ["ui-input", "[is-focus]", "[mirror-text]", "[Input 自身的只读/高亮等状态类]"],
+      "desc": "真正的输入元素。⚠️ 传进来的 fast-input-main 不会落到这里（有 append/allowClear 时 InputWrap 拿走了它），别用 .fast-input-main > input 之外的方式去找它。"
+    },
+    "iconBase": {
+      "desc": "@weapp/ui Icon 的通用骨架，本组件所有图标都是这个结构：外层 span 装类名与 title，内层是 svg（懒加载，未加载完时是 div.ui-icon.icon-placeholer）。size 决定 svg 上的尺寸类。",
+      "chain": "span.ui-icon.ui-icon-wrapper[.<传入的 className>][.mirror-text RTL][title=<title>] > svg.ui-icon-{xxs|xs|s|…}.ui-icon-svg.<图标名>",
+      "tips": "改颜色写 svg（.ui-icon-svg 或具体图标名），改外框/间距写 span 上的类；组件 less 里就是这么区分的"
+    },
+    "appendBtn": {
+      "desc": "「加号」新建按钮。整块是传给 Input 的 append 内容，点击事件绑在最内层 div.icon-wrapper 上（不是 span.ui-input-append），点击直接调 createFastData（名称为空会弹 error 提示）。",
+      "chain": "span.ui-input-append > div.icon-wrapper > div.icon-icon-add[title='快速新建'] > ref:shared.iconBase（size='xs'，name='Icon-add-to01'）",
+      "tips": [
+        "三个自定义类名都没有前缀：ui-input-append 是 @weapp/ui 的，icon-wrapper / icon-icon-add 是本组件的 —— 写样式必须限域",
+        "less 已有：.weapp-ui-props-design-fast-create-view .ui-input-group.ui-input-group-append .ui-input-append（flex 居中、宽高 calc(var(--hd) * 35)、右上右下圆角、背景 #eee、cursor:pointer）、.ui-input-group-append .ui-input-wrap{border-right:0}、.icon-wrapper{display:flex;justify-content:space-between}、.icon-wrapper svg{color:#999999}",
+        "聚焦态由 less 的 -focused 规则接管（带 !important）：.icon-icon-add, .ui-input-append 变白字 + var(--primary) 底 + focus 阴影",
+        "hover 态：less 的 .weapp-ui-props-design-fast-create-view:hover .ui-input-append,.ui-input-wrap 改边框色"
+      ]
+    },
+    "datePicker": {
+      "when": "config.showTimeField !== false（默认 true）。外面恒定包一层自己写的 div.icon-icon-date（绝对定位到输入框右侧，title 用的是移入提示 moveInTip）",
+      "desc": "日期选择器（@weapp/ui DatePicker），内部两种完全不同的形态，由 config.manualInput 决定。",
+      "chain": "div.icon-icon-date[title=<moveInTip>] > div.ui-date-picker.ui-date-picker-maxWidth[.ui-date-picker-panel-open][.weapp-ui-props-design-fast-create-view-custom-datePicker]",
+      "tips": [
+        "ui-date-picker-maxWidth 常驻（DatePicker 默认 needMaxWidth=true）；ui-date-picker-panel-open 只在面板打开时加",
+        "less 已有 .weapp-ui-props-design-fast-create-view .icon-icon-date{position:absolute;top/right/height/width} 与 .icon-icon-date .ui-date-picker-wrap-input{border:0;height/line-height: calc(33 * var(--hd))}，不要重复写",
+        "-focused 时 less 会把 .icon-icon-date .ui-input-wrap 的边框和阴影去掉"
+      ],
+      "branchCustom": {
+        "when": "config.manualInput===false（默认）—— 组件传了 customRender + className",
+        "desc": "自定义渲染形态。@weapp/ui DatePicker 用 customRender 的返回值**整体替换**了默认输入框，所以面板打开前 DOM 里根本没有 input，只有 custom-render-com。className（weapp-ui-props-design-fast-create-view-custom-datePicker）落在 ui-date-picker 根上，custom-render-com 是它的子节点。",
+        "chain": "div.ui-date-picker.ui-date-picker-maxWidth.weapp-ui-props-design-fast-create-view-custom-datePicker > div.custom-render-com > span.custom-render-com-value + div > [ref:shared.iconBase.custom-render-com-value-clear] + ref:shared.iconBase",
+        "tips": [
+          "custom-render-com-value 里是 state.date（未选日期时为空字符串，但 span 仍在）",
+          "清除图标（Icon-cancel，size='s'）只在已选日期时渲染，且 less 用 visibility:hidden + hover 才显形（&-value-clear 规则），改显隐要覆盖 visibility 而不是 display",
+          "第二个图标是 Icon-schedule-o（size='s'，无自定义类，title=moveInTip），它和清除图标同在一个**无类名的裸 div** 里 —— 想分别定位只能用 .custom-render-com-value-clear 与 .custom-render-com > div > .ui-icon:last-child",
+          "less 已有：&-custom-datePicker{height:100%}、.custom-render-com（flex + 居中 + padding 0 8px）、-value{color:var(--main-fc);height:28px;line-height:28px}、-value-clear{color:var(--invalid-fc)}、.custom-render-com .ui-icon{color:var(--secondary-fc)}"
+        ]
+      },
+      "branchNative": {
+        "when": "config.manualInput===true —— 没传 customRender / className",
+        "desc": "原生输入框形态，走 @weapp/ui DatePicker 默认渲染。",
+        "chain": "div.ui-date-picker.ui-date-picker-maxWidth > div.ui-date-picker-wrap > div.ui-input-wrap.ui-input-suffix-wrap.ui-date-picker-wrap-input[.is-focus] > input.ui-input + span.ui-input-suffix > ref:shared.iconBase.ui-date-picker-clear[.ui-date-picker-clear-show] + ref:shared.iconBase.ui-date-picker-icon",
+        "tips": [
+          "DatePicker 传了 suffix，所以 ui-input-wrap 这层的 className 是 ui-date-picker-wrap-input（这正是 less 里那条规则的目标）",
+          "两个后缀图标都来自 DatePickerSuffix，size='s'：ui-date-picker-clear（Icon-cancel，clear-show 表示可点时显形）+ ui-date-picker-icon（Icon-schedule-o）"
+        ]
+      },
+      "panel": {
+        "when": "点击日期框、面板可见时才有；面板关闭即卸载（Trigger destroyOnClose）",
+        "desc": "日期面板。由 @weapp/ui Trigger 门户渲染，**不在组件 DOM 内部**：挂在 div.ui-trigger-popupInter-container 下（默认容器是 body，因为组件没传 bindTriggerContainer）。单选 type='day' 时面板根是 div.ui-date-picker-dayPanel，内含 -dayPanel-nav / -dayPanel-content（-dayPanel-weekWrap + -dayPanel-dayWrap）/ -dayPanel-footer-quick。",
+        "tips": [
+          "因为被门户到 body，组件内限域（#<comId> …）选不中面板 —— 要改面板样式必须写在全局作用域（如 .ui-date-picker-dayPanel），或给 DatePicker 传 bindTriggerContainer 后另说",
+          "面板随 type / 当前操作切换（day → month → year 等），class 名随之变化，本文档只保证 dayPanel 这一支"
+        ],
+        "uncontrolled": true
+      }
+    },
+    "state": {
+      "desc": "运行期动态变化（初始 render 里没有），写样式时按「可能出现」对待",
+      "list": [
+        {
+          "condition": "输入框获得焦点（Input/InputAt 的 onFocus）或日期面板打开（DatePicker 的 onPanelOpen）",
+          "targetSelector": "div.weapp-ui-props-design-fast-create-view",
+          "addClass": "weapp-ui-props-design-fast-create-view-focused",
+          "note": "失焦 / onPanelClose 时移除；less 已按它写了加号按钮的选中色和输入框聚焦边框。命名里的 quickAddInput 是历史遗留叫法，跟 DOM 里没有对应元素"
+        },
+        {
+          "condition": "面板可见",
+          "targetSelector": "div.ui-date-picker",
+          "addClass": "ui-date-picker-panel-open"
+        },
+        {
+          "condition": "输入框有内容",
+          "targetSelector": "div.ui-input-wrap 内",
+          "addClass": "（新增节点 span.ui-input-clear）",
+          "note": "清空后节点消失"
+        },
+        {
+          "condition": "输入框聚焦 / 失焦",
+          "targetSelector": "div.ui-input-group、div.ui-input-wrap、input.ui-input",
+          "addClass": "is-focus",
+          "note": "is-focus 由 @weapp/ui Input 自己加，不要手写"
+        },
+        {
+          "condition": "选中 / 清空日期",
+          "targetSelector": "span.custom-render-com-value",
+          "addClass": "（文本变化，同时清除图标出现/消失）"
+        },
+        {
+          "condition": "组件被事件动作隐藏",
+          "targetSelector": "引擎外壳 #<comId>",
+          "addClass": "ebcom-display-none",
+          "note": "同时写 style.display='none'"
+        }
+      ]
+    }
+  },
+  "view-pc": {
+    "when": "页面运行态（外壳含 ebcom-view）。源码 view/View.tsx → ebMiddleware → common/index.tsx；外壳来自 weapp-ebdcoms createView.renderView",
+    "tree": [
+      "div#<comId>.ebcom.ebcom-fastcreate.{ebcom-grid|ebcom-flow|ebcom-excel}.ebcom-view[.has-no-header][.event-action-click]",
+      "div.content（引擎内容槽，绑 onClick）",
+      "ref:shared.comRoot → div.weapp-ui-props-design-fast-create-view[.-focused]（引擎在本层写 data-id=<comId>）",
+      "ref:shared.picker",
+      "ref:shared.datePicker（showTimeField 时）"
+    ],
+    "diffs": [
+      "运行态没有 ebMiddleware 为 Design 额外包的那一层裸 div，div.content 直接就是组件根",
+      "外壳没有 mask",
+      "组件 config 结构总是非空（View 分支不走「请设置内容」逻辑，那是 Design 专属）"
+    ]
+  },
+  "design-pc": {
+    "when": "设计器设计态（外壳含 ebcom-design）。源码 design/Design.tsx → ebMiddleware → common/index.tsx；外壳来自 weapp-ebdcoms createDesign.renderDesign",
+    "tree": [
+      "div#<comId>.ebcom.ebcom-fastcreate.{ebcom-grid|ebcom-flow|ebcom-excel}.ebcom-design.mask[.has-no-header]（mask 来自 Design.defaultOpts.mask=true；设计器还会在外壳上追加自己的类）",
+      "div.content（引擎内容槽，同一套 view/Content.tsx 包装）",
+      "div（ebMiddleware 在 Design 分支多包的一层裸 div，没有类名 —— 运行态没有这层）",
+      "ref:shared.comRoot",
+      "ref:shared.picker",
+      "ref:shared.datePicker"
+    ],
+    "diffs": [
+      "多一层无类名的裸 div，所以设计态里组件根的选择器要写成 #<comId> .weapp-ui-props-design-fast-create-view（不能写 > 直接子代）",
+      "外壳多 mask；标题存在时是 div.ebcom-title.ebcom-title-design",
+      "组件 config 为空对象时，ebMiddleware 直接渲染 div.weapp-ui-props-design-eb-middleware-empty（文案「请设置内容」），此时组件根完全不存在",
+      "里面的输入框/图标仍是真实 DOM，但设计器会拦截点击用于选中组件"
+    ]
+  },
+  "config-panel": {
+    "when": "设计器右侧属性面板。由 weapp-ebdcoms 的 createConfig → core/config/Form.tsx 渲染，与页面里的 ebcom-view / ebcom-design 外壳无关",
+    "tree": [
+      "div.ui-form.ebcoms-config-form.ebcoms-config-{组件 type，即 FastCreate}（Form.tsx 给 @weapp/ui Form 拼的 className；外部还会再拼一层传递进来的 className）",
+      "div.ui-form-row[.ui-form-row-first][.<该行的 wrapClassName>]（layout 里每个数组一行；本组件每个配置项单独成一行）",
+      "div.ui-form-col… > div.ui-formItem[.ui-formItem-module][.ui-formItem-noLabel][.allFieldReadOnly]（@weapp/ui FormItem）",
+      "div.ui-formItem… > 标签 span.ui-formItem-label-span > span.ui-formItem-label-span-content（label 由 weapp-designer FormPanel 的 customRenderLabel 渲染）+ 控件层",
+      "控件层：{div.ui-select（ModuleType / TimeFieldSelect 两个自定义 Select，itemType:'CUSTOM'）| 开关（itemType:'SWITCH'）| 多语言输入（itemType:'LOCALE'）}"
+    ],
+    "tips": [
+      "Config.tsx 里那两套 less 钩子 —— .weapp-ui-props-design-fast-create-config-isHoldRight（text-align:right，挂在 4 个 SWITCH 项与 moveInTip/searchTip 上）和 .weapp-ui-props-design-fast-create-config-select（.ui-select{width:100%}，挂在 setPersonnel 上）—— 是 item 的 wrapClassName，@weapp/ui Form 只在 **layout 行本身携带 wrapClassName** 时才把它拼到 div.ui-form-row 上；本组件的 layout 是 Config.tsx 显式声明的、行里没带这个字段，所以这两条规则在 DOM 上取不到目标元素。改配置面板样式请按 div.ui-form-row / div.ui-formItem 写，写之前先在 DevTools 里确认",
+      "哪些行会出现由 Config.tsx 的 customHide 决定：moduleType==='goal' 时隐藏 relatedPersonnel 与 setPersonnel；showTimeField 为假时隐藏 chooseField / moveInTip / manualInput。所以配置面板的可见行随数据变化，别用 nth-child 定位",
+      "内层 Select 只传了 data/value/onChange/style，根类就是 @weapp/ui 的 div.ui-select（less 里 -config-select 想量的就是它）"
+    ]
+  },
+  "notes": [
+    "四类前缀要分清：weapp-ui-props-design-fast-create-*（组件自己写的，源码里是 fastCreateClsPrefix）；ebcom-*（引擎外壳，本组件源码搜不到）；ui-*（@weapp/ui 组件）；ebcoms-*（设计器属性配置面板）。",
+    "本组件最大的定位坑：几个高频元素的类名是**裸名**，没有前缀 —— div.icon-wrapper / div.icon-icon-add / div.icon-icon-date / div.custom-render-com*（含 -value / -value-clear）/ className='fast-input-main'。它们和其它组件、其它库撞名概率很高，写选择器一律用 #<comId> 或 .weapp-ui-props-design-fast-create-view 限域。",
+    "less 里的死选择器（不要照着写）：① .icon-wrapper .date-popup —— 全仓库搜不到 date-popup 这个类名，日期面板真实结构是 div.ui-trigger-popupInter-container > div.ui-trigger-popupInner > div.ui-date-picker-dayPanel，而且被门户到 body，组件内怎么限域都选不中；② -config-isHoldRight / -config-select（原因见 config-panel.tips，wrapClassName 没落到 layout 行上）。",
+    "less 里已经写好的钩子（别重复写）：组件根 margin + position:relative；.ui-input-group.ui-input-group-append 的 cursor 与 .ui-input-wrap{border-right:0}；.ui-input-append 的尺寸/圆角/灰底/flex 居中；.icon-wrapper 的 flex 与 svg 颜色；.icon-icon-date 的绝对定位与 .ui-date-picker-wrap-input 的边框/行高；-custom-datePicker 与 .custom-render-com 系列（flex、值颜色、清除图标 hover 显形、.ui-icon 颜色）；-focused 下加号按钮的选中色与输入框聚焦边框；:hover 下 append 与 wrap 的边框色。",
+    "「输入框」有两层包装容易找错：div.ui-input-group（组合框根，带 fast-input-main 和 append）→ div.ui-input-wrap（带 ui-input-suffix-wrap；有 append 时它**不带** fast-input-main）→ input.ui-input（真正的输入元素）。想改整体宽度/边框写组合框根，想改输入区写 input.ui-input。",
+    "日期框的两种形态差别很大（manualInput=false 走 customRender，DOM 里连 input 都没有；=true 才是原生 ui-date-picker-wrap-input），调样式前先确认这个配置值。",
+    "所有图标都走 @weapp/ui Icon：颜色写在 svg（.ui-icon-svg 或 .Icon-xxx），尺寸/间距写在 span 的类上（span 上恒定有 ui-icon ui-icon-wrapper）。",
+    "反查源码：外壳与内容槽在 weapp-ebdcoms/src/components/core/view/createView.tsx（renderView/renderContent）与 design/createDesign.tsx（renderDesign/renderContent）；组件 DOM 全部在 weapp-ui-props-design/src/components/fast-create/common/index.tsx（render / renderAppend / customRender）；类名前缀在 src/constants/prefix.ts；已有样式在 src/components/fast-create/style/index.less；配置面板在 src/components/fast-create/config/Config.tsx + weapp-ebdcoms/src/components/core/config/Form.tsx + weapp-designer/src/common/form/{Form,Transform,FormRow}.tsx；@weapp/ui 侧在 weapp-ui/src/components/{input,date-picker,icon}/。"
+  ]
+}

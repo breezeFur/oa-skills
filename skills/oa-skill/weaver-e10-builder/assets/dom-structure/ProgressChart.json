@@ -1,0 +1,299 @@
+{
+	"component": "progress-bar 进度条（weapp-ebddatacoms/src/components/progress-bar；注册 type 与导出名都是 ProgressChart → 引擎外壳类名 ebcom-progresschart）",
+	"usage": "先按样式面板『样式』(styles 里 category==='13' 的那条，base.progressType) 选分树：base（默认，条形）走 base 树；circle（环形）/ semicircle（半圆）走 circle 树。选到树后，组件根是 shared.comRoot，数值/名称区是 shared.infoBox。用户说『改进度条颜色/宽度』时先分清：条形分支的进度是 div.progress-bar-box 的 inline 样式（来自 rangeColor 配置，不是 CSS）；环形/半圆分支的圆环是 canvas，没有 CSS 钩子。",
+	"legend": {
+		"[cls]": "条件class，满足业务条件才挂载",
+		"{a|b}": "多选一class（同一位置按配置换成其中一个）",
+		"a > b": "父子层级压缩写法，冒号左边是右边的父级",
+		"ref": "引用 shared 里的复用片段，写成 ref:shared.xxx",
+		"uncontrolled": "第三方渲染（echarts canvas、设计器拖拽层、子组件），内部结构不可控，只给挂载点",
+		"<comId>": "组件实例 id；引擎外壳的 id 与官方样式作用域里的都是它，作用域写成 #<comId>.ebcom",
+		"ebcoms-": "组件/ebdcoms 自己写的类名前缀（clsPrefix='ebcoms'）",
+		"ebcom-": "引擎/框架层的类名前缀（ebcomPrefix='ebcom'），组件源码里搜不到",
+		"ui-": "@weapp/ui 的类名（本组件只用到 EChart 的 ui-echarts）"
+	},
+	"pickTree": "两步。① 分支：progressType==='base'（或没配样式）→ base 树（条形）；'circle'/'semicircle' → circle 树（echarts 画的环）。② 运行态/设计态/PC/移动端都不换骨架：外壳 class 含 ebcom-view（运行）或 ebcom-design（设计）+ mask，移动端多一个 ebcom-m，组件自己的 DOM 一模一样，只有设计态标题多 ebcom-title-design、运行态首帧有 100ms 空档（见 shared.comRoot）。",
+	"root": {
+		"tag": "div",
+		"id": "<comId>",
+		"class": [
+			"ebcom",
+			"ebcom-progresschart",
+			"{ebcom-grid|ebcom-flow|ebcom-excel}",
+			"[ebcom-m]",
+			"{ebcom-view|ebcom-design}",
+			"[has-no-header]",
+			"[mask]",
+			"[event-action-click]",
+			"<布局/设计器追加的类名>"
+		],
+		"desc": "引擎外壳，由 weapp-ebdcoms 的 createView.renderView（运行态）/ createDesign.renderDesign（设计态）生成，不在本组件源码里。类型段固定 ebcom-progresschart（type=ProgressChart 小写拼接）；布局段 ebcom-grid/ebcom-flow/ebcom-excel；运行态 ebcom-view、设计态 ebcom-design；移动端（page.client==='MOBILE'，MView/MDesign 就是同一个组件）只多一个 ebcom-m。官方样式作用域就是 #<comId>.ebcom（getProgressChartStyles 里 scope=`#${comId}.ebcom`），照它限域最稳。",
+		"tips": [
+			"mask 只在设计态出现：ProgressBarDesign.defaultOpts.mask=true（网格布局由 ebdcoms 加、流式布局由基础设计器加）；它只把外壳直接子元素的 pointer-events 关掉，不影响组件内部样式",
+			"has-no-header 只在 titleEnabled 为假时出现；页面 config 里 titleEnabled 通常为 true（见 doc/View.tsx），所以 .header 一般都在",
+			"不会出现的类名：standalone（Design/View 都没声明 render.standalone）、content-no-padding（没声明 padding=false）"
+		],
+		"children": [
+			{
+				"tag": "div",
+				"class": [
+					"header"
+				],
+				"when": "titleEnabled 为真才有（默认布局下一般都有）",
+				"desc": "引擎标题栏（flex 行 / min-height 40px / 底部 1px 分隔线，design/common.less 已写好，别重复）。设计态标题文字多一个 ebcom-title-design。",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-title-icon",
+							"[noBgColor]"
+						],
+						"when": "config.titleIcon.path 有值",
+						"desc": "标题左侧图标（引擎 TitleIconCom），内部是 img/svg（img.ebcoms-assets-img）；noBgColor = titleIcon.style.fillType==='none'"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcom-title",
+							"[ebcom-title-design]",
+							"[ebcom-title-richtext]"
+						],
+						"desc": "组件标题文字（config.title；用了 {xx} 动态语法时内容由引擎 TransformContent 渲染，类名不变）；richtext = title 是富文本对象"
+					},
+					{
+						"tag": "div",
+						"class": [
+							"ebcoms-header-btns"
+						],
+						"when": "标题操作按钮开启（topOperatBtns.enabled）",
+						"desc": "引擎标题栏按钮组（wrapClass 传入）"
+					}
+				]
+			},
+			{
+				"tag": "div",
+				"class": [
+					"content"
+				],
+				"desc": "组件根的直接父级，只有 content 一个类。运行态是 createView.renderContent 的 div（点击事件绑在这层），设计态是 ViewContent 的 div —— 两态同一个类名。样式生成器给本组件生成的 `.content{display:flex;align-items:center;justify-content:center;}` 加前缀后正好命中这一层。⚠️ 它和组件根 div.ebcoms-progress-bar-content 是两个元素。",
+				"tips": [
+					"padding:10px 15px / flex:1 1 auto / overflow:auto 是 design/common.less 给所有引擎外壳 &>.content 的默认值",
+					"例外：样式库卡片缩略图里是 .weapp-ebde-stylib-card-thumb .ebcom-progresschart .content{padding:0 15px}（缩略图专用，页面里不生效）"
+				],
+				"children": [
+					"ref:base.tree | ref:circle.tree"
+				]
+			},
+			{
+				"tag": "div",
+				"class": [
+					"footer"
+				],
+				"when": "footerEnabled 为真且底部按钮开启才有；进度条默认 config 没有 footerEnabled，通常看不到",
+				"desc": "引擎底部按钮区"
+			}
+		]
+	},
+	"shared": {
+		"comRoot": {
+			"tag": "div",
+			"class": [
+				"ebcoms-progress-bar-content"
+			],
+			"desc": "组件根（common/index.tsx 两条分支共用的最外层 div）：position:relative + width/height 100% + flex 居中（less 已写）。两条分支只差它内部放什么 —— base 放 div.bg-box，circle 放 div.ui-echarts。circle/semicircle 时它还多写一个 inline height = outsideRadius+2（环形 85*2+2=172px、半圆 85+2=87px，随样式配置的 outsideRadius 变）。",
+			"tips": [
+				"写规则一定用 #<comId> .ebcoms-progress-bar-content 限域；裸 .info-box/.text-box/.name-box/.circle 都太通用，容易串到别的组件",
+				"运行态挂载首帧 View 返回 false（等 100ms 才渲染 Index），这段时间这个 div 不存在；引擎往根节点注入的 data-id 也因此很可能没写上 → 定位用 #<comId>，别用 [data-id]",
+				"数字/名称字体、进度条高度/底色/圆角这些样式是 100ms 后由 getProgressChartStyles 注入 <style> 才有的（选择器带 #<comId>.ebcom 前缀），刚加载时抓不到别以为没生效"
+			]
+		},
+		"infoBox": {
+			"tag": "div",
+			"class": [
+				"info-box"
+			],
+			"desc": "数值 + 名称区，两条分支都有、都在组件根下，内部按 showText / showName 各渲染一个 div。两个开关都关时这层仍存在但为空。less 已给 text-align:center + font-size:14px。环形/半圆分支这层还带 inline 定位（position:absolute; left:0; right:0，半圆再加 top = outsideRadius-insideRadius+insideRadius/2）叠在 canvas 上；条形分支无 inline，作为 flex 子项排在 bg-box 右侧。",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"text-box"
+					],
+					"when": "config.showText 为真",
+					"ref": "shared.textBox"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"name-box"
+					],
+					"when": "config.showName 为真",
+					"ref": "shared.nameBox"
+				}
+			]
+		},
+		"textBox": {
+			"tag": "div",
+			"class": [
+				"text-box"
+			],
+			"desc": "数值文本，title 属性同内容。两种形态：结果值/百分比（valueType==='resultValue'）是纯文本，如 '61.8%'；原始值（'originValue'）是 '分子/分母'，环形/半圆分支会拆成 span/span 两段（条形分支不拆，整串直接是文本）。超过 100% 时显示值仍按实际算（宽度/角度/取色按 100 封顶）。",
+			"tips": [
+				"环形/半圆分支这层带 inline color/fontSize/fontWeight/fontStyle（来自样式面板『数字文本』）→ 写 CSS 改颜色会被 inline 覆盖，要改就改样式配置或提更高优先级选择器",
+				"less 已给 >span:nth-child(1)/(2) 写了左右 padding 和 max-width:85px + 省略号截断"
+			]
+		},
+		"nameBox": {
+			"tag": "div",
+			"class": [
+				"name-box"
+			],
+			"desc": "名称文本（分子名称/分母名称），内容是 dangerouslySetInnerHTML 注入的 `<span>分子</span>/<span>分母</span>`，所以样式要打在 span 上；title 属性是去掉 span 标签后的纯文本。颜色/字号由样式面板『名称文本』生成 `#<comId>.ebcom .ebcoms-progress-bar-content .name-box{...}`，less 默认 color:#ababab。",
+			"tips": [
+				"两个名称都为空时可能出现只有 '/' 的 name-box"
+			]
+		}
+	},
+	"base": {
+		"when": "progressType==='base'（默认值，条形进度条）",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-progress-bar-content"
+				],
+				"ref": "shared.comRoot",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"bg-box"
+						],
+						"desc": "条形轨道：flex:1 + height:6px + border-radius:3px（less 已写，会被样式面板『进度条高度/圆角/底色』生成的规则覆盖）。它下面三个子元素都是 position:absolute 叠在一起。",
+						"children": [
+							{
+								"tag": "div",
+								"class": [
+									"empty-box"
+								],
+								"desc": "轨道底色层（inline 无样式）。默认 #eaf1fd，由 less 和生成规则 `... .bg-box .empty-box{background-color:...}` 控制，改底色请改样式面板『进度条背景色』"
+							},
+							{
+								"tag": "div",
+								"class": [
+									"progress-bar-box"
+								],
+								"desc": "已完成进度层，宽度/颜色全是 inline：width = 百分比字符串（如 '61.8%'）、backgroundColor = rangeColor 命中那一档的颜色；配了渐变色时改写成 backgroundImage = linear-gradient(...)。所以「改进度条颜色/长度」不是写 CSS 的事，走配置。max-width:100%，height 和圆角继承 bg-box 的规则。",
+								"tips": [
+									"进度值 0 时 width 为 '0%'，这层仍在 DOM 里（不是不渲染）"
+								]
+							},
+							{
+								"tag": "div",
+								"class": [
+									"circle",
+									"[clip-auto]"
+								],
+								"desc": "圆环进度结构（4 个 div.percent：left/right × border-placeholder/实色），less 用 clip + border 画弧。⚠️ base 分支里它恒为 display:none（less 和生成规则都写了），是 DOM 占位，不要为条形进度条写 .percent 样式。clip-auto 在进度 >50% 时挂上（去掉 clip 限制）。",
+								"children": [
+									{
+										"tag": "div",
+										"class": [
+											"percent",
+											"left",
+											"border-placeholder"
+										],
+										"desc": "左半边占位弧（inline transform:rotate），border-color #fff"
+									},
+									{
+										"tag": "div",
+										"class": [
+											"percent",
+											"left"
+										],
+										"desc": "左半边实色弧（inline transform + borderColor = 当前档位颜色）"
+									},
+									{
+										"tag": "div",
+										"class": [
+											"percent",
+											"right",
+											"border-placeholder",
+											"[wth0]"
+										],
+										"desc": "右半边占位弧；wth0 在进度 ≤50% 时挂上（border-width:0 隐藏）"
+									},
+									{
+										"tag": "div",
+										"class": [
+											"percent",
+											"right",
+											"[wth0]"
+										],
+										"desc": "右半边实色弧（inline borderColor）"
+									}
+								]
+							}
+						]
+					},
+					{
+						"tag": "div",
+						"class": [
+							"info-box"
+						],
+						"ref": "shared.infoBox"
+					}
+				]
+			}
+		]
+	},
+	"circle": {
+		"when": "progressType==='circle'（环形）或 'semicircle'（半圆）",
+		"tree": [
+			{
+				"tag": "div",
+				"class": [
+					"ebcoms-progress-bar-content"
+				],
+				"ref": "shared.comRoot",
+				"desc": "组件根（rel 见 shared.comRoot），这棵树里带 inline height，内部只有图表 + 浮在图表上的 info-box",
+				"children": [
+					{
+						"tag": "div",
+						"class": [
+							"ui-echarts"
+						],
+						"desc": "@weapp/ui 的 EChart（由 common/Circle.tsx 渲染），height 被本组件 less 覆盖成 100%（ui 默认 300px）。里面是 echarts 自己注入的 div（inline style 定尺寸）+ canvas —— 结构不可控，只能改这层尺寸，拿不到环的 CSS 钩子。",
+						"tips": [
+							"EChart 是 React.lazy + Suspense（fallback 渲染 null），图表 chunk 加载完成前这层不存在",
+							"canvas 尺寸跟随 div.ui-echarts；组件监听 window resize 和 com.resize 触发 resize"
+						]
+					},
+					{
+						"tag": "div",
+						"class": [
+							"info-box"
+						],
+						"ref": "shared.infoBox",
+						"desc": "绝对定位叠在环中央（inline left/right:0，半圆再加 top）"
+					}
+				]
+			}
+		],
+		"diffs": [
+			"环形 vs 半圆：DOM 完全一样，差别只在 echarts option（center/startAngle/top、渐变角度）和 info-box 多一个 inline top",
+			"base 分支的 bg-box / .circle / .percent 结构在这棵树里根本不存在 —— 别用 .bg-box 想改环形",
+			"生成规则对这两个类型只输出 `#<comId>.ebcom .content{display:flex;align-items:center;justify-content:center;}`；getProgressChartStyles 里那段用 border 画环的旧实现整段被注释掉了，不要照着它写",
+			"环的半径/底色/圆角只能通过样式面板 progressRadius / progressBgColor / progressCircleBorderRadius 配（写进 echarts option）"
+		]
+	},
+	"notes": [
+		"命名坑：组件 type 是 ProgressChart，所以外壳是 ebcom-progresschart；constants/index.ts 里的 `ProgressBar='ProgressBar'` 是过滤条件字段类型枚举，跟组件 type 无关；`ebcoms-com-progressbar` 和 `ebcom-progressbar` 只出现在 getProgressChartStyles 的正则里（那是它准备剥掉的前缀），DOM 上不存在这两个类，别拿来当选择器",
+		"两个 content 别混：引擎内容槽 div.content（#<comId>.ebcom 的直接子级）≠ 组件根 div.ebcoms-progress-bar-content",
+		"less 里已经写好的钩子（别重复）：.ebcoms-progress-bar-content（100% 尺寸 + relative + flex 居中）、.bg-box（flex:1/6px/圆角 3px）、.empty-box（#eaf1fd）、.progress-bar-box（max-width:100%/圆角 3px）、.circle（display:none）、.info-box（居中/14px）、.text-box（#333 + 加粗 + span 截断）、.name-box（#ababab + span 截断）、.circle/.percent/.clip-auto/.wth0/.border-placeholder（圆环几何）、.ebcoms-progress-bar-content .ui-echarts{height:100%}",
+		"运行时由 getProgressChartStyles 注入的规则（全部自动加 #<comId>.ebcom 前缀）：.content{display:flex;align-items:center;justify-content:center;}（两种分支都生成）；base 额外生成 .bg-box/.empty-box/.progress-bar-box/.circle 的显隐与尺寸；配置项 progressHeight/progressBorderRadius/progressBgColor 覆盖 bg-box/empty-box/progress-bar-box；numberfont → .text-box、namefont → .name-box。想覆盖它要拼同样的前缀和选择器顺序",
+		"样式面板里手写 CSS 代码时：.ebcoms-com-progressbar / .ebcom-progressbar 会被正则剥掉一行（正则里写的是 progressbar），写 .ebcom-progresschart 不会被剥 —— 直接用语义类名最省事",
+		"组件配置面板里的『进度条颜色』(RangeColor → div.ebcoms-charts-config-rangeColor / -rcItem / -rcc-popwrap 等) 属于设计器右侧面板，不在页面 DOM 里，写页面样式时不要引用这些类",
+		"数值口径：dataset/denominator 支持 {xx} 动态语法解析（设计态跳过解析）；分母为 0 时按 100 算；比例 >100% 时宽度/取色/角度按 100 封顶"
+	]
+}

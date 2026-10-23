@@ -1,0 +1,7 @@
+{
+  "_comment": "侧栏数据排序 sortData 示例 — edc-report dataset sort save --file",
+  "example": [
+    { "fieldId": "DATASET_ID.TABLE_ID.field_xxx", "orderType": "asc" },
+    { "fieldId": "DATASET_ID.TABLE_ID.field_yyy", "orderType": "desc" }
+  ]
+}

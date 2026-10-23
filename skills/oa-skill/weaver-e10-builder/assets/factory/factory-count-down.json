@@ -1,0 +1,198 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "bc78ba49efd0452687e59a444be46ccc",
+        "type": "CountDown",
+        "package": "@weapp/ebdothercoms",
+        "category": "912383476361125895",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "b469fadf600540dea6e44e9e7f03086e",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "倒计时",
+          "type": "CountDown",
+          "title": "倒计时",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "f35e4a",
+                "showType": "FONTBTN",
+                "btnFrom": "DEFAULT",
+                "showContent": "跳过节假日",
+                "event": {
+                  "to": "SKIPHOILDAY",
+                  "value": "跳过节假日",
+                  "customRenderConfig": "跳过节假日"
+                },
+                "isSkipBtn": true,
+                "skipStatus": false,
+                "isOpen": false,
+                "showOrder": 4,
+                "showTypeData": [
+                  "FONTBTN"
+                ]
+              }
+            ]
+          },
+          "styles": [
+            {
+              "id": "192",
+              "category": "9",
+              "customType": "",
+              "useCustom": false,
+              "themeId": "",
+              "useComStyle": true
+            }
+          ],
+          "footerEnabled": false,
+          "showTopOperatBtnConfig": true,
+          "timingType": "day-hour-minute-second",
+          "endType": "specifiedTime",
+          "deadline": "default",
+          "paramName": "",
+          "layout": {
+            "i": "e7d166480a154f69a88b24b821324cc4",
+            "x": 0,
+            "y": 139.5590909090909,
+            "w": 6,
+            "h": 15,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1596
+          },
+          "flow": {},
+          "disabled": {},
+          "countDownSettings": [
+            {
+              "id": "f8a12e97f0a04d9f86f16fa7b8488c92",
+              "name": "",
+              "timingType": "day-hour-minute-second",
+              "endType": "specifiedTime",
+              "deadline": "2026-08-05T16:50:59",
+              "paramName": ""
+            }
+          ],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,9",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,CountDownConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdothercoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "b469fadf600540dea6e44e9e7f03086e",
+        "type": "CountDown",
+        "package": "@weapp/ebdothercoms",
+        "category": "912383476361125895",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "bc78ba49efd0452687e59a444be46ccc",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "倒计时",
+          "type": "CountDown",
+          "title": "倒计时",
+          "titleEnabled": true,
+          "footerEnabled": false,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "f35e4a",
+                "showType": "FONTBTN",
+                "btnFrom": "DEFAULT",
+                "showContent": "跳过节假日",
+                "event": {
+                  "to": "SKIPHOILDAY",
+                  "value": "跳过节假日",
+                  "customRenderConfig": "跳过节假日"
+                },
+                "isSkipBtn": true,
+                "skipStatus": false,
+                "isOpen": false,
+                "showOrder": 4,
+                "showTypeData": [
+                  "FONTBTN"
+                ]
+              }
+            ]
+          },
+          "styles": [
+            {
+              "id": "192",
+              "category": "9",
+              "customType": "",
+              "useCustom": false,
+              "themeId": "",
+              "useComStyle": true
+            }
+          ],
+          "timingType": "day-hour-minute-second",
+          "showTopOperatBtnConfig": true,
+          "endType": "specifiedTime",
+          "deadline": "default",
+          "paramName": "",
+          "layout": {
+            "i": "c15f6d5bd3f7442cbfa933bbf025697d",
+            "adaptive": true,
+            "h": 15,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "countDownSettings": [
+            {
+              "id": "f8a12e97f0a04d9f86f16fa7b8488c92",
+              "name": "",
+              "timingType": "day-hour-minute-second",
+              "endType": "specifiedTime",
+              "deadline": "2026-08-05T16:50:59",
+              "paramName": ""
+            }
+          ]
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,9",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,CountDownConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdothercoms"
+      }
+    ]
+  }
+]

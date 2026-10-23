@@ -1,0 +1,325 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "d9cdee5542ef4d78903db958e1d1a109",
+        "type": "Calendar",
+        "package": "@weapp/ebddatacoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "ed1d9649e95d48588b7ef6880d9b2081",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "日历",
+          "type": "Calendar",
+          "title": "",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "calendarType": "1",
+          "condition": [],
+          "defaultView": "3",
+          "weekStart": "-7",
+          "filter": {
+            "commonFilters": []
+          },
+          "showViewModeChange": true,
+          "viewModeSelectType": "tile",
+          "showLunar": true,
+          "useAttendanceHoliday": false,
+          "monthChangeAutoSelectFirstDate": true,
+          "baseInfoForMulp": {
+            "startTimeRange": 9,
+            "endTimeRange": 18
+          },
+          "dataSetNodes": [],
+          "baseInfo": {
+            "use_viewModeChangeHideItem": true
+          },
+          "historyData": {},
+          "notTransformField": [
+            "topOperatBtns",
+            "bottomOperatBtns"
+          ],
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "69c202",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-more05",
+                  "title": "更多",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "JUMPLINK",
+                  "value": [
+                    [
+                      {
+                        "type": "CLICK",
+                        "name": "单击",
+                        "id": "",
+                        "disableDelete": false,
+                        "events": [
+                          {
+                            "id": "",
+                            "type": "NewPage",
+                            "isNew": true,
+                            "linkInfo": {
+                              "page": {
+                                "pageId": "ScheduleHome",
+                                "pageName": "日程首页",
+                                "pageType": "SYSTEMPAGE",
+                                "openMode": "4"
+                              },
+                              "openMode": "0",
+                              "params": [],
+                              "name": "日程首页"
+                            }
+                          }
+                        ],
+                        "actionDesc": "系统：日程首页"
+                      }
+                    ]
+                  ]
+                },
+                "showOrder": 3,
+                "isFilter": true,
+                "isEdit": false,
+                "isOpen": false
+              }
+            ]
+          },
+          "bottomOperatBtns": {
+            "enabled": false,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "56bd95",
+                "showType": "FONTBTN",
+                "btnFrom": "DEFAULT",
+                "showContent": "进入日程",
+                "event": {
+                  "to": "ENTERSCHEDULE",
+                  "value": "系统：日程首页"
+                },
+                "isOpen": false,
+                "isSkipBtn": false,
+                "showOrder": 1
+              }
+            ]
+          },
+          "layout": {
+            "i": "e034bfd47aa04e75bd82750da0c7fa58",
+            "x": 0,
+            "y": 75,
+            "w": 8,
+            "h": 34,
+            "scope": "",
+            "moved": false,
+            "selected": true,
+            "offsetTop": 886
+          },
+          "flow": {},
+          "disabled": {},
+          "disableQuickSearchSetting": false,
+          "disableHistorySearch": false,
+          "disableCommonFilter": false,
+          "canSavecommonFilter": false,
+          "commonConditionSetting": false,
+          "styles": [],
+          "canCreateInterData": [
+            "calendar",
+            "task",
+            "contactRemind"
+          ],
+          "canCreateDataset": true,
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,38",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,CalendarStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebddatacoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_ANONYMOUS_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "ed1d9649e95d48588b7ef6880d9b2081",
+        "type": "Calendar",
+        "package": "@weapp/ebddatacoms",
+        "category": "4",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "d9cdee5542ef4d78903db958e1d1a109",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "日历",
+          "type": "Calendar",
+          "title": "",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "calendarType": "1",
+          "baseInfoForMulp": {
+            "startTimeRange": 9,
+            "endTimeRange": 18
+          },
+          "dataSetNodes": [],
+          "baseInfo": {
+            "use_viewModeChangeHideItem": true
+          },
+          "condition": [],
+          "defaultView": "3",
+          "weekStart": "-7",
+          "showViewModeChange": true,
+          "viewModeSelectType": "tile",
+          "showLunar": true,
+          "useAttendanceHoliday": false,
+          "monthChangeAutoSelectFirstDate": true,
+          "historyData": {},
+          "notTransformField": [
+            "topOperatBtns",
+            "bottomOperatBtns"
+          ],
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "7ec49a",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-more05",
+                  "title": "更多",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "JUMPLINK",
+                  "value": [
+                    [
+                      {
+                        "type": "CLICK",
+                        "name": "单击",
+                        "id": "",
+                        "disableDelete": false,
+                        "events": [
+                          {
+                            "id": "",
+                            "type": "NewPage",
+                            "isNew": true,
+                            "linkInfo": {
+                              "page": {
+                                "pageId": "ScheduleHome",
+                                "pageName": "日程首页",
+                                "pageType": "SYSTEMPAGE",
+                                "openMode": "4"
+                              },
+                              "openMode": "0",
+                              "params": [],
+                              "name": "日程首页"
+                            }
+                          }
+                        ],
+                        "actionDesc": "系统：日程首页"
+                      }
+                    ]
+                  ]
+                },
+                "showOrder": 3,
+                "isFilter": true,
+                "isEdit": false,
+                "isOpen": false
+              }
+            ]
+          },
+          "bottomOperatBtns": {
+            "enabled": false,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "d0cae1",
+                "showType": "FONTBTN",
+                "btnFrom": "DEFAULT",
+                "showContent": "安排日程",
+                "event": {
+                  "to": "ARRANGESCHEDULE",
+                  "value": "系统：日程首页"
+                },
+                "isOpen": false,
+                "isSkipBtn": false,
+                "showOrder": 1
+              }
+            ]
+          },
+          "layout": {
+            "i": "f6e956d565734584aab32cc51bd12028",
+            "adaptive": true,
+            "h": 34,
+            "selected": true
+          },
+          "disabled": {},
+          "flow": {},
+          "disableQuickSearchSetting": false,
+          "disableHistorySearch": false,
+          "disableCommonFilter": false,
+          "canSavecommonFilter": false,
+          "commonConditionSetting": false,
+          "styles": [],
+          "canCreateInterData": [
+            "calendar",
+            "task",
+            "contactRemind"
+          ],
+          "canCreateDataset": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,38",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,CalendarStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebddatacoms"
+      }
+    ]
+  }
+]

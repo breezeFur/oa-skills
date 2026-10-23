@@ -1,0 +1,150 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "d86b7f9948c24c9b99bec22c1ec4e9f7",
+        "type": "EbButton",
+        "package": "@weapp/ebdbasecoms",
+        "category": "2",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "f21d56d0818a48be9c4a0b5e49de5c9d",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "按钮",
+          "type": "EbButton",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "btnText": "按钮",
+          "btnType": "default",
+          "size": "md",
+          "customFontSize": "12",
+          "customIconSize": 12,
+          "status": "enable",
+          "isDecoratedBtn": true,
+          "customButtonSize": false,
+          "btnKind": "btn",
+          "groupSize": "md",
+          "showExpandIcon": true,
+          "btnGroup": [
+            {
+              "id": "d41d8cd98f00b204e9800998ecf8427e",
+              "text": "按钮",
+              "onlyIcon": false,
+              "hoverTip": "",
+              "btnGroupDisabled": false,
+              "isHide": false
+            }
+          ],
+          "showBtnNum": 3,
+          "mobileShowType": "default",
+          "btnKindDisabled": false,
+          "hoverTipSelect": "default",
+          "layout": {
+            "i": "c8354603727d486da9730577178a0e38",
+            "x": 11,
+            "y": 139.5590909090909,
+            "w": 1,
+            "h": 5,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1596
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,930457493168030182",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ButtonStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdbasecoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "f21d56d0818a48be9c4a0b5e49de5c9d",
+        "type": "EbButton",
+        "package": "@weapp/ebdbasecoms",
+        "category": "2",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "d86b7f9948c24c9b99bec22c1ec4e9f7",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "按钮",
+          "type": "EbButton",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "btnText": "按钮",
+          "btnType": "default",
+          "size": "md",
+          "customFontSize": "12",
+          "customIconSize": 12,
+          "status": "enable",
+          "isDecoratedBtn": true,
+          "customButtonSize": false,
+          "btnKind": "btn",
+          "groupSize": "md",
+          "showExpandIcon": true,
+          "btnGroup": [
+            {
+              "id": "d41d8cd98f00b204e9800998ecf8427e",
+              "text": "按钮",
+              "onlyIcon": false,
+              "hoverTip": "",
+              "btnGroupDisabled": false,
+              "isHide": false
+            }
+          ],
+          "showBtnNum": 3,
+          "mobileShowType": "default",
+          "btnKindDisabled": false,
+          "fixedArea": "0",
+          "layout": {
+            "i": "b39acd3397064b069f7fbfb5403f1737",
+            "adaptive": true,
+            "h": 5,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": []
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,930457493168030182",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ButtonStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdbasecoms"
+      }
+    ]
+  }
+]

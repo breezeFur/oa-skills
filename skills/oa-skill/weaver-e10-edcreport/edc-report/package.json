@@ -1,0 +1,32 @@
+{
+  "name": "edc-report",
+  "version": "0.8.0",
+  "description": "e-Builder EDC 报表独立 CLI（与 weaver-e10-edcreport Skill 同仓；复用 e10-login 鉴权）",
+  "bin": {
+    "edc-report": "edc-report.js"
+  },
+  "files": [
+    "edc-report.js",
+    "cli.js",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "link:dev": "npm link"
+  },
+  "keywords": [
+    "e-builder",
+    "edc",
+    "report",
+    "weaver",
+    "e10"
+  ],
+  "license": "UNLICENSED",
+  "peerDependenciesMeta": {
+    "e10-login": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "_comment": "侧栏数据聚合 aggreData 示例 — edc-report dataset agg save --file",
+  "example": [
+    {
+      "fieldId": "DATASET_ID.TABLE_ID.field_xxx",
+      "countType": "sum",
+      "showName": "数量合计",
+      "fieldName": "s_sum_field_xxx"
+    },
+    {
+      "groupBy": "DATASET_ID.TABLE_ID.field_yyy"
+    }
+  ]
+}

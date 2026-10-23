@@ -1,0 +1,132 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "b2b28800971e42ebb54ba6011ace29b4",
+        "type": "CollapsePanel",
+        "package": "@weapp/ebddatacoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "a5db0950f9fa4453a6c68dbccccef110",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "折叠面板",
+          "type": "CollapsePanel",
+          "title": "标题",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "panels": [
+            {
+              "id": "1",
+              "content": "面板项1",
+              "defaultActive": true,
+              "children": []
+            }
+          ],
+          "spreadType": "mutex",
+          "flow": {
+            "isCanvas": true,
+            "linkedNodes": {},
+            "nodes": []
+          },
+          "expandAll": false,
+          "layout": {
+            "i": "c2eeb81cf3184f15bd7ed963f30d9b6d",
+            "x": 4,
+            "y": 97.45454545454545,
+            "w": 5,
+            "h": 21,
+            "autoHeight": true,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1133
+          },
+          "disabled": {},
+          "styles": [],
+          "displayName": "面板项1",
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,928387954529443845",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,CollapsePanelStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebddatacoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "a5db0950f9fa4453a6c68dbccccef110",
+        "type": "CollapsePanel",
+        "package": "@weapp/ebddatacoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "b2b28800971e42ebb54ba6011ace29b4",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "折叠面板",
+          "type": "CollapsePanel",
+          "title": "标题",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "panels": [
+            {
+              "id": "1",
+              "content": "面板项1",
+              "defaultActive": true,
+              "children": []
+            }
+          ],
+          "spreadType": "mutex",
+          "flow": {
+            "isCanvas": true,
+            "nodes": [],
+            "linkedNodes": {}
+          },
+          "expandAll": false,
+          "layout": {
+            "i": "d6431dfbf3eb43f6b8c2e549a7572321",
+            "adaptive": true,
+            "h": 21,
+            "selected": false
+          },
+          "disabled": {},
+          "styles": []
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,928387954529443845",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,CollapsePanelStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebddatacoms"
+      }
+    ]
+  }
+]

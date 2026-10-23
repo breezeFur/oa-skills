@@ -1,0 +1,167 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "aaeb1bbc9d414ba4ba9c2adccb14228f",
+        "type": "NavBar",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "a25f93b8f1144a11988284c4a5a20ba7",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "导航栏",
+          "type": "NavBar",
+          "title": "标题",
+          "titleEnabled": false,
+          "navMenus": [
+            {
+              "id": "c112c203f63d435195ce0fb42fefd1d3",
+              "name": "导航项1",
+              "icon": {
+                "iconStyle": {
+                  "backgroundColor": "transparent",
+                  "color": "#FF666A"
+                },
+                "path": "#icon-quoted-price"
+              },
+              "otherParams": {
+                "version": 1
+              }
+            },
+            {
+              "id": "b64ed02fd46b4cb094809addb5df9bf0",
+              "name": "导航项2",
+              "icon": {
+                "iconStyle": {
+                  "backgroundColor": "transparent",
+                  "color": "#68a5ff"
+                },
+                "path": "#icon-Cloud-reimbursement"
+              },
+              "otherParams": {
+                "version": 1
+              }
+            }
+          ],
+          "rightArrow": true,
+          "separator": true,
+          "splitBgColor": "#f0f1f4",
+          "layout": {
+            "i": "b37ff16cf754495f9d485ff0e4a9180b",
+            "x": 0,
+            "y": 119.9090909090909,
+            "w": 5,
+            "h": 6,
+            "autoHeight": true,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1380
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,45",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,NavBarStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdnavcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "a25f93b8f1144a11988284c4a5a20ba7",
+        "type": "NavBar",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "aaeb1bbc9d414ba4ba9c2adccb14228f",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "导航栏",
+          "type": "NavBar",
+          "title": "标题",
+          "titleEnabled": false,
+          "navMenus": [
+            {
+              "id": "c112c203f63d435195ce0fb42fefd1d3",
+              "name": "导航项1",
+              "icon": {
+                "iconStyle": {
+                  "backgroundColor": "transparent",
+                  "color": "#FF666A"
+                },
+                "path": "#icon-quoted-price"
+              },
+              "otherParams": {
+                "version": 1
+              }
+            },
+            {
+              "id": "b64ed02fd46b4cb094809addb5df9bf0",
+              "name": "导航项2",
+              "icon": {
+                "iconStyle": {
+                  "backgroundColor": "transparent",
+                  "color": "#68a5ff"
+                },
+                "path": "#icon-Cloud-reimbursement"
+              },
+              "otherParams": {
+                "version": 1
+              }
+            }
+          ],
+          "rightArrow": true,
+          "separator": true,
+          "splitBgColor": "#f0f1f4",
+          "layout": {
+            "i": "d032c469c9b84549a59e421c05471f05",
+            "adaptive": true,
+            "h": 6,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": []
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,45",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,NavBarStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdnavcoms"
+      }
+    ]
+  }
+]

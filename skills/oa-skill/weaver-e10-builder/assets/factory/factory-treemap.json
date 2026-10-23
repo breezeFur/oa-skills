@@ -1,0 +1,322 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "a3931d5ced19481d974b06e0123de702",
+        "type": "Treemap",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "f27369e708e34be19a6e2240d1a191b9",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "矩形树图",
+          "type": "Treemap",
+          "title": "矩形树图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "f7438d",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "be2dc8",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [],
+          "height": 360,
+          "label": {
+            "show": true,
+            "valType": "value",
+            "connector": ", "
+          },
+          "layout": {
+            "i": "bc3ed15025b24003b5fdda2ef3d85d40",
+            "x": 0,
+            "y": 97.45454545454545,
+            "w": 4,
+            "h": 34,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1133
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "filterVersion": 1,
+          "hasCssCache": true,
+          "measureName": "",
+          "minMeasures": [],
+          "maxMeasures": [],
+          "yoyDimensions": [],
+          "graphNodeName": {},
+          "graphRelation": {},
+          "graphGroupBy": {},
+          "graphNodeSize": {},
+          "scatterColor": {},
+          "scatterSize": {},
+          "xAxis": {
+            "type": "measures",
+            "data": {}
+          },
+          "yAxis": {},
+          "filter": {},
+          "dataset": {
+            "id": "",
+            "text": "",
+            "type": "LOGIC",
+            "groupId": "weaver-ebuilder-form-service",
+            "isPhysical": true,
+            "usage": "all",
+            "detailTable": false,
+            "objType": "physical",
+            "module": "ebuilder",
+            "appId": "",
+            "isFormModuleSelected": true
+          },
+          "searchConditions": {
+            "commonSearchType": "0",
+            "commonFilters": [],
+            "conditionId": ""
+          },
+          "eventGroup": [],
+          "url": [],
+          "markLine": {
+            "average": false,
+            "fixed": "",
+            "currentDataSetId": ""
+          },
+          "choseLabels": [],
+          "addToolTip": {
+            "addContent": "",
+            "addFields": []
+          },
+          "dataListDisplay": {
+            "fieldList": []
+          },
+          "nodesShowRange": {}
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "f27369e708e34be19a6e2240d1a191b9",
+        "type": "Treemap",
+        "package": "@weapp/ebdchartcoms",
+        "category": "5",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "a3931d5ced19481d974b06e0123de702",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "矩形树图",
+          "type": "Treemap",
+          "title": "矩形树图",
+          "titleEnabled": true,
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "f7438d",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Right-refresh",
+                  "title": "刷新",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "REFRESHCOM",
+                  "value": "刷新组件"
+                },
+                "isOpen": false,
+                "showOrder": 1
+              },
+              {
+                "id": "be2dc8",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-Advanced-search",
+                  "title": "搜索",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "SEARCH",
+                  "value": "搜索组件"
+                },
+                "isOpen": false,
+                "showOrder": 2,
+                "hideAlways": true
+              }
+            ]
+          },
+          "showTopOperatBtnConfig": true,
+          "measures": [],
+          "dimensions": [],
+          "height": 360,
+          "label": {
+            "show": true,
+            "valType": "value",
+            "connector": ", "
+          },
+          "layout": {
+            "i": "de3a404bc65b4fa2a2b67e66ae85d9ec",
+            "adaptive": false,
+            "h": 34,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {},
+          "styles": [],
+          "filterVersion": 1,
+          "measureName": "",
+          "minMeasures": [],
+          "maxMeasures": [],
+          "yoyDimensions": [],
+          "graphNodeName": {},
+          "graphRelation": {},
+          "graphGroupBy": {},
+          "graphNodeSize": {},
+          "scatterColor": {},
+          "scatterSize": {},
+          "xAxis": {
+            "type": "measures",
+            "data": {}
+          },
+          "yAxis": {},
+          "filter": {},
+          "dataset": {
+            "id": "",
+            "text": "",
+            "type": "LOGIC",
+            "groupId": "weaver-ebuilder-form-service",
+            "isPhysical": true,
+            "usage": "all",
+            "detailTable": false,
+            "objType": "physical",
+            "module": "ebuilder",
+            "appId": "",
+            "isFormModuleSelected": true
+          },
+          "searchConditions": {
+            "commonSearchType": "0",
+            "commonFilters": [],
+            "conditionId": ""
+          },
+          "eventGroup": [],
+          "url": [],
+          "markLine": {
+            "average": false,
+            "fixed": "",
+            "currentDataSetId": ""
+          },
+          "choseLabels": [],
+          "addToolTip": {
+            "addContent": "",
+            "addFields": []
+          },
+          "dataListDisplay": {
+            "fieldList": []
+          },
+          "nodesShowRange": {}
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,2",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,ChartStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdchartcoms"
+      }
+    ]
+  }
+]

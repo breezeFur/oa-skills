@@ -1,0 +1,205 @@
+{
+  "component": "PageHeader 页头",
+  "usage": "用户说『给页头某一部分设样式』→ 按 pickTree 定位到某棵树 → 在树里找语义节点 → 用 id/class 写选择器。只列关键节点，纯布局包裹 div 已省略。",
+  "legend": {
+    "[cls]": "条件类名，满足条件才出现",
+    "{a|b}": "多选一",
+    "a > b": "合并两层（中间节点无类名/无关键类）",
+    "ref": "引用 shared 下的复用片段",
+    "<comId>": "组件运行时 id（挂在引擎外壳那层）。官方样式生成器一律以 #<comId> 限域，自写样式建议照做",
+    "前缀": "ebcoms=本仓库源码(clsPrefix) 与引擎(@weapp/ebdcoms)共用 | ebcom=引擎外壳与布局层(ebcomPrefix) | ui=@weapp/ui（ui-layout / ui-title / ui-menu / ui-btn）| rgl / weapp-ebde=引擎拖拽层"
+  },
+  "pickTree": "最外两层固定（见 root）：引擎外壳 > .ebcoms-pageheader-view-content.content。里面只有一条主链：.ebcoms-pageheader-wrapper（@weapp/ui Title 的 Row）> 两个 ui-layout-col-12 左右列。往下的分叉：① config 里有 buttons 字段（老页面数据）→ history 树；② page.client 是移动端 → mobile 树；③ 其余 → pc 树。设计态与预览态结构一致，只是相关节点多一个 isDesign 类；吸顶类由滚动时动态加（见 shared.state）。",
+
+  "root": {
+    "tag": "div",
+    "id": "<comId>",
+    "class": "ebcom ebcom-pageheader [ebcom-pageheader-{plugin.resourceType}] [ebcom-m] ebcom-grid [ebcom-view|ebcom-design] has-no-header",
+    "desc": "【引擎外壳】由引擎渲染，flex 纵列，子节点固定是 header + content + footer 三个平级兄弟。⚠️ 本组件 `static renderHeader = () => null`，引擎判 `showHeader = titleEnabled && !Component.renderHeader` → 永远为假，所以 .header 从不渲染、外壳恒带 has-no-header（引擎 less 里无对应规则，纯标记）；footerEnabled 默认也不开 → .footer 同样没有。实际只剩 .content 一个子节点。",
+    "children": [
+      {
+        "tag": "div",
+        "class": "ebcoms-pageheader-view-content content",
+        "desc": "【引擎内容槽 + 组件根】两个类在同一个元素上：content 来自引擎，ebcoms-pageheader-view-content 来自本组件 `static defaultOpts.render.contentClass`。组件自产 DOM 全部从这里开始。已有样式钩子（view/index.less:3）：font-size:14*hd，且 `.ebcoms-pageheader-view-content{padding:0 !important}`；移动端同名校验在 view-m/index.less:3。",
+        "children": [
+          { "ref": "shared.wrapper", "desc": "整条页头（Title 的 Row）" }
+        ]
+      }
+    ]
+  },
+
+  "shared": {
+    "wrapper": {
+      "tag": "div",
+      "class": "ui-layout-row ui-title ui-title-noIcon ui-title-noTitle ebcoms-pageheader-wrapper [ebcoms-pageheader-pure-text] [ebcoms-pageheader-wrapper-tabStyle] [ebcoms-pageheader-wrapper-history]",
+      "desc": "【整条页头】= @weapp/ui Title 的 Row 自带类（ui-layout-row + ui-title）+ 本组件传入的 className（ebcoms-pageheader-wrapper）。改整条高度/内边距/背景/对齐都打它。默认样式（view/index.less:314）：border:0; min-height:48*hd; height:100%; display:flex; align-items:center; background:transparent; flex-wrap:nowrap。ui-title-noIcon 是 Title 收到 noIcon 后自动加的；ui-title-noTitle 因为组件只传 customRenderLeft/Right 或 getTitle、从不传 title。pure-text=图标/按钮/更多全都没有；-wrapper-tabStyle=标题下方插了选项卡（PC，会变 column-reverse）；-wrapper-history=走历史数据分支。",
+      "children": [
+        {
+          "tag": "div",
+          "class": "ui-layout-col ui-layout-col-12 ui-title-col",
+          "desc": "【左列】Title 自动渲染的 Col（span=12 写死；ui-title-col 也是 Title 加的）。⚠️ 左右两个 col 的 class 完全一样，只能靠 :first-child / :nth-child(2) 区分——index.less 就是这么写的（`> .ui-layout-col-12:first-child{max-width:100%}`、`> .ui-layout-col-12:nth-child(2){max-width:70%}`）。实际宽度由内联 style 的 flex/maxWidth 决定（按 config.proportion 算）。",
+          "children": [{ "ref": "pc.left", "desc": "列内容由 customRenderLeft 渲染。⚠️ 移动端不是这套类名，对应节点见 mobile.diffs 第 3/5 条" }]
+        },
+        {
+          "tag": "div",
+          "class": "ui-layout-col ui-layout-col-12 ui-title-col",
+          "desc": "【右列】同左列，靠 :nth-child(2) 区分",
+          "children": [{ "ref": "pc.right", "desc": "列内容由 customRenderRight 渲染。⚠️ 移动端见 mobile.diffs 第 8/9 条" }]
+        }
+      ]
+    },
+
+    "title": {
+      "desc": "【标题块】customRenderTitle 的产出",
+      "chain": "div.ebcoms-pageheader-title-area > ( 可选 div.ebcoms-pageheader-title-icon ) + div.ebcoms-pageheader-title-wrapper[.hasIcon] > ( div.ebcoms-pageheader-title > div.ebcoms-pageheader-title-content | div.ebcoms-pageheader-title-custom > div.ebcoms-pageheader-title-content ) + div.ebcoms-newtab-tab-top.ebcoms-newtab-{left|center|right|cover}[.dropDownRight]",
+      "tips": "① 文字本体是 .ebcoms-pageheader-title-content（由 @weapp/ebdcoms 的 TransformContent 渲染，className 即它），自定义标题时外面多包一层 .ebcoms-pageheader-title-custom。② 图标是 .ebcoms-pageheader-title-icon，内部才是通用图元 .ebcoms-assets-item。③ ⚠️ 图标可能出现两次，条件相反：underTheTitle 时在 .ebcoms-pageheader-context-left 下（不在 title 里），否则在 .ebcoms-pageheader-title 里 —— 别假定唯一。④ .ebcoms-pageheader-title-wrapper 的 hasIcon 条件是「有图标 且 左侧容器里放的是 NewTab」，而 .ebcoms-pageheader-context-wrapper 的 hasIcon 条件是「有图标 且 左侧容器里放的不是 NewTab」，两者互斥、别记反。⑤ 装了页头插件时整块可被替换，见 notes。"
+    },
+
+    "drop": {
+      "desc": "【投放容器】左右两个「容器」区，用户往里拖组件（按钮组、选项卡等）",
+      "chain": "div.ebcoms-pageheader-context-{left|right}-container[.isDesign][.needMarginTop] > div.rgl-dnd-flow-layout.ebcom[id=<dropCom.id>，仅 view 态] > DroppableView 或 Droppable（@weapp/designer，DOM 不可控）",
+      "tips": "⚠️ 移动端前缀不同：.ebcoms-pageheader-m-context-{left|right}-container（移动端这个容器带 .underTheTitle，PC 不带；PC 带 .isDesign，移动端不带）。needMarginTop=设计态左侧容器为空且标题在下方（margin-top:10*hd）。rgl-dnd-flow-layout 是引擎的拖拽层类名（index.less 靠它设 height:100%）。历史数据分支完全不渲染投放容器。"
+    },
+
+    "btn": {
+      "desc": "【单个按钮】由 @weapp/ebdcoms 的 ConfigurableButton 渲染，页头只传配置",
+      "chain": "div.ebcoms-configurable-btn.{showType} > div.{default-btn|hover-btn} > div.ebcoms-configurable-btn-view > ( 纯图标时 div.ebcoms-configurable-btn-view-icon | 有文字时 button.ui-btn > div.ebcoms-button-config-preview-btn-content > div.ebcoms-button-config-preview-btn-content-text[.lefticon|.righticon] )",
+      "tips": "⚠️ default-btn / hover-btn 是同一个 div 的两个互斥类名（JS 按 hover 切换），不是两个元素、也不是状态类。EventClickable 只 clone 子元素挂 onClick、不加 DOM 层，所以层级不会多。已有钩子：`.ebcoms-configurable-btn-view-icon{padding:5px;margin-left:8px}`（PC 在 view/index.less:269、移动端在 view-m/index.less:154）；移动端还改了 `.ebcoms-button-config-preview-btn-content-text{line-height:22*hd}`。"
+    },
+
+    "menuBtn": {
+      "desc": "【更多按钮】按钮列表里 isSplit 之后的那些被收进下拉菜单",
+      "chain": "div.ebcoms-pageheader-button.ebcoms-pageheader-menuButton > div > (@weapp/ui Menu type='select')：触发区 div.ui-menu-select-title > ( span.ui-menu-select-title-text + span.ui-menu-select-title-icon )；弹层根类 ui-menu-selectpopup-{selectType} 额外叠加 ebcoms-pageheader-view-trigger",
+      "tips": "弹层挂 body，不能拿 #<comId> 当祖先选择器。弹层里的每一项还是 ConfigurableButton（见 shared.btn）。左侧图标是 IconFont(type=menu)，由 customSelectContent 传进去。"
+    },
+
+    "tabInner": {
+      "desc": "【页头内选项卡】页签 DOM 由 NewTab 组件自己渲染，通过 PAGEHEADER_RENDER_EXTRA_CONTENT 事件注入到页头提供的插槽里；页头只给外壳",
+      "chain": "div.ebcoms-newtab-tab-top-inner.ebcom ebcom-newtab ebcom-grid [.pageheader-has-icon] [.isDesign] [.ebcoms-newtab-tab-top-inner-{Lines-Expand|Collapse|Switch|Drop-down}] [.ebcoms-newtab-tab-top-inner-{horizontal|vertical|topDropdown}] [.ebcoms-newtab-tab-top-inner-{top|bottom}] [id=<tab组件id>] > div.{tabContentCls}.content > 注入的页签 DOM",
+      "tips": "tabContentCls 由 `tab/common/utils.ts` 的 getTabContentClass 生成，形如 `ebcoms-newtab-top-1 ebcoms-newtab-left [ebcoms-newtab-more-wrap|-more-shrink|-more-dropdown|-more-drawer] [ebcoms-newtab-verticalStyle] titleEnabled`。注入的真实页签根是 div#ebcoms-tab-header-weight.ebcoms-tab-header（移动端 #ebcoms-m-tab-header-weight.ebcoms-m-tab-header），内部全是 ui-menu-*。⚠️ 改页签样式务必用 .ebcoms-newtab-tab-top-inner 限域，否则会打到别处的 ui-menu。移动端外壳是 ebcoms-newtab-tab-top-inner-m（无那几个模式后缀）。"
+    },
+
+    "state": {
+      "desc": "【吸顶 / 设计态】滚动或配置变化时 JS 动态加的类，初始 DOM 里没有",
+      "list": [
+        "预览态向下滚 → 引擎外壳 `div#<comId>.ebcom.ebcom-pageheader...` 本身加 .ebcoms-pageheader-fixed（position:fixed!important; top:0!important; padding:0 20*hd; z-index:11；JS 用 comViewRef / querySelector('#'+id) 定位到它，同时把宽度内联到 wrapper 上）",
+        "设计态向下滚 → 页面布局项 .weapp-ebde-gl-page-layout-item 加 .ebcoms-pageheader-design-fixed（fixed + translate(0,-16px)，z-index:103）",
+        "标题下方插了选项卡时的特殊吸顶 → .ebcoms-pageheader-fixed-tab 打在右列内容 .ebcoms-pageheader-context-right 上，并给它补 .ebcom + id=<comId>；外层布局项加 .ebcoms-pageheader-fixed-wrapper（transform:unset）",
+        "⚠️ 三套类名加在**不同元素**上，写吸顶样式前先确认目标；index.less 末尾有它们的完整规则（view/index.less:706 起）"
+      ]
+    }
+  },
+
+  "pc": {
+    "when": "config 里没有 buttons 字段（新数据，走 newButtons）且 page.client 非移动端",
+    "left": {
+      "tag": "div",
+      "class": "ebcoms-pageheader-context-left [tab-right-side] [tab-mode-vertical]",
+      "desc": "【左半区】= customRenderLeft 的根。tab-right-side=竖向选项卡且位置=2（flex-direction:row-reverse）；tab-mode-vertical=竖向选项卡（align-items:unset）。已有样式：display:flex; align-items:center; height:100%（view/index.less:113）。",
+      "children": [
+        { "tag": "div", "class": "ebcoms-pageheader-title-icon", "desc": "仅 underTheTitle && !showNewTab 时在这里；内部 AssetsItem（不可控）" },
+        { "tag": "div", "class": "ebcoms-newtab-tab-top ebcoms-newtab-{left|center|right|cover}", "desc": "仅竖向选项卡（mode=vertical）时页签落点；背景色由 JS 内联。内部见 shared.tabInner" },
+        {
+          "tag": "div",
+          "class": "ebcoms-pageheader-context-wrapper [underTheTitle] [hasIcon]",
+          "desc": "【左半区内容包裹层】underTheTitle=标题在下方布局；hasIcon=有图标且左侧容器里放的不是选项卡（width:91%）",
+          "children": [
+            { "ref": "shared.title", "desc": "仅 !showNewTab（左侧容器里没插选项卡）" },
+            { "ref": "shared.drop", "desc": "左侧投放容器 → .ebcoms-pageheader-context-left-container" },
+            { "ref": "shared.tabInner", "desc": "仅 tabPosition=2 且 mode=horizontal（页签放标题下方）" }
+          ]
+        }
+      ]
+    },
+    "right": {
+      "tag": "div",
+      "class": "ebcoms-pageheader-context-right [isDesign]",
+      "desc": "【右半区】= customRenderRight 的根。display:flex; align-items:center; height:100%; overflow-y:hidden。吸顶时会被加 .ebcoms-pageheader-fixed-tab（见 shared.state）。",
+      "children": [
+        { "ref": "shared.title", "desc": "仅 showNewTab && underTheTitle（此时标题从左侧挪到这里）" },
+        {
+          "tag": "div",
+          "class": "ebcoms-drop-wrapper [two-sides] [newtab-style]",
+          "desc": "【右半区横排容器】⚠️ PC 是 .ebcoms-drop-wrapper，**没有 pageheader- 中缀**；移动端才是 .ebcoms-pageheader-drop-wrapper，别写混。two-sides=innerLayout==='two-sides'（row-reverse，按钮组也跟着反转、菜单按钮 order:-1）；newtab-style=标题下方插了选项卡（width:50%）。display:flex; width:100%; height:100%; align-items:center。",
+          "children": [
+            { "ref": "shared.drop", "desc": "右侧投放容器 → .ebcoms-pageheader-context-right-container" },
+            {
+              "tag": "div",
+              "class": "ebcoms-pageheader-buttonGroup-wrapper [ebcoms-pageheader-buttonGroup-wrapper-nobtns]",
+              "desc": "【按钮区外壳】-nobtns=一个可见按钮都没有（margin-left:14*hd）。⚠️ 与里面那层 .ebcoms-pageheader-buttonGroup 是两个不同的东西，名字很像。默认 display:flex; max-width:50%; overflow:hidden; hover 时 overflow:auto。",
+              "children": [
+                {
+                  "tag": "div",
+                  "class": "tab-list-buttonGroup",
+                  "desc": "⚠️ 无 ebcoms- 前缀（源码写死的字符串）。PC 上按钮组是嵌在它**内部**的",
+                  "children": [
+                    { "tag": "span|div", "desc": "ExtraBtn 注入的内容（仅 underTheTitle）——由选项卡通过事件注入，页头不产 DOM，随事件的 type 是 dom 还是 config 而不同" },
+                    {
+                      "tag": "div",
+                      "class": "ebcoms-pageheader-buttonGroup",
+                      "desc": "【按钮区】display:flex; justify-content:flex-end; align-items:center",
+                      "children": [
+                        { "tag": "div", "class": "ebcoms-pageheader-buttonGroup-wrap", "desc": "> :not(:last-child){margin-right:10*hd}；:first-child{margin-left:10*hd}", "children": [{ "ref": "shared.btn", "desc": "isSplit 之前的每个按钮重复一次" }] },
+                        { "ref": "shared.menuBtn", "desc": "仅 isSplit 之后还有可见按钮" }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  "mobile": {
+    "when": "非历史数据 且 page.client 为移动端（外壳上多一个 ebcom-m）",
+    "desc": "与 pc 树渲染逻辑同构，但类名是**独立的一套 -m- 命名**，不共用 PC 的类名。对应关系：PC 的 `ebcoms-pageheader-X` ↔ 移动端的 `ebcoms-pageheader-m-X`（少数例外见下）。以下只列差异，未列到的节点按 pc 树同名替换即可。",
+    "diffs": [
+      "整条页头 wrapper 类名**共用** ebcoms-pageheader-wrapper，但修饰类换成 ebcoms-pageheader-m-pure-text 与 ebcoms-pageheader-m-wrapper-tabStyle（PC 是不带 -m 的 pure-text / -wrapper-tabStyle）",
+      "Title 的 Col span 不固定：leftCol = btns.length===0 || showNewTab ? 12 : 8，rightCol 对应 12 / 16（PC 写死 12/12）",
+      "左半区：div.ebcoms-pageheader-m-context-left[.tab-right-side][.tab-mode-vertical] > ( 可选 div.ebcoms-pageheader-m-title-icon + div.ebcoms-newtab-tab-top.ebcoms-newtab-{top|center|buttom|cover} + div.ebcoms-pageheader-m-context-wrapper[.underTheTitle] > 标题块 + 投放容器 )",
+      "⚠️ 移动端 direction 映射表第 3 项是 'buttom'（源码拼写如此），PC 同位置是 'right' —— 写选择器时别按 PC 的拼法写",
+      "标题块：⚠️ 外面还套着一层 **PC 类名**的 div.ebcoms-pageheader-title（移动端也用它，别以为整条链都是 -m-），里面才是 div.ebcoms-pageheader-m-title-area > div.ebcoms-pageheader-m-title-wrapper > ( div.ebcoms-pageheader-m-title[.showNewTab] > div.ebcoms-pageheader-m-title-content ) + div.tab-menu-area > div.ebcoms-newtab-tab-top...（PC 对应层为 title-area / -title-wrapper / -title / -title-content，且没有 tab-menu-area 包裹）",
+      "图标：div.ebcoms-pageheader-m-title-icon（PC 是 ebcoms-pageheader-title-icon）。⚠️ 移动端不受 iconVisible 控制，有 path 就渲染",
+      "投放容器：div.ebcoms-pageheader-m-context-{left|right}-container[.underTheTitle][.needMarginTop]（PC 是 .isDesign + .needMarginTop，没有 .underTheTitle）",
+      "右半区：div.ebcoms-pageheader-m-context-right > div.ebcoms-pageheader-drop-wrapper[.two-sides][.newtab-style]（⚠️ 移动端**带** pageheader- 中缀，PC 不带）",
+      "按钮区：div.ebcoms-pageheader-m-buttonGroup-wrapper > div.tab-list-buttonGroup > ExtraBtn + div.ebcoms-pageheader-m-buttonGroup > ( div.ebcoms-pageheader-m-buttonGroup-wrap + div.ebcoms-pageheader-m-button.ebcoms-pageheader-m-menuButton )",
+      "⚠️ 层级关系与 PC 相反：移动端 .tab-list-buttonGroup 与 .ebcoms-pageheader-m-buttonGroup 是**平级**（都挂在 -m-buttonGroup-wrapper 下）；PC 的 .ebcoms-pageheader-buttonGroup 是嵌在 .tab-list-buttonGroup **内部**",
+      "⚠️ 移动端 -m-context-right 上的 .two-sides 被注释掉了，当前只可能带 .newtab-style",
+      "页签外壳：div.ebcoms-newtab-tab-top-inner-m.ebcom ebcom-newtab ebcom-grid（PC 无 -m 后缀），内层 div.{tabContentCls}.content；注入的页签根是 #ebcoms-m-tab-header-weight.ebcoms-m-tab-header",
+      "移动端标题文字：view 态是 TransformContent className=ebcoms-pageheader-m-title-content；设计态是 div.ebcoms-pageheader-m-title-content[innerHTML]。已有样式钩子 `.ebcoms-pageheader-m-title-content{font-size/color/font-weight/letter-spacing: var(--eb-title-*)}`"
+    ],
+    "tips": "移动端 UI 组件类名也有 -m 变体（如注入页签里的 ui-m-menu-*），index.less 里成对出现（view-m/index.less:504 有 `.ui-m-menu-tab .ui-m-menu-top .ui-m-menu-list`）。改移动端样式时注意别只覆盖 ui-* 而漏了 ui-m-*。"
+  },
+
+  "history": {
+    "when": "config 里存在 buttons 字段（老页面数据）——PC/移动端的判定式都是 `'buttons' in config`，设计态多一个 `typeof config.buttons != 'undefined'`。此时 config.buttons 有值时优先于 newButtons。兼容转换在 utils.ts 的 compatibleConfig → actionsConvertEventAction（把老的 actions 转成 eventGroup）。",
+    "why": "历史数据不传 customRenderLeft/customRenderRight，而是传 getTitle + buttons 给 Title。@weapp/ui Title 的 getLeftComponent/getRightComponent 里，只要收到 customRender* 就直接 return 它的结果、把自带的布局层丢掉 —— 所以历史分支会**多出** ui-title-left / ui-title-right / ui-title-right-container 这三层。",
+    "pc": {
+      "tag": "div",
+      "class": "ui-layout-row ui-title ui-title-noIcon ui-title-noTitle ebcoms-pageheader-wrapper [ebcoms-pageheader-pure-text] ebcoms-pageheader-wrapper-history",
+      "desc": "wrapper 多一个 .ebcoms-pageheader-wrapper-history（justify-content:space-between、两个 col 都 flex:none、第二个 col overflow-x:auto）。",
+      "children": [
+        { "tag": "div", "class": "ui-layout-col ui-layout-col-12 ui-title-col > div.ui-title-left > div.ebcoms-pageheader-title", "desc": "⚠️ 历史分支没有 customRenderLeft，所以 Title 自带的 .ui-title-left 回来了（直接包着标题，中间**没有** ui-title-title-top —— 因为传了 getTitle，Title.renderTitle 会提前 return，不走自带的那层）。标题仍是 .ebcoms-pageheader-title（视图态内含 .ebcoms-pageheader-title-content，自定义标题时包 .ebcoms-pageheader-title-custom）；图标 div.ebcoms-pageheader-title-icon 在这里、不是 -m-。" },
+        { "tag": "div", "class": "ui-layout-col ui-layout-col-12 ui-title-col > div.ui-title-right > div.ui-title-right-container", "desc": "⚠️ 同理；容器里是 buttons，即 div.ebcoms-pageheader-buttonGroup > ( div.ebcoms-pageheader-buttonGroup-wrap + div.ebcoms-pageheader-button.ebcoms-pageheader-menuButton )" }
+      ],
+      "absent": "完全不渲染投放容器 → 没有 context-left/right、drop-wrapper、buttonGroup-wrapper、tab-list-buttonGroup、newtab-tab-top-inner 这些节点"
+    },
+    "mobile": {
+      "desc": "在引擎壳的 .content 里**多包一层**，其余与 pc 历史分支同构",
+      "chain": "div.ebcoms-pageheader-view-content.content > div.ebcoms-pageheader-history-data.ebcom[id=<comId>][.mask] > div.ui-layout-row.ui-title.ui-title-noIcon.ui-title-noTitle.ebcoms-pageheader-wrapper[.ebcoms-pageheader-pure-text] > 两个 ui-layout-col-12",
+      "tips": "⚠️ ① 这层是「多套的内层容器」，**不是**替代引擎壳 —— 引擎壳与 ebcom-m 都还在（编译 CSS 的选择器就是 `.ebcoms-pageheader-view-content .ebcoms-pageheader-history-data .ebcoms-pageheader-wrapper`）。② .mask 的条件是 !view，而 view-m/View.tsx 恒传 view，实际不出现。③ ⚠️ 这一支内部用的全是**PC 类名**（ebcoms-pageheader-title / -title-content / -buttonGroup / -buttonGroup-wrap / -button / -menuButton），既不是 -m- 也不是 -wrapper-history —— 改移动端历史页头样式别按 -m- 找。④ 移动端历史分支不传 leftCol/rightCol。"
+    }
+  },
+
+  "notes": [
+    "【类名前缀】① 本仓库 clsPrefix='ebcoms'，但引擎(@weapp/ebdcoms)也用这个前缀，按文件来源区分，别看前缀猜归属。② 无前缀、源码写死的类名：`.tab-list-buttonGroup`（PC/移动端都有）、`.tab-menu-area`（仅移动端标题块里）、`.content`/`.header`/`.footer`（引擎层）。③ 引擎/拖拽层的类名：`.ebcom`、`.rgl-dnd-flow-layout`、`.weapp-ebde-*`。",
+    "【@weapp/ui 自动追加的类，你没写但存在】Title 的 Row → `ui-layout-row ui-title`；noIcon → Title 加 `ui-title-noIcon`；不传 title → 加 `ui-title-noTitle`；两个 Col → `ui-layout-col ui-layout-col-{span} ui-title-col`（其中 ui-title-col 是 Title 补的，不是 Row）。写选择器时如果按源码里写的 className 去匹配会漏掉这些。",
+    "【已有样式钩子（应优先复用，别重复造）】view/index.less + view-m/index.less 里已经定义好：`.ebcoms-pageheader-view-content{padding:0!important; font-size:14*hd}`、`.ebcoms-pageheader-wrapper{border:0; min-height:48*hd; display:flex; align-items:center}`、`.ebcoms-pageheader-title-icon{display:flex; padding:0 6*hd}`、`.ebcoms-pageheader-title-content{overflow:hidden; nowrap; ellipsis}`、`.ebcoms-pageheader-buttonGroup-wrap` 的按钮间距（10*hd）、`.ebcoms-configurable-btn-view-icon{padding:5px; margin-left:8*hd}`、`.ebcoms-pageheader-style-btnDashed{border-style:dashed}`。改前先 grep 这两个 less，避免和已有规则打架。",
+    "【插件可以整体替换标题与按钮】页头注册了 PHGEHEADER_CUNSTOM_RENDER_PLUGIN，会依次调 getPageHeaderTitleConfig / getproportion / getPageHeaderTitleConfig、以及 renderPageHeaderTitle / renderPageHeaderBtnLayout（PC 还有 getPageHeaderBtns）。装了插件时标题块和按钮区的 DOM 可能与本文档完全不同 —— 排查不到元素时先确认现场有没有插件。另：自定义渲染区域（ExtraContent / ExtraBtn 的插槽）里的 DOM 完全由注入方决定，本文档只标了挂载点。",
+    "【不可控 DOM（外部组件渲染）】投放容器的 DroppableView/Droppable 来自 @weapp/designer；页签来自 NewTab 组件（事件注入）；更多按钮下拉来自 @weapp/ui Menu(type=select)；标题文字来自 @weapp/ebdcoms 的 TransformContent；按钮来自 ConfigurableButton。这些内部结构不在本仓库，本文档只给到挂载点或它自己加的类名。",
+    "【反查源码】本组件 → view/（Content.tsx 全部逻辑与类名、btn/ButtonGroup.tsx + PageHeaderButton.tsx + MenuGroup.tsx、index.less 样式钩子）、view-m/（同名文件 + index.less）、design/Design.tsx + design-m/Design.tsx（设计态，defaultOpts.contentClass 与 defaultProps）、extra-content/（ExtraContent.tsx / ExtraBtn.tsx 插槽）、constants/index.ts、utils.ts（compatibleConfig）。@weapp/ui → D:\\fwCode\\weapp-ui（components/title/Title.tsx 决定 ui-title-* 与左右列布局、components/layout/{Row,Col}.tsx + components/block/index.tsx 决定 ui-layout-*、components/menu/pc/SelectMenu.tsx 决定 ui-menu-select-*、constants/index.ts 里 titleClsPrefix='ui-title' / layoutClsPrefix='ui-layout' / menuClsPrefix='ui-menu'）。引擎 → D:\\fwCode\\weapp-ebdcoms/src/components/core/view/createView.tsx（renderView/renderHeader/renderContent/renderFooter、showHeader 与 has-no-header 的判定、getClassName 拼外壳类）、design/createDesign.tsx、design/common.less；按钮 → D:\\fwCode\\weapp-ebdcoms/src/common/button-config/ConfigurableButton.tsx；拖拽 → D:\\fwCode\\weapp-ebdcoms/src/common/event-action/event-click/EventClickable.tsx（确认它不加 DOM 层）。页签类名规则 → D:\\fwCode\\weapp-ebdnavcoms\\src\\components\\tab\\common\\utils.ts 的 getTabLayoutClsNames。"
+  ]
+}

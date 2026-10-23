@@ -1,0 +1,62 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "bea8b489180a4960bd7a394074798125",
+        "type": "FastCreate",
+        "package": "@weapp/ui-props-design",
+        "category": "912383476361125895",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "快速新建",
+          "type": "FastCreate",
+          "title": "快速新建",
+          "labelPosition": {
+            "pc": "lr",
+            "m": "tb"
+          },
+          "moduleType": "goal",
+          "setPersonnel": "manager",
+          "showTimeField": true,
+          "relatedPersonnel": false,
+          "enterAdd": true,
+          "layout": {
+            "i": "c886fc8bd6d64a5180aa857b586792f4",
+            "x": 0,
+            "y": 171.5590909090909,
+            "w": 8,
+            "h": 13,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 1948
+          },
+          "flow": {},
+          "disabled": {},
+          "styles": [],
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms"
+      }
+    ]
+  }
+]

@@ -1,0 +1,163 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "e2d25e02dbc54e229a8969523988eabe",
+        "type": "NewTab",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "db453d3261184f13bd6021d59c2addca",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "选项卡",
+          "type": "NewTab",
+          "title": "标题",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "rerender": "on",
+          "tabs": [
+            {
+              "id": "a033db76b6db44c2a9a88a5f8acde1ff",
+              "content": "标签项1",
+              "defaultActive": true,
+              "children": []
+            }
+          ],
+          "addChildAfterSelect": "notAllow",
+          "flow": {
+            "isCanvas": true,
+            "linkedNodes": {},
+            "nodes": []
+          },
+          "topOperatBtns": {
+            "enabled": true,
+            "alignType": "CENTER",
+            "btns": [
+              {
+                "id": "f2ce08",
+                "showType": "ICON",
+                "btnFrom": "DEFAULT",
+                "showContent": {
+                  "path": "#icon-set-up-o",
+                  "title": "设置",
+                  "style": {
+                    "fontSize": "36",
+                    "bgColor": "transparent",
+                    "borderColor": "transparent",
+                    "color": "#999",
+                    "radius": "3px"
+                  }
+                },
+                "event": {
+                  "to": "TABCONTENTSET",
+                  "value": "0"
+                },
+                "action": "openTabset",
+                "isOpen": false,
+                "isSkipBtn": false,
+                "showOrder": 1
+              }
+            ]
+          },
+          "layout": {
+            "i": "c32df81c251141e595fab1c55edaa16b",
+            "x": 0,
+            "y": 44,
+            "w": 6,
+            "h": 24,
+            "autoHeight": true,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 545
+          },
+          "disabled": {},
+          "styles": [],
+          "displayName": "标签项1",
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,39",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,NewTabStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdnavcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "db453d3261184f13bd6021d59c2addca",
+        "type": "NewTab",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "e2d25e02dbc54e229a8969523988eabe",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "选项卡",
+          "type": "NewTab",
+          "title": "标题",
+          "titleEnabled": false,
+          "footerEnabled": false,
+          "rerender": "on",
+          "tabs": [
+            {
+              "id": "a033db76b6db44c2a9a88a5f8acde1ff",
+              "content": "标签项1",
+              "defaultActive": true,
+              "children": []
+            }
+          ],
+          "addChildAfterSelect": "notAllow",
+          "flow": {
+            "isCanvas": true,
+            "nodes": [],
+            "linkedNodes": {}
+          },
+          "layout": {
+            "i": "c044c74f42554c048eadb507e1726fb5",
+            "adaptive": true,
+            "h": 24,
+            "selected": false
+          },
+          "disabled": {},
+          "styles": [],
+          "displayName": "标签项1"
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1,39",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig,NewTabStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms,@weapp/ebdnavcoms"
+      }
+    ]
+  }
+]

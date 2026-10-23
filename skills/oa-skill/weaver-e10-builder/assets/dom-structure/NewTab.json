@@ -1,0 +1,606 @@
+{
+	"component": "new-tab 选项卡组件（weapp-ebdnavcoms/src/components/tab，目录名 tab，组件类型 NewTab，口语常叫 new-tab）",
+	"usage": "NewTab 的「组件根」不是一个元素，而是同级的两个块：.ebcoms-tab-header（选项栏）+ .ebcoms-tab-content（内容区），两者都挂在引擎外壳的 .content 里，都带一个 <comId> 的 class。先按 page.client 选分树：PC → shared.tabHeader + shared.tabContent；移动端 → mobile。再按 config 的 more / mode / 下级页签独立展示开关去看 tab-more 与 sub-tab。写选择器一定用 .ebcoms-tab-header / .ebcoms-tab-content / #<comId> 限域 —— 组件内部有 header / content / text / tab-name / count / main / left / right 这类无前缀裸类名，不限域必然误伤。",
+	"legend": {
+		"[cls]": "条件class，满足业务/配置条件才挂载",
+		"{a|b}": "多选一class（同一位置按配置或客户端换成其中一个）",
+		"a > b": "父子层级压缩写法，冒号左边是右边的父级",
+		"ref:shared.xxx": "引用 shared 中定义的复用片段",
+		"uncontrolled": "第三方组件（@weapp/ui 的 Menu/Trigger/Popover/Empty、@weapp/ebdcoms 的 OperationBtns/TransformContent、@weapp/designer 的 DroppableView）渲染，内部结构不可控，只给挂载点",
+		"<comId>": "组件实例 id。引擎外壳的 id、.ebcoms-tab-header 与 .ebcoms-tab-content 上拼的 class 都是它；官方样式作用域写成 #<comId>.ebcom",
+		"ebcoms-": "组件自己写的类名前缀（clsPrefix='ebcoms'）",
+		"ebcom-": "引擎/框架层的类名前缀（ebcomPrefix='ebcom'），组件源码里搜不到",
+		"weapp-ebdnavcoms-": "组件库对外容器前缀（ebdNavComsClsPrefix），只出现在独立容器 TabViewCommon / SubTabViewContainer 的根上",
+		"ui- / ui-m-": "@weapp/ui 的 Menu 系列类名（ui-m- 是它的移动端变体），组件只传 className 与 type/position 拼接",
+		"裸类名": "header / main / left / right / content / text / text-container / tab-name / count / tab-dot / active-icon / separator 这些没有前缀的类名都是组件自己写的，最容易被通用样式误伤"
+	},
+	"pickTree": "1. 状态：View.state.loading===true → state-loading（整棵被 Spin 替换）。\n2. 客户端：page.client==='MOBILE' → mobile（类名整体换成 ebcoms-m-* / ui-m-*），PC → shared.tabHeader + shared.tabContent。\n3. PC 下再看样式配置 config.styles 里 category 为选项卡（NEWTAB）那条的 tab.mode：horizontal / vertical 只改选项栏内部的条件类名（vertical / isverticalStyle3/4/5 / positionRight …）和引擎 .content 上的布局类名，DOM 骨架不变；topDropdown 会把选项栏里的选项列表整段换成顶部下拉触发器（见 shared.selectTrigger）。\n4. 再看 tab.more：'2' → more-shrink（自动换行＋收缩图标）、'4' → more-dropdown、'5'/'6' → more-drawer，这三类弹出层结构见 tab-more。\n5. 下级页签独立展示（tab.subItemDisplayMode==='1' 且 addChildAfterSelect==='notAllow'）→ 页面里会多出一个 #sub-tab-<comId> 独立容器，见 sub-tab。\n6. 编辑器画布（设计态）→ design，只有差异清单。",
+	"root": {
+		"tag": "div",
+		"id": "<comId>",
+		"class": [
+			"ebcom",
+			"ebcom-newtab",
+			"{ebcom-grid|ebcom-flow|ebcom-excel}",
+			"[ebcom-m]",
+			"ebcom-view",
+			"[has-no-header]",
+			"[content-no-padding]",
+			"[event-action-click]",
+			"[standalone]"
+		],
+		"desc": "引擎外壳，由 weapp-ebdcoms 的 createView 生成，不在本组件源码里。类型名拼成 ebcom-newtab，布局拼成 ebcom-grid/ebcom-flow/ebcom-excel（grid 与 flow 决定内容区里是 .content-box 还是 .flow-content-box）；配了点击事件动作挂 event-action-click。⚠️ has-no-header 在 NewTab 上恒为真且不能反推有没有标题栏：组件声明了 static renderHeader，引擎就不渲染自己那层 .header，但仍会把 has-no-header 加上（和 nav-bar / picture 的判断逻辑正好相反）。官方样式作用域是 #<comId>.ebcom（getTabStyles 生成的自定义样式被它 + pretreatCssCode 限域）。",
+		"when": "运行态视图。设计态外壳由 createDesign 拼（ebcom-newtab … ebcom-design），结构差异见 design",
+		"children": [
+			{
+				"tag": "div",
+				"class": [
+					"header",
+					"[hideLabelBar]"
+				],
+				"when": "config.titleEnabled===true 时才有（本组件 config 默认标题栏关闭，设计态 children.onBeforeCreate 还会强制置 false）。这层不是引擎写的：组件用 static renderHeader 把 TabTitle 交回引擎，引擎把返回值直接放在外壳下，所以它和 .content 是平级兄弟，不是 .content 的子元素",
+				"desc": "组件标题栏（TabTitle 的输出）。整块结构见 ref:shared.tabTitleHeader"
+			},
+			{
+				"tag": "div",
+				"class": [
+					"content",
+					"ebcoms-newtab-{tab|menu|select}-{top|bottom|left|right}",
+					"ebcoms-newtab-{left|center|right|cover|top|bottom}",
+					"[ebcoms-newtab-more-{wrap|shrink|dropdown|drawer}]",
+					"[ebcoms-newtab-verticalStyle]",
+					"[ebcoms-m-newtab]",
+					"[titleEnabled]"
+				],
+				"desc": "引擎内容槽。⚠️ 这串布局类名不是组件 render 里写的，是引擎读组件 static defaultOpts.render.contentClass = getTabContentClass(props) 拼上来的，所以「选项栏在上/在左」「更多用什么方式收」「纵向样式四五」这些定位类名都在这一层（.content 上），不在 .ebcoms-tab-content 上。取值规则：type 由 mode 决定（horizontal→tab / vertical→menu / topDropdown→select，移动端 topDropdown→menu 且多一个 -m 中缀），position 由 mode+position 决定（horizontal 时 1/2→top/bottom，其余→left/right），align 段为 left/center/right/cover（vertical 时是 top/bottom，topDropdown 时整段消失）。⚠️ 它和组件里的 .ebcoms-tab-content 同名不同层，隔着一层父子关系，是本组件最容易打错的一处",
+				"children": [
+					"ref:shared.tabHeader",
+					"ref:shared.tabContent"
+				]
+			},
+			{
+				"tag": "div",
+				"class": [
+					"footer"
+				],
+				"when": "config.footerEnabled===true 时才有；NewTab 默认 false，正常看不到",
+				"desc": "引擎底部按钮区，来自 createView.renderFooter"
+			}
+		],
+		"tips": [
+			"本组件没有「组件自己的根 div」：Content.render 返回的是一个 Fragment（.ebcoms-tab-header 与 .ebcoms-tab-content 并列）。想整块限域就用 #<comId> 或这两个类名，别假设存在单一根",
+			"TabViewCommon（组件库导出的 NewTabView，独立预览用）会自己渲染一套同样的外壳：div#<comId>.ebcom.ebcom-newtab.ebcom-grid.ebcom-view.weapp-ebdnavcoms-newtab-viewContainer[.isVertical][.verticalStyleFour] > div.<布局类>.content。它没有 has-no-header，且不渲染 TabTitle（标题栏交给宿主 PageHeader 的插槽），结构与规则页一致"
+		]
+	},
+	"shared": {
+		"tabTitleHeader": {
+			"tag": "div",
+			"class": [
+				"header",
+				"[hideLabelBar]"
+			],
+			"desc": "组件标题栏（TabTitle），由 static renderHeader 交给引擎渲染，位置在外壳第一个子节点、与 .content 平级。⚠️ header / main / left / right / more-icon 都是无前缀裸类名。已有钩子：common/index.less 的 `.ebcom-newtab > .header.hideLabelBar` 那一大段（.main/.left/.right/.more-icon/.ebcoms-header-btns 的布局与间距），以及 body[page-rtl='true'] 下的镜像规则",
+			"when": "config.titleEnabled===true；titleEnabled 为 false 时整块不渲染",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"main"
+					],
+					"when": "hideLabelBar===true（config.titleEnabled && config.hideLabelBar 且 enableHideLabelBar 判定通过）时才走这一支",
+					"desc": "hideLabelBar 分支：标题与操作按钮分列左右",
+					"chain": "div.header.hideLabelBar > div.main > div.left + div.right",
+					"children": [
+						{
+							"tag": "div",
+							"class": [
+								"left"
+							],
+							"desc": "标题区",
+							"children": [
+								"ref:shared.tabTitleText"
+							]
+						},
+						{
+							"tag": "div",
+							"class": [
+								"right"
+							],
+							"when": "父组件不是 PageHeader 时才有",
+							"desc": "右侧按钮区",
+							"children": [
+								"ref:shared.headerBtns"
+							]
+						}
+					]
+				},
+				"ref:shared.tabTitleText",
+				"ref:shared.headerBtns"
+			],
+			"tips": [
+				"非 hideLabelBar 分支没有 main/left/right：.header 的直接子节点就是「标题图标 + .ebcom-title + 顶部操作按钮」。所以写 .header 的布局要按分支分别处理",
+				"enableHideLabelBar 在只有 0~1 个可见页签时会返回 true；此时标题栏换成 .main 那一支"
+			]
+		},
+		"tabTitleText": {
+			"tag": "div",
+			"class": [
+				"ebcom-title",
+				"[ebcom-title-design]"
+			],
+			"when": "config.title 有内容时",
+			"desc": "标题文字。运行态由 @weapp/ebdcoms 的 TransformContent 渲染并拼上 ebcom-title（所以会带 ebcoms-transform-content-readonly 等类）；设计态直接渲染 div.ebcom-title.ebcom-title-design + dangerouslySetInnerHTML。它前面可能还有一个由 TitleIconComP 渲染的标题图标（@weapp/ebdcoms，不可控）"
+		},
+		"headerBtns": {
+			"tag": "div",
+			"class": [
+				"ebcoms-header-btns"
+			],
+			"when": "顶部操作按钮开启且有可用按钮、且 extra-content 没声明隐藏时才渲染",
+			"desc": "标题栏右侧的操作按钮容器，由 TabTitle 的 ComBtns 渲染：里面是 @weapp/ebdcoms 的 OperationBtns（wrapClass 传的是 ebcoms-header-btns，内部结构不可控）。另有 ExtraContent（默认返回空、无 DOM）、移动端改用 span.ui-icon.more-icon，以及设计/运行态的筛选搜索（FilterSearch / CommonFilter）",
+			"tips": [
+				"这个 ebcoms-header-btns 是「标题栏」按钮；选项栏里还有另一个同名 wrapClass 的按钮容器（见 shared.operations 里的 OperationBtns），两者最容易混",
+				"已有钩子：common/index.less 里 `.ebcom-newtab > .header.hideLabelBar .right .ebcoms-header-btns` 那段"
+			]
+		},
+		"tabHeader": {
+			"tag": "div",
+			"class": [
+				"ebcoms-tab-header",
+				"<comId>",
+				"[ebcoms-tab-header-title-enabled]",
+				"[ebcoms-tab-header-titleleft-iconafter]",
+				"[ebcoms-tab-header-preset]",
+				"[vertical]",
+				"[topDropdown]",
+				"[new-tab-style]",
+				"[isBreadFirst]",
+				"[isBreadSec]",
+				"[isBreadThi]",
+				"[beforeLogin]",
+				"[positionRight]",
+				"[isverticalStyle4]",
+				"[isverticalTree]",
+				"[textAlignHorizontal]",
+				"[isverticalStyle3]",
+				"[customStyle<样式id>]",
+				"[moreModeClass_<mode>_<more>]",
+				"[unlockIconWidth]",
+				"[rightAndOverflow]"
+			],
+			"id": "ebcoms-tab-header-weight",
+			"desc": "选项栏（Content.renderHeader 的最外层，组件渲染的第一个块）。类名三段：固定前缀 ebcoms-tab-header；class 里再拼一个 <comId>（getTabStyles 生成的选择器写成 .ebcoms-tab-header.<comId>，官方样式靠它限域）；其余全是条件类。⚠️ 带下划线的大驼峰类名（moreModeClass_horizontal_4、customStyle1101998774837403648）也在这层。⚠️ id 是固定字符串 ebcoms-tab-header-weight，不是唯一 id，别用它做单实例定位（已有多处 less 用它提优先级）",
+			"when": "运行态始终渲染这个 div（即使内容是空的），除非配置隐藏标题栏逻辑命中——见下面 tips",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ui-menu",
+						"ui-menu-{tab|menu|select}",
+						"[ui-menu-limit]",
+						"[ui-menu-hasmore]",
+						"ui-menu-{tab|select}-{top|bottom|left|right}",
+						"[ui-menu-{tab|menu|select}-rtl]",
+						"ebcoms-tab-menu-{top|bottom|left|right}",
+						"[hasChild]"
+					],
+					"desc": "@weapp/ui Menu（uncontrolled，内部结构不可控，只给挂载点）。className 由组件传 ebcoms-tab-menu-<position> + [hasChild]；ui-menu-* 由 Menu 自己按 type/position/overflowType 拼。type 由选项栏布局决定：horizontal→tab、vertical→menu、topDropdown→select（移动端 horizontal/vertical→tab、topDropdown→menu）。当前页签的选项就是在 Menu 里通过 customRenderItem / customRenderItemIcon / customRenderItemContent 三个回调渲染出来的，见 ref:shared.tabItem 与 ref:shared.selectTrigger",
+					"tips": [
+						"Menu 里还有这些被本组件样式复用的类：ui-menu-list-item、ui-menu-list-item-active、ui-menu-list-item-content-wrap、ui-menu-list-item-overflow、ui-menu-tab-top-container、ui-menu-nav-container-scrolling、ui-menu-nav-scroll、ui-menu-hasmore、ui-menu-overflow-more-text、ui-menu-select-title(-text/-count/-icon)、ui-trigger",
+						"overflowType：more 为 '4'/'5'/'6' 时是 'more'（挂 ui-menu-hasmore），否则 'scroll'（挂滚动容器）"
+					]
+				},
+				"ref:shared.tabItem",
+				{
+					"tag": "span",
+					"class": [
+						"ebcoms-newtab-shrink",
+						"[active]"
+					],
+					"when": "shouldShowShrinkIcon(config, client) 为真：horizontal 且 more==='2'，或移动端 horizontal 且 more 为 '4'/'5'/'6'（源码在 common/tab-dropdown/ShrinkIcon.tsx）",
+					"desc": "折叠/展开图标（收缩图标），点击切换自动换行。组件给它传 className=ebcoms-newtab-shrink，active 时内部 svg 旋转 180°。已有钩子：common/style.less 的 .ebcoms-newtab-shrink（flex 居中、宽 20px、cursor:pointer、&.active .ui-icon 旋转）与 `.ebcoms-newtab-shrink + .ui-menu`（右侧留 20px）"
+				},
+				"ref:shared.operations",
+				{
+					"tag": "div",
+					"class": [
+						"nav-panel-btn"
+					],
+					"when": "isPanel===true 且 mode==='topDropdown'",
+					"desc": "导航面板按钮（面包屑场景），内容来自 Menu 的 extraContent"
+				}
+			],
+			"tips": [
+				"三个「整块变空/消失」的开关，光看类名分不出来，要看是否 :empty：1) hideMenu（运行时接口下发）→ 整个选项栏内容不渲染；2) enableHideLabelBar（titleEnabled+hideLabelBar 且可见页签 ≤1）→ 同上；3) noMenuDataHiding 且菜单数据 ≤0 → 同上。这些情况下 .ebcoms-tab-header 这个 div 仍然存在但没有子元素",
+				"同一层还有 from PageHeader 场景：父组件 type==='PageHeader' 且 underTheTitle 且容器位置靠左时，整个选项栏不渲染"
+			]
+		},
+		"tabItem": {
+			"tag": "div",
+			"class": [
+				"ui-menu-list-item",
+				"ui-menu-list-item-tab",
+				"ui-menu-parent-icon",
+				"[ui-menu-list-item-active]",
+				"[ui-menu-list-item-tab-active]",
+				"[ebcoms-tab-select-content]",
+				"[ui-menu-list-item-flex]"
+			],
+			"id": "<页签项 id>",
+			"desc": "一个页签项（customRenderItem 返回的根）。id 直接写的是页签数据 id（但注意 shared.tabItemContent 里的文字节点会带同一个 id，见其 tips）。active 时同时挂 ui-menu-list-item-active 与 ui-menu-list-item-tab-active；横向铺满（align==='4' 且 horizontal）时挂 ui-menu-list-item-flex；顶部下拉模式时挂 ebcoms-tab-select-content。⚠️ 这层还被 @weapp/ui 当 Menu 的选项容器用，ui-* 前缀那段是 Menu 的，ebcoms-tab-select-content 是本组件加的",
+			"when": "菜单数据里的每个可见页签各一份（含子项；纵向样式四会用 Trigger 包一层，见 tips）",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ui-menu-list-item-content-wrap",
+						"[ui-menu-list-item-overflow]",
+						"[tab-history-width]",
+						"[isverticalStyle3]"
+					],
+					"desc": "选项内容外层（customRenderItem 里的 menuContent）。如果传了 customRenderItemContent 回调，这一整块会被换成 div.ebcoms-tab-header-customRenderItemContent —— 那是插件口子，默认没有",
+					"children": [
+						{
+							"tag": "div",
+							"class": [
+								"ui-menu-list-item-content"
+							],
+							"children": [
+								{
+									"tag": "div",
+									"class": [
+										"text-container",
+										"[text-overflow]"
+									],
+									"desc": "文字/图标的横向容器；align==='4'（铺满）时多 text-overflow",
+									"children": [
+										{
+											"tag": "span",
+											"class": [
+												"ebcoms-assets-icon"
+											],
+											"when": "页签配了图标时（可能是 @weapp/ui AssetsItem，也可能是 customRenderItemIcon 回调给的自定义图标）",
+											"desc": "页签图标挂载点。⚠️ ebcoms-assets-icon 是 @weapp/ui AssetsItem 的类名，内部还有 ui-icon-wrapper / ui-icon-svg 等，不可控。已有钩子：common/style.less 的 .text() mixin 里 `.ebcoms-assets-icon{margin-right:calc(3*var(--hd))}`"
+										},
+										{
+											"tag": "div",
+											"class": [
+												"text",
+												"pc",
+												"[hasIcon]"
+											],
+											"desc": "页签文字块。⚠️ text / pc / hasIcon 都是裸类名。pc 是固定类；图标路径或图片存在时加 hasIcon（less 用它把宽度收成 calc(100% - 24*var(--hd))）。纵向样式五会额外有 isverticalStyle5 相关处理",
+											"children": [
+												"ref:shared.tabItemContent",
+												{
+													"tag": "span",
+													"class": [
+														"count"
+													],
+													"when": "displayCounts 里该页签 displayCount > -1 且 showCount",
+													"desc": "角标计数，内容形如 (12)。来自 Count 组件，可被插件 renderMenuItemCount 整体替换",
+													"tips": [
+														"已有钩子：common/style.less 的 .text() mixin 里 .count{padding-left:calc(3*var(--hd))}，是裸类名，必须限域"
+													]
+												},
+												{
+													"tag": "span",
+													"class": [
+														"tab-dot"
+													],
+													"when": "displayCounts 里该页签 displayCount==='*' 且 showCount",
+													"desc": "红点角标（无数字）。已有钩子：common/style.less 里 `.text > span.tab-dot{width:5px;height:5px;background:#ff666a;border-radius:50%;margin-left:3px}`"
+												}
+											]
+										}
+									]
+								}
+							]
+						},
+						{
+							"tag": "div",
+							"class": [
+								"active-icon",
+								"[active]"
+							],
+							"desc": "选中态装饰（下划线/竖条之类的动画元素）。⚠️ 它在 ui-menu-list-item-content-wrap 里、是 ui-menu-list-item-content 的兄弟，不是它的子元素；激活态挂 active。裸类名，必须限域"
+						}
+					]
+				},
+				{
+					"tag": "div",
+					"class": [
+						"separator",
+						"ebcoms-tab-separator"
+					],
+					"when": "isBreadFirst（面包屑样式一）时",
+					"desc": "页签之间的分隔符，内容是配置里的 separator 文本。⚠️ separator 是裸类名，ebcoms-tab-separator 是组件加的"
+				}
+			],
+			"tips": [
+				"纵向样式四（VER_D）且页签有子项：这一层外面再包 @weapp/ui Trigger，子级菜单在弹层里，DOM 不在选项栏内。纵向样式五（VER_E）：有子项时包 Popover（popupClassName=ebcoms-tab-style5-popover）+ Trigger（额外拼 weapp-ebdnavcoms-tab-verticalItem-isverticalStyle5），无子项的非子级只用 Popover 包一层。两者源码都在 common/tab-verticalItem/VerticalFiveItem.tsx",
+				"子页签（data.childrenList 有值）在默认分支下走的是 Menu 自己渲染的 itemNode，结构由 Menu 决定（不可控）"
+			]
+		},
+		"tabItemContent": {
+			"tag": "div",
+			"class": [
+				"tab-name"
+			],
+			"desc": "页签文字的包裹层（ItemContent），带 title 属性（截断时原生 tooltip）",
+			"chain": "div.text.pc > div.tab-name > div.ebcoms-tab-menu-item.tab-name[.ebcoms-transform-content-readonly]",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ebcoms-tab-menu-item",
+						"tab-name",
+						"[ebcoms-transform-content-readonly]"
+					],
+					"desc": "@weapp/ebdcoms 的 TransformContent 根节点：组件传的 className（ebcoms-tab-menu-item tab-name）拼在它的 div 上，富文本/字段内容由 dangerouslySetInnerHTML 注入（内部 p/span 等不可控）"
+				}
+			],
+			"tips": [
+				"⚠️ tab-name 出现两次：外层 div 和 TransformContent 根节点都叫 tab-name（`.text .tab-name` 这类 less 就是按嵌套写的）。已有钩子：common/style.less 的 .text() mixin 里 .tab-name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}",
+				"⚠️ 同一个页签 id 会出现在两个元素上（外层 .ui-menu-list-item 和 TransformContent 根节点都写 id=页签id），别用 #id 定位单个元素",
+				"页面多语言/字段替换由 TransformContent 完成，写样式只需要管好 .ebcoms-tab-menu-item 这层，别改注入的内容结构"
+			]
+		},
+		"operations": {
+			"tag": "div",
+			"class": [
+				"ebcoms-tab-operations-wrap",
+				"[vertical]",
+				"[topDropdown]",
+				"[hasTabBtns]",
+				"[isSignal]"
+			],
+			"desc": "选项栏右侧的操作按钮区（Content.renderComBtns）。两个来源：直接 dom() 分支就是这一层 div；有子组件操作按钮时由 view/ComBtns.tsx 渲染，最外层仍是同一个 ebcoms-tab-operations-wrap。里面依次是 renderHeaderEx、renderOwnBtns（@weapp/ebdcoms OperationBtns，wrapClass=ebcoms-header-btns）、以及 FilterSearch（ebcoms-charts-main-filtertotal-mask 挂载点）",
+			"when": "showChildOpBtns 为真（horizontal 或 topDropdown），且没走 PageHeader 的 underTheTitle 分支、没有自定义内容",
+			"chain": "div.ebcoms-tab-operations-wrap > (div.ebcoms-header-btns 内的 @weapp/ebdcoms OperationBtns) + (FilterSearch 挂载点)",
+			"tips": [
+				"子选项卡选择「操作按钮显示在中间」（BtnShowType.Middle）时，这层会被挪到内容区，并被 div.ebcoms-tab-content-container-right 包一层",
+				"optionShowType 为 ChildEX 且父组件不是 PageHeader 时，renderComBtns 会作为子选项卡头部的一部分渲染（子选项卡自己调）",
+				"hasTabBtns 条件：(顶部操作按钮开启且 titleEnabled 为 false) 或 optionShowType 为 Middle"
+			]
+		},
+		"selectTrigger": {
+			"tag": "div",
+			"class": [
+				"ebcoms-newtab-tab-dropdown-header-select",
+				"[spreadMenu]"
+			],
+			"when": "mode==='topDropdown'（PC），或移动端 topDropdown 时的对应结构（ebcoms-newtab-tab-m-dropdown-header-select）",
+			"desc": "顶部下拉模式下，选项栏里显示的当前页签触发器（customSelectContent 返回的根）。真正的内容来自 view/CustomSelectContent.tsx",
+			"children": [
+				{
+					"tag": "span",
+					"class": [
+						"ui-menu-select-title"
+					],
+					"desc": "下拉触发器内容，可能是 .ebcoms-assets-icon + .ui-menu-select-title 的顺序（图标前置/后置），也可能只此一层",
+					"children": [
+						{
+							"tag": "span",
+							"class": [
+								"ui-menu-select-title-text"
+							],
+							"desc": "当前页签文字（值同页签文字），后面可能跟插件 renderMenuInnerContent 追加的内容"
+						},
+						{
+							"tag": "span",
+							"class": [
+								"ui-menu-select-title-count"
+							],
+							"when": "有计数角标时",
+							"desc": "形如 (12) 的计数"
+						},
+						{
+							"tag": "span",
+							"class": [
+								"ui-menu-select-title-icon"
+							],
+							"desc": "下拉箭头容器，内部是 @weapp/ui Icon（Icon-Down-arrow04，size=sm）。图标前置的分支里这一层是 .ui-menu-select-title 的兄弟"
+						}
+					]
+				}
+			],
+			"tips": [
+				"已有钩子：common/style.less 有一整段针对 .ui-menu-select-title / -text / -count / -icon 的规则，以及 `>.ebcoms-assets-icon + .ui-menu-select-title`（图标前置）与 `.ui-menu-select-title + .ebcoms-assets-icon`（图标后置）两个位置差异规则",
+				"getTabStyles 里还有一条专门的：.ebcoms-tab-header.<comId> .ebcoms-newtab-tab-dropdown-header-select .ui-menu-select-title-text"
+			]
+		},
+		"tabContent": {
+			"tag": "div",
+			"class": [
+				"ebcoms-tab-content-{top|bottom|left|right}",
+				"ebcoms-tab-content",
+				"<comId>",
+				"[ebcoms-tab-content-childs-bg]",
+				"[ebcoms-tab-flow-content]",
+				"[isNotEmpty]",
+				"[ebcoms-subTab-position-{top|bottom|left|right}]",
+				"[ebcoms-subTab-children-vertical]",
+				"[ebcoms-subTab-children-drop]",
+				"[ebcoms-subTab-children-dropDown]",
+				"[ebcoms-subTab-children]"
+			],
+			"desc": "内容区（Content.render 的第二个块，与 .ebcoms-tab-header 平级）。⚠️ 它和引擎的 .content 同名但不同层/不同元素：引擎那层是父级（还挂着 ebcoms-newtab-* 布局类）。类名里 position 取的是归一化后的值（bottom 会变成 top，与 .content 上的 ebcoms-newtab-tab-bottom 不同名，这是刻意留的两个钩子）。rerender 为 On 时挂 ebcoms-tab-content-childs-bg，flow 布局挂 ebcoms-tab-flow-content；独立展示的下级页签会挂 ebcoms-subTab-* 那一串；内联 style 里 padding 只在 rerender=On 且 GRID 布局时由 getTabPaddding 给（高度自动填充时只有 height:auto）",
+			"when": "config.hideMenuContent!==true 时；否则整块不渲染",
+			"children": [
+				{
+					"tag": "div",
+					"class": [
+						"ebcoms-tab-content-container-right"
+					],
+					"when": "有下级页签且 optionShowType 为 Middle（操作按钮显示在中间）",
+					"desc": "把「中间操作按钮 + 页签内容」重新包一层的 flex 容器；里面的结构就是下面的操作按钮区与内容盒子",
+					"children": [
+						"ref:shared.operations"
+					]
+				},
+				{
+					"tag": "div",
+					"class": [
+						"content-box",
+						"ebcom",
+						"[show]"
+					],
+					"id": "<droppableId>",
+					"when": "page.layoutType 为 GRID 且 rerender==='Off'（一次性渲染所有页签内容）；每个页签一个盒子",
+					"desc": "一个页签的内容盒子（GRID 布局）。id 是 config.flow.linkedNodes[页签id] 对应的拖拽节点 id；只有当前选中页签的盒子带 show（非 show 的显隐由宿主运行时的全局样式控制，本组件仓库里没有 .content-box 的显隐规则，组件只负责挂/去 show）。内部是 @weapp/designer 的 DroppableView（comId=组件id、id=页签id），真实业务组件 DOM 全部不可控",
+					"tips": [
+						"写样式只针对 .content-box.show 分支，别给 .content-box 写 display，会跟宿主的页签切换机制打架",
+						"GRID 布局下子组件是绝对定位层叠的：design/index.less 里 `.flow-content-box, > .content-box{height:100%;width:100%;position:absolute;z-index:-999}`，show 才抬起来",
+						"已有钩子：body[page-rtl='true'] 下 .ebcom-newtab.ebcom-view .content-box.ebcom 会 scaleX(-1)"
+					]
+				},
+				{
+					"tag": "div",
+					"class": [
+						"content-box",
+						"ebcom",
+						"[show]"
+					],
+					"id": "<droppableId>",
+					"when": "rerender!=='Off'（每次只渲染当前页签）时，只有一个盒子，且 key 带 refresh 计数用于强制重建",
+					"desc": "同上，只是渲染策略不同：weight 无关，显隐靠 show === (页签id 命中当前选中 且 tabKey!=='all')"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"flow-content-box",
+						"[show]"
+					],
+					"when": "page.layoutType 为 FLOW",
+					"desc": "FLOW 布局下的页签内容盒子，没有 ebcom 与 id，内容由 renderFlowComs 渲染（流水式排布，不用拖拽容器）"
+				},
+				{
+					"tag": "iframe",
+					"class": [
+						"ebcoms-m-tab-content-container-iframe"
+					],
+					"when": "该页签 type==='dataset'（数据源页签）",
+					"desc": "数据源页签用 iframe 承载整站页面（类名带 -m- 但 PC 也是这个类，是历史命名）；未配置/取不到时退化成 @weapp/ui 的空态。iframe 内部完全不可控"
+				},
+				{
+					"tag": "div",
+					"class": [
+						"ebcoms-subTab-header",
+						"[ebcoms-subTab-header-titleleft-iconafter]",
+						"[vertical]",
+						"[topDropdown]",
+						"[positionRight]",
+						"[ebcoms-subTab-header{left|center|right|top|bottom}]",
+						"[moreModeClass_<mode>_<more>]",
+						"[rightAndOverflow]"
+					],
+					"id": "<comId>",
+					"when": "getIsIndependSub() 为真（下级页签独立展示）且当前有选中的下级页签",
+					"desc": "下级页签的选项栏（common/sub-tab/index.tsx）。里面的 Menu 与 tabItem 的渲染逻辑和主选项栏同源（customRenderItemChild），所以 .ui-menu-list-item 那一套类名同样适用；type 为 select 时页签项会多 ebcoms-tab-select-content。renderHeaderEx / renderComBtns 会以兄弟节点形式追加在后面",
+					"tips": [
+						"已有钩子：getTabStyles 里有 `.ebcoms-subTab-header.<sub-tab-<comId>>…` 与 `.ebcoms-subTab-header.<comId>…` 两组限域规则"
+					]
+				}
+			],
+			"tips": [
+				"还有另一个「下级页签独立展示」的形态：页面里单独挂一个 #sub-tab-<comId> 容器（SubTabViewContainer），见 sub-tab 树。两者可以同时存在：主内容区里是 .ebcoms-subTab-header + 内容盒子，独立容器里是完整的一套外壳",
+				"isNotEmpty 条件类只在纵向排列且（有中间操作按钮 或 有自身顶部按钮）时挂"
+			]
+		},
+		"contentContainerRight": {
+			"tag": "div",
+			"class": [
+				"ebcoms-tab-content-container-right"
+			],
+			"desc": "Content.renderContentWithBtn 在「有下级页签 + 操作按钮显示在中间」时把（操作按钮区 + 页签内容）重新包的一层，用于横向排列这两块"
+		}
+	},
+	"state-loading": {
+		"when": "View.state.loading===true（组件初始化取数/插件未就绪阶段）",
+		"tree": [
+			"div#<comId>.ebcom.ebcom-newtab.ebcom-view.has-no-header（外壳照常渲染）",
+			"> .content（引擎内容槽）",
+			"> span.ui-spin / @weapp/ui Spin（View.render 里直接 return，选项栏与内容区都不渲染）"
+		],
+		"diffs": [
+			"loading 期间没有 .ebcoms-tab-header 也没有 .ebcoms-tab-content，整块只有一个 Spin；切换加载态不需要写任何选择器",
+			"Spin 的具体类名由 @weapp/ui 决定（ui-spin 系列），不可控"
+		]
+	},
+	"tab-more": {
+		"when": "样式配置里 tab.mode==='horizontal' 时按 tab.more 分支：'1' → ebcoms-newtab-more-wrap（自动换行，无收缩图标）、'2' → ebcoms-newtab-more-shrink（自动换行 + 收缩图标）、'3'（默认）→ 滚动、'4' → ebcoms-newtab-more-dropdown、'5'/'6' → ebcoms-newtab-more-drawer",
+		"tree": [
+			"该模式类名挂在引擎 .content 上（getTabLayoutClsNames 产出 ebcoms-newtab-more-{wrap|shrink|dropdown|drawer}），不在 .ebcoms-tab-header 上",
+			"收缩图标见 shared.tabHeader 里的 span.ebcoms-newtab-shrink",
+			"下拉形态：moreTriggerProps.popupClassName 为 weapp-ebdnavcoms-tab-more-trigger，弹层内容由 common/tab-dropdown/TabDropdownIconAndList.tsx 渲染",
+			"抽屉形态：common/tab-dropdown/TabDrawerIconAndList.tsx 渲染"
+		],
+		"diffs": [
+			"more==='2'：选项栏里多一个 ebcoms-newtab-shrink（active 时旋转箭头），超出的页签换行显示，没有弹层",
+			"more==='4'：超出部分进下拉弹层。弹层类名 ebcoms-newtab-dropdown，内部 ebcoms-newtab-dropdown-list、ebcoms-newtab-dropdown-list-item（禁用态 ebcoms-newtab-dropdown-list-item-disabled）；另有一组 ebcoms-newtab-j-wrap-list / ebcoms-newtab-j-wrap-list-split。触发器是 ebcoms-tab-menu-<position> 之外的独立 moreTrigger（弹层类 weapp-ebdnavcoms-tab-more-trigger）",
+			"more==='5'/'6'：抽屉形态。弹层类名 ebcoms-newtab-drawer、ebcoms-newtab-drawer-list、ebcoms-newtab-drawer-list-container、ebcoms-newtab-drawer-list-footer、ebcoms-newtab-drawer-list-item、ebcoms-newtab-j-wrap-list-item",
+			"已有钩子：view/index.less 里针对 subViewContainer 的 .ebcoms-newtab-more-dropdown.ebcoms-newtab-right（隐藏自带的更多文字）与 .ebcoms-newtab-more-dropdown.ebcoms-newtab-left（限制 .ui-menu-hasmore .ui-menu-list 宽度）",
+			"设计态（design/index.less、design-m/index.less）另有 showShrinkIcon、.ebcoms-newtab-more-drawer > .showShrinkIcon > .ui-m-menu 等规则，仅画布用"
+		]
+	},
+	"sub-tab": {
+		"when": "下级页签配置为独立展示（样式里 tab.subItemDisplayMode==='1' 且 config.addChildAfterSelect==='notAllow'）时，页面会通过 SubTabViewContainer 渲染一个 id 为 sub-tab-<comId> 的独立容器；必须与同 comId 的 TabViewCommon 搭配才有内容，否则返回空 Fragment",
+		"tree": [
+			"div#sub-tab-<comId>.ebcom.ebcom-newtab.ebcom-grid.ebcom-view.weapp-ebdnavcoms-newtab-subViewContainer.ebcoms-tab-content[.isVertical][.verticalStyleFour][.ebcoms-subTab-position-<pos>][.ebcoms-subTab-children-vertical][.ebcoms-subTab-children-drop]",
+			"> div.<getTabContentClass 产出的布局类>.content",
+			"> SubTab（common/sub-tab/index.tsx）→ div.ebcoms-subTab-header.<sub-tab-<comId>>…（结构同 shared.tabContent 里的 ebcoms-subTab-header）"
+		],
+		"diffs": [
+			"根是独立外壳（id 以 sub-tab- 前缀），不是主组件的 #<comId>；类名里同时有 ebcom 系列（外壳）、weapp-ebdnavcoms-newtab-subViewContainer（库容器）、ebcoms-tab-content 与 ebcoms-subTab-*（组件条件类）",
+			"已有钩子：view/index.less 针对 .weapp-ebdnavcoms-newtab-subViewContainer 的 border-radius:0、verticalStyleFour 定宽定高去背景去阴影、isVertical.ebcom.ebcom-grid 改 inline-flex、.ebcom.ebcom-grid:empty{border:0}、isVertical .ui-menu-menu{min-width:calc(100*var(--hd))}",
+			"移动端对应容器是 weapp-ebdnavcoms-newtab-subViewContainer 的 m 版本（MTabViewCommon/MSubTabViewCommon），头部类 names 换成 ebcoms-m-subTab-header 系列"
+		]
+	},
+	"mobile": {
+		"when": "page.client==='MOBILE'",
+		"tree": [
+			"div#<comId>.ebcom.ebcom-newtab.ebcom-grid.ebcom-view.ebcom-m[.has-no-header]（外壳多 ebcom-m，独立容器版是 weapp-ebdnavcoms-newtab-viewContainer-m，并带 [isVertical][isBottom]）",
+			"> .content（布局类同上，topDropdown 时多 -m 中缀：ebcoms-newtab-m-select-<pos>；horizontal/vertical 的 type 都变成 tab）",
+			"> div.ebcoms-m-tab-header[大量条件类，如 ebcoms-m-tab-header-title-enabled / -preset / horizontal / vertical / topDropdown / isBreadFirst / isBreadSec / isBreadThi / isMoreAuto / isDesign / positionRight / textAlignHorizontal / isverticalStyle4/5 / isverticalStyleTree / showShrinkIcon / allowSelectParent / showChildOpBtn / unlockIconWidth]，id 同样是固定串 ebcoms-m-tab-header-weight",
+			"> div.ebcoms-m-tab-content-<pos>.ebcoms-m-tab-content[.mobile][.ebcoms-m-tab-content-childs-bg][.ebcoms-m-tab-flow-content][.vertical][.showChildMask][.ebcoms-m-subTab-position-<pos>][.ebcoms-m-subTab-children-vertical][.ebcoms-m-subTab-children-drop][.ebcoms-m-subTab-children]",
+			"> div.ebcoms-m-tab-content-container > SubTabContent + 内容盒子"
+		],
+		"diffs": [
+			"整体是「有前缀替换」而不是换实现：组件自己写的类一律 ebcoms-m-*，@weapp/ui 的 Menu 换成移动端实现、类名 ui-* → ui-m-*（ui-m-menu、ui-m-menu-list、ui-m-menu-list-item、ui-m-menu-list-item-content、ui-m-menu-content、ui-m-menu-top-text、ui-m-menu-wrap…）",
+			"页签项：ui-m-menu-list-item 系列，组件额外挂 ebcoms-m-tab-menu-item；选中态类名是 ui-m-menu-list-item-tab-active；顶部下拉模式下是 ebcoms-m-tab-menu-<pos>",
+			"内容盒子比 PC 多一个 tab-content-box 类：flow-content-box.tab-content-box[.show] 与 content-box.tab-content-box.ebcom[.show]，且内容区多一层 div.ebcoms-m-tab-content-container",
+			"操作按钮区类名为 ebcoms-m-tab-operations-wrap，弹层容器 ebcoms-m-popup-wrapper，按钮 wrapClass 仍是 ebcoms-header-btns；中间操作按钮的容器是 ebcoms-m-tab-content-container-right",
+			"图标位置差异由 ebcoms-newtab-tab-m-icon-after / ebcoms-newtab-tab-m-icon-left 控制；分隔符仍是 separator + ebcoms-tab-separator",
+			"移动端 topDropdown 的触发器是 ebcoms-newtab-tab-m-dropdown-header-select（PC 是 ebcoms-newtab-tab-dropdown-header-select）",
+			"移动端 more==='4'/'5'/'6' 也会渲染收缩图标（shouldShowShrinkIcon 的 MOBILE 分支）",
+			"移动端还有轮播形态（common/tab-carousel，swiper）与下拉/抽屉头部（design-m/index.less 的 showShrinkIcon 系列仅画布用）",
+			"已有钩子：view-m/index.less 与 common/style.less 里的 ui-m-* 规则（含 ui-m-menu-list-item-wrap、ui-m-menu-list-subitem-title、ui-m-menu-top-text 等），改移动端样式优先复用这些限域写法"
+		]
+	},
+	"design": {
+		"when": "编辑器画布（design/Design.tsx、design-m/Design.tsx，由 createDesign 挂载）",
+		"tree": [
+			"外壳由 createDesign 拼（ebcom-newtab … ebcom-design），没有 createView 那套 has-no-header / footer 逻辑",
+			"组件内部结构与运行态基本同源：design/Content.tsx 同样输出 div.ebcoms-tab-header[id=ebcoms-tab-header-weight]、div.ebcoms-tab-content 与 tabItem 的 ui-menu-list-item 系列"
+		],
+		"diffs": [
+			"Design 也声明 static renderHeader（TabTitle 传 isDesign=true）：标题改用 div.ebcom-title.ebcom-title-design + dangerouslySetInnerHTML；TabTitle 的 ComBtns 在设计态会把 CommonFilter / SearchContent 直接渲染出来（运行态是 FilterSearch）",
+			"tabs 为空时 design/Content.tsx 直接 return <div style={height:100%, flex:1}><EmptyNavTab/></div>，渲染 div.ebcoms-tab-emptyPage（内含 @weapp/ui Empty：ui-empty-image / ui-empty-description / ui-empty-icon）与「添加」按钮。⚠️ 这个空态只在设计态出现，运行态没有",
+			"设计态内容盒子额外有 tabEmpty、datasetTabContent、tab-content-box 等标记类，配合 design/index.less 里 `.content-box.tabEmpty`、`.content-box.tab-content-box`、`:not(.more-coms-content-box)`、`.weapp-ebpv-com-placeholder`、拖拽占位（.weapp-ebde-droparea-m 等）等规则；design-m 另有 .more-coms-content-box 的绝对定位层叠写法",
+			"设计态的显隐不走 show 的运行时机制：画布上 flow-content-box / content-box 是 position:absolute + z-index:-999 全量铺开，靠 .show 抬层级",
+			"校验样式请到运行态页面做：设计态外壳、空态、拖拽占位都是画布专有"
+		]
+	},
+	"notes": [
+		"前缀之外还有两族要认得：ebcoms-transform-content-* 来自 @weapp/ebdcoms 的 TransformContent（页签文字与标题文字都用它），ebcoms-assets-icon / ui-icon-* 来自 @weapp/ui 的 AssetsItem / Icon（页签图标与下拉箭头）。ebcoms-charts-main-filtertotal-mask 是 FilterSearch 的挂载点。",
+		"最容易打错的三处：1) .content —— 引擎内容槽，组件自己的内容区叫 .ebcoms-tab-content，两者隔一层父子关系；2) .header —— 组件标题栏（TabTitle 输出，和 .content 平级），不是引擎的 header（引擎那层在 NewTab 上根本不存在）；3) .ebcoms-header-btns —— 标题栏与选项栏各有一个同名 wrapClass 的按钮容器，要按祖先（.header 还是 .ebcoms-tab-header）区分。",
+		"has-no-header 在 NewTab 上恒为真，不能用来判断有没有标题栏：组件用 static renderHeader 接管了 header 渲染，所以引擎不渲染自己的 .header，但仍会把 has-no-header 加上。判断标题栏只看 .header 存不存在（config.titleEnabled）与 .hideLabelBar。",
+		"comId 有三重身份，别混：作为 id 出现在引擎外壳（div#<comId>）和独立容器（div#sub-tab-<comId>）；作为 class 同时拼在 .ebcoms-tab-header 与 .ebcoms-tab-content 上（getTabStyles 生成的选择器全靠它限域，形如 .ebcoms-tab-header.<comId>）；作为属性出现在 createView 写到组件实例首个 DOM 上的 data-id=<comId>（NewTab 里通常落在 .ebcoms-tab-header）。另有固定 id ebcoms-tab-header-weight 与 ebcoms-m-tab-header-weight，都不是唯一的。",
+		"官方样式生成器 getTabStyles 的作用域统一是 #<comId>.ebcom 加 pretreatCssCode 限域，产出的选择器就这些：.ebcoms-tab-header.<comId> 及其后代（.ui-menu-list-item、.ui-menu-list-item-active、.ui-menu-list-item-active .ui-menu-list-item-content-wrap、.ui-menu-list-item:hover、.ebcoms-newtab-tab-dropdown-header-select .ui-menu-select-title-text、.ebcoms-tab-header-customRenderItemContent）、.ebcoms-tab-content.<comId>（含 :not(.ebcoms-subTab-children) 的容器高度、.ebcoms-subTab-children > .content-box.show）、.ebcoms-tab-flow-content.<comId>、移动端 .ebcoms-m-tab-header.<comId> / .ebcoms-m-tab-content.<comId>、下级 .ebcoms-subTab-header.<sub-tab-<comId>>。要精准覆盖这些点，直接照抄对应选择器即可。",
+		"组件自己 less 里已有、不要重复写的钩子：common/style.less 的 .text() mixin（.text / .tab-name / .count / .ebcoms-assets-icon / .text-container）与 .text>span.tab-dot 红点；.ebcoms-newtab-tab-dropdown-header-select 系；.ebcoms-newtab-menu-select-width-by-tabcontent / -by-tabwidth；.ebcoms-newtab-shrink / -dropdown / -drawer；.ebcoms-tab-emptyPage；.ebcom-newtab 的圆角与阴影、.ebcom-newtab > .content.ebcoms-newtab-tab-bottom 等四个方向的反转 flex；.ebcoms-newtab-tab-top/.ebcoms-newtab-tab-bottom > .ebcoms-tab-header 的 flex 排布；.ebcom-newtab .ui-menu-nav-container-scrolling .ui-menu-nav-scroll 的对齐；.ebcoms-newtab-shrink + .ui-menu 的右留白。common/index.less 的 .ebcom-newtab > .header.hideLabelBar 系、RTL 镜像、.ebcom-newtab .ebcoms-empty-text .ui-empty-description 与 .ui-menu-tab-top .ui-menu-tab-top-container{bottom:0}。",
+		"裸类名清单（不限域必误伤）：header、main、left、right、content、text、text-container、tab-name、count、tab-dot、active-icon、separator、nav-panel-btn、flow-content-box、show、isNotEmpty、vertical、topDropdown、hasChild、hasIcon、pc。写规则请至少带上 .ebcoms-tab-header / .ebcoms-tab-content / #<comId> 之一。",
+		"配置开关对结构的影响：titleEnabled 决定标题栏是否有；hideLabelBar 决定标题栏走 .main 分支还是平铺（还需 enableHideLabelBar 与页签数判定）；hideMenuContent 关内容区；hideMenu / noMenuDataHiding 会把选项栏内容清空但保留 .ebcoms-tab-header；page.layoutType 决定 GRID 的 .content-box 还是 FLOW 的 .flow-content-box；config.highlyAutomaticFilling 会让内容区只有 height:auto 的内联样式；isPanel 会加 div.nav-panel-btn 并把 tabItem 内容换成面板。",
+		"反查源码位置：引擎外壳与内容槽在 weapp-ebdcoms/src/components/core/view/createView.tsx（getContainerClass / renderHeader / renderContent / renderFooter）；标题栏在 weapp-ebdnavcoms/src/components/tab/common/tab-title/TabTitle.tsx 与 ComBtns.tsx；选项栏与内容区在 .../tab/view/Content.tsx（renderHeader / customRenderItem / showContent / renderComBtns / renderChildCom / render）；页签文字与角标在 .../tab/view/ItemContent.tsx、Count.tsx；顶部下拉触发器在 .../tab/view/CustomSelectContent.tsx；布局类名与更多模式在 .../tab/common/utils.ts（getTabLayoutClsNames / getTabContentClass / getTabPosition / getTabType）；下级页签在 .../tab/common/sub-tab/index.tsx；独立容器在 .../tab/view/ViewContainer.tsx、SubTabViewContainer.tsx；样式生成器在 .../tab/view/getTabStyles.ts；已有样式在 .../tab/common/style.less、common/index.less、view/index.less、design/index.less、view-m/index.less。"
+	]
+}

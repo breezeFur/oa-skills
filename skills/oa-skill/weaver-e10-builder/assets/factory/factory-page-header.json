@@ -1,0 +1,171 @@
+[
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "PC",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "be025fc5901a43f782797690fc326382",
+        "type": "PageHeader",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "a26b6372e57147d8b8a7dd90e9179a02",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "页头",
+          "type": "PageHeader",
+          "title": "标题",
+          "titleEnabled": true,
+          "icon": {
+            "path": "",
+            "folderId": ""
+          },
+          "newButtons": [
+            {
+              "id": "d41d8cd98f00b204e9800998ecf8427e",
+              "text": "按钮"
+            },
+            {
+              "id": "9eafa13020d13418e8b6ca4dd9b69918",
+              "text": "按钮"
+            },
+            {
+              "id": "helpBtn",
+              "text": "帮助",
+              "isHide": true
+            },
+            {
+              "id": "5e2e731db1cb3a5d9e54a0b74efa02cd8",
+              "isSplit": true
+            }
+          ],
+          "flow": {
+            "isCanvas": true,
+            "nodes": [
+              "d7854bf46f054649ba60582796024939",
+              "f5a2e3febb82413db475a42020e2edad"
+            ],
+            "linkedNodes": {
+              "left": "d7854bf46f054649ba60582796024939",
+              "right": "f5a2e3febb82413db475a42020e2edad"
+            }
+          },
+          "underTheTitle": false,
+          "layout": {
+            "i": "f43667ba4c774b02945cf6944a817559",
+            "x": 0,
+            "y": 189.5590909090909,
+            "w": 12,
+            "h": 8,
+            "autoHeight": true,
+            "scope": "",
+            "moved": false,
+            "selected": false,
+            "offsetTop": 2146
+          },
+          "disabled": {},
+          "styles": [],
+          "displayName": "页头容器",
+          "hasCssCache": true
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms"
+      }
+    ]
+  },
+  {
+    "id": "",
+    "pageId": "",
+    "layoutType": "GRID",
+    "terminalType": "MOBILE",
+    "module": "EB_PAGE",
+    "ecodeVersion": 1,
+    "appId": "",
+    "comps": [
+      {
+        "id": "a26b6372e57147d8b8a7dd90e9179a02",
+        "type": "PageHeader",
+        "package": "@weapp/ebdnavcoms",
+        "category": "3",
+        "pid": "",
+        "refModule": "",
+        "refCompId": "be025fc5901a43f782797690fc326382",
+        "refPluginPackageId": null,
+        "refPluginPackage": null,
+        "config": {
+          "name": "页头",
+          "type": "PageHeader",
+          "title": "标题",
+          "titleEnabled": true,
+          "icon": {
+            "path": "",
+            "folderId": ""
+          },
+          "newButtons": [
+            {
+              "id": "d41d8cd98f00b204e9800998ecf8427e",
+              "text": "按钮"
+            },
+            {
+              "id": "9eafa13020d13418e8b6ca4dd9b69918",
+              "text": "按钮"
+            },
+            {
+              "id": "helpBtn",
+              "text": "帮助",
+              "isHide": true
+            },
+            {
+              "id": "5e2e731db1cb3a5d9e54a0b74efa02cd8",
+              "isSplit": true
+            }
+          ],
+          "underTheTitle": false,
+          "layout": {
+            "i": "e05c2afe089e4adc88de25c9bf17a20a",
+            "adaptive": true,
+            "h": 8,
+            "selected": false
+          },
+          "disabled": {},
+          "flow": {
+            "nodes": [
+              "eda9dd6b24fe435e9758489490aab12e",
+              "aa15503d464e45288063b8814df71d80"
+            ],
+            "linkedNodes": {
+              "left": "eda9dd6b24fe435e9758489490aab12e",
+              "right": "aa15503d464e45288063b8814df71d80"
+            },
+            "isCanvas": true
+          },
+          "styles": [],
+          "displayName": "页头容器"
+        },
+        "masterComponent": null,
+        "isCustom": false,
+        "isLock": false,
+        "ecodeId": "",
+        "ecodeVersion": null,
+        "applyStyle": "1",
+        "prop": "EB",
+        "styleCategoryCompKey": "BasicStyleConfig",
+        "styleCategoryPackage": "@weapp/ebdcoms"
+      }
+    ]
+  }
+]
