@@ -3,8 +3,8 @@
   "files": [
     {
       "path": "SKILL.md",
-      "bytes": 4936,
-      "sha256": "03bbff43b18c47af48c1bdbe3c5a9f005969472e49192f8aeea825ed6b9c884f"
+      "bytes": 5419,
+      "sha256": "020c7b6c5632338a43f0fe39cf785867db5331e0e7ae58c7af36deb8d901c941"
     },
     {
       "path": "agents/openai.yaml",
@@ -203,8 +203,8 @@
     },
     {
       "path": "references/implementation.md",
-      "bytes": 10804,
-      "sha256": "d8b3b8e89bbf9b3762f9065a7cdc2c8124eeb2d097dda029ff23ab285a7e154c"
+      "bytes": 12459,
+      "sha256": "007ab630fb0246e40de8ca89878189b49b3ee3578ce2c7cec302ebfd70c8d7c1"
     },
     {
       "path": "references/keqing-case.md",
@@ -253,8 +253,8 @@
     },
     {
       "path": "references/user-conventions.md",
-      "bytes": 4934,
-      "sha256": "4077223c8fbb8decc6255c69dc758882a63ece2fdd8fb2ec3ea12f173c32fc59"
+      "bytes": 5316,
+      "sha256": "24577fc876aaf6ed985a0c21e423c4dc4e5686b1a21c03ce1af644ec6c092d73"
     },
     {
       "path": "scripts/search_timeouts.py",
@@ -267,5 +267,5 @@
       "sha256": "1fabdbb149c4cc4926b1f04959107d2da68645e258bf588e311c44d97b5fd6f2"
     }
   ],
-  "updated_on": "2026-10-23"
+  "updated_on": "2026-11-05"
 }
