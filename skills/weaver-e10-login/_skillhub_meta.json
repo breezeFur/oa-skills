@@ -1,0 +1,13 @@
+{
+  "name": "泛微E10登录工具",
+  "installedAt": 1793188106295,
+  "source": "marketplace",
+  "version": "1.5.1",
+  "skillId": "skill_2091018631913672704",
+  "pay_mode": 0,
+  "description_zh": "E10 平台的登录认证工具，支持 OAuth2.0 浏览器授权登录、ETEAMSID 手动写入、登录状态查询与多环境（Profile）切换。",
+  "description_en": "E10 login & auth tool — OAuth2.0 browser authorization, manual ETEAMSID set, status check and multi-environment profile switching.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/673fcf99-ac38-4a44-86e7-e7654dee6e75/3554aefc-a0ba-4d4b-a9b4-8ea40ca8e7df.png",
+  "iconLocalPath": "C:\\Users\\MX20363\\.workbuddy\\skills\\weaver-e10-login\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/673fcf99-ac38-4a44-86e7-e7654dee6e75/3554aefc-a0ba-4d4b-a9b4-8ea40ca8e7df.png"
+}

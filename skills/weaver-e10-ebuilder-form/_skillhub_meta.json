@@ -1,0 +1,13 @@
+{
+  "name": "泛微E10 eBuilder智能助手",
+  "installedAt": 1793188124262,
+  "source": "marketplace",
+  "version": "1.0.4",
+  "skillId": "skill_2092447755916156928",
+  "pay_mode": 0,
+  "description_zh": "面向泛微 E10 OA 的 eBuilder 智能助手。通过自然语言查询业务列表和表单数据，按名称填写人员、部门及关联数据，并协助新增、修改或删除数据。",
+  "description_en": "AI assistant for Weaver E10 OA eBuilder forms. Query list/form data, fill relational fields by name, and assist data creation/modification/deletion.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/673fcf99-ac38-4a44-86e7-e7654dee6e75/avatar/skill/au_7b57e7e0-992.png",
+  "iconLocalPath": "C:\\Users\\MX20363\\.workbuddy\\skills\\weaver-e10-ebuilder-form\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/673fcf99-ac38-4a44-86e7-e7654dee6e75/avatar/skill/au_7b57e7e0-992.png"
+}

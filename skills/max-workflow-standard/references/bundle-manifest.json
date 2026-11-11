@@ -1,11 +1,6 @@
 {
-  "built_on": "2026-10-15",
+  "built_on": "2026-11-11",
   "files": [
-    {
-      "path": "SKILL.md",
-      "bytes": 5419,
-      "sha256": "020c7b6c5632338a43f0fe39cf785867db5331e0e7ae58c7af36deb8d901c941"
-    },
     {
       "path": "agents/openai.yaml",
       "bytes": 349,
@@ -203,8 +198,8 @@
     },
     {
       "path": "references/implementation.md",
-      "bytes": 12459,
-      "sha256": "007ab630fb0246e40de8ca89878189b49b3ee3578ce2c7cec302ebfd70c8d7c1"
+      "bytes": 14408,
+      "sha256": "5780e3a64b263173df67cb52752fd06c7474824d48c8b6d71fe43e8ecc999f86"
     },
     {
       "path": "references/keqing-case.md",
@@ -213,8 +208,8 @@
     },
     {
       "path": "references/provenance.md",
-      "bytes": 3930,
-      "sha256": "78e2dff958b7abd88106ea5d3309e08617edd64507e912d7db72585bb224ec5e"
+      "bytes": 3764,
+      "sha256": "2ebf72000300aab6e80ef45a9dcb559657b80a900c2f7d0aa8fde73b72cd730b"
     },
     {
       "path": "references/screenshots.md",
@@ -265,7 +260,12 @@
       "path": "scripts/verify_bundle.py",
       "bytes": 4235,
       "sha256": "1fabdbb149c4cc4926b1f04959107d2da68645e258bf588e311c44d97b5fd6f2"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 6089,
+      "sha256": "7f36a884d44926360a0332a63ec6582af4bb75d729b6dd4f101bdb8b81ed8948"
     }
   ],
-  "updated_on": "2026-11-05"
+  "updated_on": "2026-10-16"
 }

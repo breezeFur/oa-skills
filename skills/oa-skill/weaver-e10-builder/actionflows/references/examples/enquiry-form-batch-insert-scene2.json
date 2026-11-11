@@ -1026,7 +1026,7 @@
    }
   ],
   "version": 1,
-  "secretKey": "REPLACE_WITH_RUNTIME_SECRET",
+  "secretKey": "<SECRET_KEY>",
   "checkReport": {
    "msgs": ""
   },

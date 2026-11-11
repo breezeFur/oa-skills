@@ -1,0 +1,13 @@
+{
+  "name": "泛微E10流程智能助手",
+  "installedAt": 1793188104802,
+  "source": "marketplace",
+  "version": "1.0.3",
+  "skillId": "skill_2091034496688197632",
+  "pay_mode": 0,
+  "description_zh": "泛微 E10/OA 流程智能助手。支持按流程标题/编号/发起时间/完成时间/操作时间/紧急程度/发起人/工作流/表单字段等条件查询待办、已办、我发起和全部流程，支持查看详情、生成摘要、打开流程、同意/提交/批准、退回、转办/委托/转发/抄送/加审、批量提交/置已读/催办/共享/转发/退回，以及发起创建流程和修改已存在流程表单。",
+  "description_en": "Weaver E10/OA workflow assistant skill. Query pending, done, initiated and all workflows by title/number/time/urgency/initiator/workflow/form fields; view details, generate summaries, open flows, approve/submit, return, transfer/delegate/forward/cc/add review, run batch submit, mark-read, supervise, share, forward and reject operations, and initiate or edit workflow forms.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/673fcf99-ac38-4a44-86e7-e7654dee6e75/d7645997-f347-44ff-9538-83083376b809.png",
+  "iconLocalPath": "C:\\Users\\MX20363\\.workbuddy\\skills\\weaver-e10-workflow\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/673fcf99-ac38-4a44-86e7-e7654dee6e75/d7645997-f347-44ff-9538-83083376b809.png"
+}

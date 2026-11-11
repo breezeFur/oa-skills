@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "product": "weaver-work-cli",
+  "productVersion": "0.1.49",
+  "packageName": "weaver-work-cli",
+  "command": "weaver-work-cli",
+  "nodeEngine": ">=18"
+}

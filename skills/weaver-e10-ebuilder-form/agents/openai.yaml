@@ -1,0 +1,4 @@
+interface:
+  display_name: "泛微E10-EB智能助手"
+  short_description: "查询OA业务和表单，按名称填写人员、部门及关联数据"
+  default_prompt: "使用 $weaver-e10-ebuilder-form 帮我查找OA中的eBuilder业务菜单，并查询或维护相关表单数据。"

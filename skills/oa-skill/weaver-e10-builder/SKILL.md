@@ -15,33 +15,19 @@ auto: true
 
 ## 安装与升级
 
-本 skill 需与 CLI **版本匹配**（当前对应 CLI `1.5.4`）。版本不一致时命令/文档/选项可能对不上——升级前先对齐：
+Agent 负责准备 CLI，不要求用户手动安装或再次确认安装。先按 [CLI 自动准备](../cli-setup.md) 检查 Node.js/npm、命令路径和版本；缺少或版本不匹配时直接安装当前技能对应的 CLI `1.5.4`：
 
-```shell
-e10-cli --version          # 查 CLI 版本，应与上方 description 标注一致
-
-# CLI 从 npm 装（升级先卸旧包 e10-cli，避免 bin 残留冲突）：
-** 注意 如果你使用的是workbuddy **
-先用 bash 直接删掉旧包目录（不走 npm 的删除），再让 npm 纯安装，必须指定一个有权限的工作目录作为缓存地址
-
-其他工具可以使用 npm rm -g weaver-e10-builder
-
-npm install -g weaver-e10-builder
-
-# skill 升级：先卸旧（旧名 skill-e10-cli；删掉的命令文档/actionflows 不会自动清，是"删不干净"主因），再装新
-npx -y skills remove skill-e10-cli
-npx -y skills add ./weaver-e10-builder.zip --skill -y
+```text
+npm install -g weaver-e10-builder@1.5.4 --registry=https://registry.npmjs.org
+e10-cli --version
+e10-cli --help
 ```
 
-> 若 `skills remove` 无效，手动删后再 add，安装位置按工具区分：
-> - Claude Code：`rm -rf ~/.claude/skills/skill-e10-cli` → 新 skill 装到 `~/.claude/skills/weaver-e10-builder`
-> - WorkBuddy：`rm -rf ~/.workbuddy/skills/skill-e10-cli` → 新 skill 装到 `~/.workbuddy/skills/weaver-e10-builder`
-
-> 📌 **1.1.0 起发布的 skill 都是「薄指令层」扁平简化版**：只带 SKILL.md / _catalog / actionflows 指令层 / scripts（不含深目录文档树，适配 marketplace 两级目录限制）。**完整文档（references 等）随配套 CLI 的 skill-docs 分发**——npm 安装 CLI 时 postinstall 会自动同步，或装完跑一次 `e10-cli auth status` 触发同步。**因此装完 skill 后，看到目录里多出/更新 references 文档、或旧文档被清理，都是正常的同步现象**，不是装错或重复安装。
+版本匹配时复用。更新采用 npm 原位安装，不先删旧包、技能目录或认证文件。更新本仓库技能时先比较并保留用户改动，保持完整目录及相对引用；不要用供应商薄包覆盖本仓库的维护版指令。npm 包可能在 postinstall 同步文档，安装前备份受影响的已有技能到技能目录之外，完成后核对并保留本仓库的入口规则与用户修改。
 
 ## 文档与模板取用
 
-**skill 只带指令层；文档/模板随配套 CLI 包发布**（marketplace skill 包限两级目录，深目录文档树走 npm）。
+本仓库包含完整指令、文档与模板。先读取当前技能中的对应资料；缺少配套文档时才使用 CLI 的 `skill sync`，同步前比较和备份，不覆盖本仓库的定制入口及用户改动。
 
 **文档通常已就位，无需手动拷贝**：
 - 每次会话跑 `e10-cli auth status` 时，CLI 自动探测本机已装 skill（`~/.claude/skills`、`~/.workbuddy/skills`、`~/.codex/skills`），把文档树同步进对应 skill 目录（SKILL.md 版本一致则跳过）。装好 skill 后第一次 `auth status` 即可。

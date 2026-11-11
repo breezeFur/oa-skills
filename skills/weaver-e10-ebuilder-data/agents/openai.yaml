@@ -1,0 +1,4 @@
+interface:
+  display_name: "泛微E10eBuilder专项基础"
+  short_description: "按Tag定位表单，查询并维护数据，按名称填写人员、部门及关联字段"
+  default_prompt: "使用 $weaver-e10-ebuilder-data 定位 E10 eBuilder 表单，查询或维护数据，并按名称填写人员、部门、分部及关联字段。"

@@ -20,27 +20,19 @@
 - **若把 `edc-report/` 单独拷走安装**：必须保持它与 `scripts/` 同级，否则用 `EDC_REPORT_SCRIPTS` 显式指定脚本目录。
 - **只改 `references/*.md` 规则**：CLI 不会“自动学会”；若规则要落到可执行默认值，需改 `scripts/` 并在同一轮更新里同步（Skill 整合时请一并改脚本 + 必要时 bump CLI 版本）。
 
-## 安装
+## Agent 自动安装与更新
 
-```bash
-# 依赖
-npm i -g e10-login          # 若尚未安装
-e10-login status
+按 [CLI 自动准备](../../cli-setup.md) 由 Agent 直接准备 e10-login@1.5.0 和本完整技能中的 CLI。缺少命令、版本不匹配或脚本指向旧目录时，在当前 edc-report 目录注册；不要只把本子目录 npm 打包后移走，因为打包不会带上相邻 scripts。
 
-# 从 Skill 目录安装（推荐）
-cd weaver-e10-edcreport/edc-report
-npm i -g .
-
-# 或开发态 link（始终跟 Skill scripts）
+```text
+npm install -g e10-login@1.5.0 --registry=https://registry.npmjs.org
 npm link
+edc-report --version
+edc-report --help
+edc-report scripts-path
 ```
 
-```bash
-edc-report --help
-edc-report --version
-edc-report policy scope     # 最高优先级：仅改用户点名项
-edc-report scripts-path     # 确认解析到的脚本目录（应为 Skill 的 scripts/）
-```
+版本应与本目录 package.json 一致，scripts-path 应指向当前完整技能的 scripts。注册无权限时使用 node "<本目录>/edc-report.js" 直接运行相同 CLI。安装和验证不触发登录，准备完成后继续原报表任务。
 
 ## 命令速查
 

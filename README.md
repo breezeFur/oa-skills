@@ -9,10 +9,11 @@
 ```text
 请安装 https://github.com/breezeFur/oa-skills 中已发布的 OA 技能。
 先读取仓库 README.md 和 AGENTS.md，确认你所用 AI 的真实技能目录和规则文件，保留完整技能及配套资源。
+按选定技能直接帮我安装或更新需要的 CLI 和解释器，核对命令路径、版本、启动结果后继续任务；不要让我手动执行安装命令。页面 runtime 在首次实际页面任务时通过自身 bootstrap 自动准备。
 安装完成后，把 docs/oa-agents.md 中的 OA 规则片段合并到我实际生效的 AGENTS.md；将 __OA_SKILLS_DIR__ 换成本机技能目录的绝对路径。
 保留我已有的规则，先备份；已有 OA 标记块就更新同一块，不要重复追加，也不要用仓库 AGENTS.md 覆盖整个文件。
 之后处理 OA 相关任务时，先检查并读取已安装的对应 OA 技能，再按技能要求检查工具、版本和认证环境。
-验证 5 个技能定义、规则中的真实路径及新会话加载情况，最后报告安装路径、规则文件路径和仍需准备的外部依赖。
+验证 13 个技能定义、规则中的真实路径及新会话加载情况，最后报告安装路径、规则文件路径和仍需准备的外部依赖。
 ```
 
 安装包含三个步骤：**安装技能目录 → 合并 OA 规则到接收者的规则文件 → 验证新会话识别**。只克隆仓库或只阅读本仓库的 AGENTS.md 不会替接收者的其他项目配置规则。
@@ -26,8 +27,16 @@
 | weaver-e10-edcreport | [报表搭建](skills/oa-skill/weaver-e10-edcreport/SKILL.md) | 数据源、布局、查询条件及点名修改 |
 | weaver-e10-components | [组件搭建](skills/oa-skill/weaver-e10-components/SKILL.md) | 可复用指标卡、图表、表格、筛选器及设计器配置 |
 | max-workflow-standard | [MAX 规范](skills/max-workflow-standard/SKILL.md) | MAX 公司流程、泳道、表单及验收规范 |
+| weaver-e10-login | [登录认证](skills/weaver-e10-login/SKILL.md) | e10-login 安装、OAuth、登录状态及环境切换 |
+| weaver-e10-basic | [基础能力](skills/weaver-e10-basic/SKILL.md) | 租户、人员身份切换等基础操作 |
+| weaver-e10-ebuilder-data | [Tag 与数据](skills/weaver-e10-ebuilder-data/SKILL.md) | 按稳定 Tag 定位应用、表单、关联数据及动作 |
+| weaver-e10-ebuilder-form | [表单数据](skills/weaver-e10-ebuilder-form/SKILL.md) | 查询业务列表、填写并维护表单数据 |
+| weaver-e10-workflow | [流程办理](skills/weaver-e10-workflow/SKILL.md) | 待办、已办、发起、处理与流程详情 |
+| weaver-e10-shared | [流程共享规则](skills/weaver-e10-shared/SKILL.md) | weaver-work-cli 自动准备、认证及输出/写入契约 |
+| weaver-e10-page-generator | [页面生成](skills/weaver-e10-page-generator/SKILL.md) | 文字/截图生成、复刻、修改页面及自动准备 runtime |
+| weaver-e10-package-comparison | [离线包比对](skills/weaver-e10-package-comparison/SKILL.md) | 迁出包业务功能差异、验证点及离线可视化 |
 
-`oa-skill` 是前三个技能所在的集合目录。保留它的原有嵌套结构与全部 references、assets、scripts；报表 CLI 会引用同一技能内的相邻 scripts，不能只复制 CLI 子目录。
+`oa-skill` 是 Builder、动作流、报表和组件四个技能所在的集合目录。其他 weaver-e10-* 技能位于 skills/ 下同级目录；流程技能需要同级 weaver-e10-shared，登录/数据技能需要同级 weaver-e10-login。共同安装指南是 [CLI 自动准备](skills/oa-skill/cli-setup.md)，保留 oa-skill 集合及其相对引用。保留原有嵌套结构与全部 references、assets、scripts；报表 CLI 会引用同一技能内的相邻 scripts，不能只复制 CLI 子目录。
 
 ## 安装前确认位置
 
@@ -45,7 +54,7 @@ $oaRepoPath = Join-Path $env:USERPROFILE 'oa-skills'
 git clone https://github.com/breezeFur/oa-skills.git $oaRepoPath
 $oaSkillsPath = Join-Path $env:USERPROFILE '.agents\skills'
 New-Item -ItemType Directory -Force -Path $oaSkillsPath | Out-Null
-foreach ($oaSkillName in @('oa-skill', 'max-workflow-standard')) {
+foreach ($oaSkillName in @('oa-skill', 'max-workflow-standard', 'weaver-e10-basic', 'weaver-e10-ebuilder-data', 'weaver-e10-ebuilder-form', 'weaver-e10-login', 'weaver-e10-package-comparison', 'weaver-e10-page-generator', 'weaver-e10-shared', 'weaver-e10-workflow')) {
     $oaLinkPath = Join-Path $oaSkillsPath $oaSkillName
     $oaTargetPath = Join-Path (Join-Path $oaRepoPath 'skills') $oaSkillName
     $oaExisting = Get-Item -LiteralPath $oaLinkPath -Force -ErrorAction SilentlyContinue
@@ -57,7 +66,7 @@ foreach ($oaSkillName in @('oa-skill', 'max-workflow-standard')) {
 }
 ```
 
-目录符号链接也可使用。环境不支持链接时，可把上述两个目录完整复制到实际技能目录，并在以后更新时比较副本。示例中的“已有安装”跳过提示不代表已验证该副本可用。
+目录符号链接也可使用。环境不支持链接时，可把上述目录完整复制到实际技能目录，并在以后更新时比较副本。示例中的“已有安装”跳过提示不代表已验证该副本可用。
 
 ### Linux / macOS
 
@@ -66,7 +75,7 @@ git clone https://github.com/breezeFur/oa-skills.git "$HOME/oa-skills"
 oa_repo_path="$HOME/oa-skills"
 oa_skills_path="$HOME/.agents/skills"
 mkdir -p "$oa_skills_path"
-for oa_skill_name in oa-skill max-workflow-standard; do
+for oa_skill_name in oa-skill max-workflow-standard weaver-e10-basic weaver-e10-ebuilder-data weaver-e10-ebuilder-form weaver-e10-login weaver-e10-package-comparison weaver-e10-page-generator weaver-e10-shared weaver-e10-workflow; do
   oa_link_path="$oa_skills_path/$oa_skill_name"
   if [ -e "$oa_link_path" ] || [ -L "$oa_link_path" ]; then
     printf '已有安装，先核对再处理：%s\n' "$oa_link_path"
@@ -88,13 +97,24 @@ done
 
 该规则让 AI 在 OA 任务前先检查、读取对应技能，然后按任务检查 CLI、版本和认证。规范问答只读相关资料；不会因为问一个流程规范问题就登录 OA 或扫描整个技能库。
 
-## 外部工具与认证
+## Agent 自动安装/更新工具与认证
 
-- Builder 声明对应 e10-cli 1.5.4；动作流使用该 CLI 的 actionflow 命令组。e10-cli 发行包需按技能安装说明单独准备，本仓库没有提供它。
-- 报表 CLI 源码位于 `skills/oa-skill/weaver-e10-edcreport/edc-report`，Node.js 要求 >=18。按需在完整仓库的该目录执行 `npm link` 注册 `edc-report`，再以 `edc-report --help` 检查启动；这会改变本机 npm 命令安装。
-- `weaver-e10-components` 已收录，依赖同集合中相邻的 Builder 指令。`weaver-e10-login` 认证技能未收录；若本机已有可按认证任务读取，缺失时明确说明，不把它算作本次已安装。
-- e10-login 是外部认证 CLI，需要单独准备并在本机登录。克隆技能不会迁移登录态。安装时检查命令可用性即可；实际平台操作前才检查相应目标环境的认证状态。
-- 密码、Token、Cookie、私钥及认证缓存留在本机，输出和提交物中不得包含实际凭证。公司资料保留来源和适用范围；后续新增公司资料须确认公开范围。
+技能安装或业务任务需要 CLI 时，Agent 按 [CLI 自动准备](skills/oa-skill/cli-setup.md) 检查当前环境并直接补齐，不另设安装确认、不要求用户开终端。有效版本复用；缺少、不匹配或用户要求更新时按匹配来源更新，验证真实路径、版本和 --help 后继续原任务。只准备本轮选定技能的依赖。
+
+| 工具 | 安装或更新来源 | 使用范围 |
+| --- | --- | --- |
+| e10-cli | `npm install -g weaver-e10-builder@1.5.4 --registry=https://registry.npmjs.org` | 应用/流程设计、动作流、自定义组件 |
+| e10-login | `npm install -g e10-login@1.5.0 --registry=https://registry.npmjs.org` | 独立登录、基础操作、数据/表单及报表认证 |
+| edc-report | 在当前完整报表技能的 edc-report 目录执行 `npm link`；无全局注册权限可直接用 Node 运行入口 | 报表；scripts-path 必须指向当前技能 scripts |
+| weaver-work-cli | `npm install -g weaver-work-cli@latest --registry=https://registry.npmjs.org`；已核对基线 0.1.49 | 流程办理；共享规则已随仓库收录 |
+| ui-code-agent runtime | 页面技能自身 `bootstrap.mjs ensure --json`，遵循产品清单和锁文件 | 首次实际页面任务自动准备，组件 runtime 按页面类型准备 |
+| Node.js / Python | 优先宿主已有解释器，不足时由 Agent 通过当前系统官方安装方式准备 | 页面 Node >=22.5；其他 CLI Node >=18；本地脚本 Python >=3.10 |
+
+XiaoE 客户端托管的流程 CLI 按共享规则由客户端自动准备，不另装全局副本。实际系统权限或来源缺项如实报告；用户明确限制网络时保留离线范围。原位 npm 更新不先删旧目录、不清认证文件。Builder npm postinstall 可能同步技能文档，先备份受影响技能到技能目录之外，保留本仓库入口和用户修改。
+
+CLI 安装验证不触发登录。实际在线操作前才核对目标环境及有效认证，Agent 发起官方授权流程，用户完成浏览器授权。独立 e10-login 与 weaver-work-cli 的认证体系按各自技能判断，不能用一个命令的登录状态证明另一个已登录。宿主命名凭据插件和目标 API 权限仍是数据技能的真实前提，不把 npm 安装等同于插件已可用。
+
+密码、Token、Cookie、私钥和认证缓存留在本机，不进入输出、安装日志或 Git。资料原件保留来源及适用范围；后续新增公司资料须明确公开范围。
 
 ## 安装完成如何验证
 
@@ -102,16 +122,16 @@ done
 
 | 检查项 | 完成依据 |
 | --- | --- |
-| 技能文件 | 实际技能目录中的 5 个 SKILL.md 都可读取，链接目标正确，配套文件完整 |
+| 技能文件 | 实际技能目录中的 13 个 SKILL.md 都可读取，链接目标正确，配套文件完整 |
 | OA 规则合并 | 接收者实际规则文件已回读；OA 标记块唯一、路径真实、原规则保留 |
-| AI 已识别 | 新会话或重新加载后，AI 能列出 5 个技能并说明 OA 操作前读取对应技能；尚未执行新会话验证时标为待验证 |
-| 工具依赖 | 报告 e10-cli、edc-report、e10-login 的可用性及匹配情况，缺少什么就列出什么 |
+| AI 已识别 | 新会话或重新加载后，AI 能列出 13 个技能并说明 OA 操作前读取对应技能；尚未执行新会话验证时标为待验证 |
+| 工具准备 | 按所选技能直接安装/更新必要 CLI，报告实际路径、版本和启动验证；真实阻断说明原因 |
 | 平台认证 | 作为独立准备项报告，缺少登录态不伪装成工具或技能安装失败 |
 
 可在接收者 AI 的新会话发送：
 
 ```text
-请先不要操作 OA 平台。列出你读取到的 OA 操作前检查规则、规则文件路径和已安装的 5 个 OA 技能路径，并说明创建表单、修改动作流、搭建报表、创建自定义组件、审阅 MAX 流程分别应先读哪个技能。
+请先不要操作 OA 平台。列出你读取到的 OA 操作前检查规则、规则文件路径和已安装的 13 个 OA 技能路径，并说明创建表单、修改动作流、搭建报表、创建自定义组件、审阅 MAX 流程分别应先读哪个技能。
 ```
 
 若新会话不能识别，检查真实技能目录、嵌套技能发现、规则覆盖及加载长度。目标工具若只识别直接子目录，按其支持方式登记这些已有 SKILL.md 路径，或为尚未发现的技能创建目录链接；保留源目录结构和相对引用，并确认没有重复同名技能。按目标 AI 的方式重新加载，Codex 未检测到更新时可重启；不要把未验证状态报告为完成。

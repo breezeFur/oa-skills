@@ -1,16 +1,24 @@
 <!-- OA_SKILLS_START -->
-## OA 操作前先检查技能
+## OA 操作前先检查技能并自动准备工具
 
-- OA 技能安装根目录：`__OA_SKILLS_DIR__`。开始泛微 E10、E-Builder、OA 表单、流程、动作流、报表、权限或编号相关任务前，先在该目录检查对应技能的 SKILL.md 是否存在，并读取其指令及本次必要的参考资料，再执行操作。
-- oa-skill 是技能集合目录，不是单独的技能名称。按任务选择：
-  - 应用、表单、原生流程、权限、编号：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-builder/SKILL.md`。
+- OA 技能安装根目录：`__OA_SKILLS_DIR__`。开始泛微 E10、E-Builder、OA 表单、流程、动作流、报表、权限、编号、页面或迁出包比对任务前，先读取对应技能的 SKILL.md 及本轮必要的参考资料。
+- 按任务选择；oa-skill 是集合目录：
+  - 应用、表单设计、原生流程设计、权限、编号：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-builder/SKILL.md`。
   - ESB 动作流：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-builder/actionflows/SKILL.md`，技能名 generating-actionflows。
   - E-Builder 报表：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-edcreport/SKILL.md`。
-  - 自定义组件、指标卡、图表、表格、筛选器：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-components/SKILL.md`；先按组件技能读取相邻 Builder 的基础指令。
+  - 自定义组件、指标卡、图表、表格、筛选器：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-components/SKILL.md`。
+  - E10 登录和环境认证：`__OA_SKILLS_DIR__/weaver-e10-login/SKILL.md`。
+  - 租户、人员身份切换等基础操作：`__OA_SKILLS_DIR__/weaver-e10-basic/SKILL.md`。
+  - 按稳定 Tag 查询和维护表单数据：`__OA_SKILLS_DIR__/weaver-e10-ebuilder-data/SKILL.md`。
+  - 业务列表、表单数据填写与修改：`__OA_SKILLS_DIR__/weaver-e10-ebuilder-form/SKILL.md`。
+  - 待办、已办、发起和处理流程：`__OA_SKILLS_DIR__/weaver-e10-workflow/SKILL.md`；先读取配套 `__OA_SKILLS_DIR__/weaver-e10-shared/SKILL.md`，认证由 weaver-work-cli 托管。
+  - 页面生成、复刻和修改：`__OA_SKILLS_DIR__/weaver-e10-page-generator/SKILL.md`。
+  - 新旧迁出包离线比对：`__OA_SKILLS_DIR__/weaver-e10-package-comparison/SKILL.md`。
   - MAX 创鑫公司流程、泳道或表单规范：额外读取 `__OA_SKILLS_DIR__/max-workflow-standard/SKILL.md`；其他公司的 OA 任务按其业务要求执行。
-- 认证任务若本机另有 weaver-e10-login 等匹配技能，先读取对应技能；本仓库未收录认证技能，不编造其存在或安装来源。
-- 只检查任务相关的已知技能路径；不要每次遍历整个技能库、加载全部 references，或为规范问答触发登录。遵循对应技能的渐进读取和交付约定。
-- 执行平台查询或修改前，检查任务需要的 CLI 是否可用、版本是否与技能匹配，以及目标环境的认证状态；优先使用技能提供的 CLI 和工具，不凭猜测拼接口、字段或资源 ID。
-- 技能、工具或认证缺失时，明确说明缺项与影响，继续可独立完成的部分；依赖缺项的平台操作等待准备完成，不报告未执行的成功结果。
-- OA 读写范围以用户本次任务及已有授权为准；安装技能不表示获准修改业务系统。密码、Token、Cookie、私钥及认证缓存留在本机，输出与 Git 提交中不得包含实际凭证。
+- 用户要求安装/更新技能或执行需要 CLI 的任务时，按 `__OA_SKILLS_DIR__/oa-skill/cli-setup.md` 由 Agent 直接检查、安装或更新本轮所需工具，并验证真实路径、版本和启动。有效版本直接复用，不要求用户手动安装，也不另外设置安装确认步骤；用户明确要求只检查或不安装时遵从。
+- 页面工具通过自己的 bootstrap 和产品锁文件自动准备；XiaoE 客户端托管的流程 CLI 按共享技能由客户端准备，其他环境按官方 npm 来源自动安装/更新。不要安装猜测的包或无关 CLI。
+- 只读取任务相关路径，不每次扫描全部技能。纯规范问答不登录，离线包比对不安装在线 OA CLI；仅补齐实际需要的本地解释器。
+- 工具准备完成后继续原任务。CLI 安装验证不调用平台业务接口；实际在线操作前才核对目标环境和有效认证。已有登录态复用，缺少认证时按对应技能发起官方授权。
+- 真正的系统权限、宿主能力或认证缺项如实说明，继续可独立完成的部分；不把未执行的安装、登录或业务操作报告为成功。OA 业务读写和确认以用户任务及对应技能契约为准。
+- 密码、Token、Cookie、私钥、认证缓存和本机配置留在本机，输出与 Git 提交中不得包含实际凭证。
 <!-- OA_SKILLS_END -->

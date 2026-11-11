@@ -11,6 +11,8 @@ description: "将业务需求编译为 Weaver ESB 动作流，或读取已有动
 
 ## 运行与维护边界
 
+- 首次需要运行命令或用户要求更新时，按 [CLI 自动准备](../../cli-setup.md) 直接安装/更新 `weaver-e10-builder@1.5.4`，核对 `e10-cli --version` 和 `e10-cli actionflow --help`；有效 CLI 直接复用，准备成功后继续原动作流任务。无需另装动作流 CLI，也不要求用户手动执行安装命令。
+
 - **运行模式（默认）**：只运行 `e10-cli actionflow <命令>`、读取本 Skill 的当前阶段/当前组件说明；不得读取或修改 e10-cli 源码（`packages/cli/src/services/actionflow/`）。
 - **维护模式**：仅在用户明确要求修复、审计或新增组件时编辑实现；修改后必须跑类型检查、测试、构建和本 Skill 校验。校验目标固定为 `skill/actionflows`：不要把上层 `skill` 或发布目录 `skill-docs` 当作这个动作流 Skill 的标准目录校验。上层入口包含 E10 包的自定义元数据（如 `author`、`category`、`version`、`display_name`），不因通用校验器不认识这些扩展字段而改写、删除或迁移它们。
 - 参数、默认值、动态必填、真实对象结构的唯一权威是 `e10-cli actionflow component-describe <type>`，参考文件不重复属性表。

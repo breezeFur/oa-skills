@@ -1,0 +1,8 @@
+{
+	"schemaVersion": 1,
+	"product": "ui-code-agent",
+	"productVersion": "0.1.71",
+	"packageName": "ui-code-agent",
+	"registry": "https://registry.npmmirror.com",
+	"nodeEngine": ">=22.5"
+}

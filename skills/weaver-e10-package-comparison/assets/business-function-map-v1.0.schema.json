@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/ebuilder/business-function-map-v1.0.schema.json",
+  "title": "eBuilder Business Function Map v1.0",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "application",
+    "businessDomains",
+    "functionCards",
+    "endToEndChains",
+    "objectAssignments",
+    "unmappedObjects",
+    "risks",
+    "summary",
+    "evidence"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "business-function-map/v1.0"},
+    "application": {"type": "object"},
+    "businessDomains": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/businessDomain"}
+    },
+    "functionCards": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/functionCard"}
+    },
+    "endToEndChains": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/endToEndChain"}
+    },
+    "objectAssignments": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/objectAssignment"}
+    },
+    "unmappedObjects": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/unmappedObject"}
+    },
+    "risks": {"type": "array", "items": {"type": "object"}},
+    "summary": {"type": "object"},
+    "evidence": {"type": "object"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "logicalKey": {"type": "string", "minLength": 1},
+    "stringArray": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "evidenceLevel": {
+      "enum": ["CONFIG_OBSERVED", "CODE_CONFIRMED", "BUSINESS_INFERRED", "UNRESOLVED", "RUNTIME_VERIFIED"]
+    },
+    "businessDomain": {
+      "type": "object",
+      "required": ["logicalKey", "name", "description", "evidenceLevel", "functionCards"],
+      "properties": {
+        "logicalKey": {"$ref": "#/$defs/logicalKey"},
+        "name": {"type": "string", "minLength": 1},
+        "description": {"type": "string"},
+        "evidenceLevel": {"$ref": "#/$defs/evidenceLevel"},
+        "functionCards": {"$ref": "#/$defs/stringArray"}
+      },
+      "additionalProperties": true
+    },
+    "functionCard": {
+      "type": "object",
+      "required": [
+        "logicalKey", "name", "domain", "purpose", "status", "evidenceLevel", "roles",
+        "terminals", "entries", "userActions", "entities", "datasets", "forms", "pages",
+        "actionFlows", "workflows", "menus", "permissions", "integrations", "dependencies",
+        "successOutcome", "failurePaths", "unresolved", "evidence"
+      ],
+      "properties": {
+        "logicalKey": {"$ref": "#/$defs/logicalKey"},
+        "name": {"type": "string", "minLength": 1},
+        "domain": {"$ref": "#/$defs/logicalKey"},
+        "purpose": {"type": "string"},
+        "status": {"enum": ["CONFIRMED", "PARTIAL", "UNRESOLVED", "ADAPTER_REQUIRED"]},
+        "evidenceLevel": {"$ref": "#/$defs/evidenceLevel"},
+        "roles": {"$ref": "#/$defs/stringArray"},
+        "terminals": {"$ref": "#/$defs/stringArray"},
+        "entries": {"$ref": "#/$defs/stringArray"},
+        "userActions": {"$ref": "#/$defs/stringArray"},
+        "entities": {"$ref": "#/$defs/stringArray"},
+        "datasets": {"$ref": "#/$defs/stringArray"},
+        "forms": {"$ref": "#/$defs/stringArray"},
+        "pages": {"$ref": "#/$defs/stringArray"},
+        "actionFlows": {"$ref": "#/$defs/stringArray"},
+        "workflows": {"$ref": "#/$defs/stringArray"},
+        "menus": {"$ref": "#/$defs/stringArray"},
+        "permissions": {"$ref": "#/$defs/stringArray"},
+        "integrations": {"$ref": "#/$defs/stringArray"},
+        "dependencies": {"$ref": "#/$defs/stringArray"},
+        "successOutcome": {"$ref": "#/$defs/stringArray"},
+        "failurePaths": {"$ref": "#/$defs/stringArray"},
+        "unresolved": {"$ref": "#/$defs/stringArray"},
+        "evidence": {"type": "array", "items": {"type": "object"}}
+      },
+      "additionalProperties": false
+    },
+    "endToEndChain": {
+      "type": "object",
+      "required": ["logicalKey", "name", "functionCard", "entryKind", "nodes", "branches", "failurePaths", "breakpoints", "evidenceLevel"],
+      "properties": {
+        "logicalKey": {"$ref": "#/$defs/logicalKey"},
+        "name": {"type": "string"},
+        "functionCard": {"$ref": "#/$defs/logicalKey"},
+        "entryKind": {"enum": ["用户入口", "后台自动化", "系统内部动作"]},
+        "nodes": {"type": "array", "items": {"type": "object"}},
+        "branches": {"type": "array"},
+        "failurePaths": {"$ref": "#/$defs/stringArray"},
+        "breakpoints": {"type": "array", "items": {"type": "object"}},
+        "evidenceLevel": {"$ref": "#/$defs/evidenceLevel"}
+      },
+      "additionalProperties": false
+    },
+    "objectAssignment": {
+      "type": "object",
+      "required": ["logicalKey", "objectType", "primaryDomain", "functionCards", "assignmentMethod", "evidenceLevel"],
+      "properties": {
+        "logicalKey": {"$ref": "#/$defs/logicalKey"},
+        "objectType": {"type": "string", "minLength": 1},
+        "primaryDomain": {"type": ["string", "null"]},
+        "functionCards": {"$ref": "#/$defs/stringArray"},
+        "assignmentMethod": {
+          "enum": [
+            "EXPLICIT_DEPENDENCY", "EXPLICIT_BINDING", "FEATURE_GROUP", "MENU_TARGET",
+            "PAGE_DATASET_BINDING", "FORM_ACTION_BINDING", "WORKFLOW_FORM_BINDING",
+            "NAME_CLUSTER_INFERRED", "UNMAPPED"
+          ]
+        },
+        "evidenceLevel": {"$ref": "#/$defs/evidenceLevel"}
+      },
+      "additionalProperties": false
+    },
+    "unmappedObject": {
+      "type": "object",
+      "required": ["logicalKey", "objectType", "name", "sourcePath", "sourceRef", "reason", "evidenceLevel"],
+      "properties": {
+        "logicalKey": {"$ref": "#/$defs/logicalKey"},
+        "objectType": {"type": "string"},
+        "name": {"type": "string"},
+        "sourcePath": {"type": "string"},
+        "sourceRef": {"type": "object"},
+        "reason": {"type": "string"},
+        "evidenceLevel": {"const": "UNRESOLVED"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

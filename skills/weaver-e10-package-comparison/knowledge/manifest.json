@@ -1,0 +1,66 @@
+{
+  "authorityPolicy": {
+    "claudeUsage": [
+      "BUSINESS_FEATURE_GROUPING",
+      "HANDLER_EXPLANATION",
+      "SERVICE_SPECIFIC_SEMANTICS",
+      "JSON_HIDDEN_REFERENCE_EXPLANATION",
+      "CHINESE_EXPRESSION",
+      "VALIDATION_GUIDANCE"
+    ],
+    "computationCore": "CODEX_ONLY",
+    "conflictDecision": "CODEX_WINS_UNLESS_DIRECT_SOURCE_EVIDENCE_OVERRIDES",
+    "countDifferenceIsNotConflict": true,
+    "primaryFacts": "CODEX"
+  },
+  "builtOn": "2026-07-29",
+  "counts": {
+    "config-nodes.jsonl": 1303,
+    "conflict-registry.jsonl": 0,
+    "evidence-index.jsonl": 9,
+    "external-reference-rules.jsonl": 300,
+    "feature-groups.jsonl": 176,
+    "handler-semantics.jsonl": 99,
+    "id-replacement-rules.jsonl": 5226,
+    "logical-key-rules.jsonl": 1303,
+    "relation-edges.jsonl": 7101,
+    "risk-rules.jsonl": 837,
+    "validation-templates.jsonl": 12
+  },
+  "files": {
+    "config-nodes.jsonl": "2e4770c6c0ccadd3c8115721fee7e26abcdc1a55fb26bc770694cd75379278cd",
+    "conflict-registry.jsonl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "evidence-index.jsonl": "ee92ca5d1d578183f49472fff922ad1ceb3dbf6bd83767356e7d2e884d3cb522",
+    "external-reference-rules.jsonl": "70b02eca17461d6e930c0bf4af74a9152fb6e3dc33c4bc91887ac600e29fbecd",
+    "feature-groups.jsonl": "23b7222c7e571bd605a64e93f94ada2e1cbc678f26bb1a21e1adc92f9452512c",
+    "handler-semantics.jsonl": "2b7bea2279209d06282c8b34b755a8b4e4f972b6ac66c7d5e321a6729c1195b3",
+    "id-replacement-rules.jsonl": "82a830f527193acaae0f4e10df6849a93acfb80e321979e21c2262c12b1d67c8",
+    "logical-key-rules.jsonl": "532a7926ec575a7ae057baa00ba36e8feab1f9a0444a4f390f7534b866d67a80",
+    "relation-edges.jsonl": "92751b831613ab37c9d6af3fa96d862094e8771efab48104e7865cfdfe87fdc0",
+    "risk-rules.jsonl": "c00d27f6a30b95e881abfada54328a81139e0cdc414a7df207f88b6e7c0d12d7",
+    "validation-templates.jsonl": "aae41d1ca77d247e09130807083ecacf5df0b96aed0c38c700b2a76764b9079e"
+  },
+  "handlerSemanticBreakdown": {
+    "JSON_HIDDEN_REFERENCE": 22,
+    "SERVICE_HANDLER": 15,
+    "SERVICE_SPECIFIC_SEMANTIC": 62
+  },
+  "requiredCounts": {
+    "config-nodes.jsonl": 1303,
+    "external-reference-rules.jsonl": 300,
+    "feature-groups.jsonl": 176,
+    "handler-semantics.jsonl": 99,
+    "id-replacement-rules.jsonl": 5226,
+    "relation-edges.jsonl": 7101,
+    "risk-rules.jsonl": 837
+  },
+  "runtimeDependencies": {
+    "databaseServer": false,
+    "externalSkills": false,
+    "network": false,
+    "pythonThirdPartyPackages": false,
+    "sourceTree": false
+  },
+  "schemaVersion": "ebuilder-compare-knowledge/v1.0",
+  "tableCoverage": 1116
+}

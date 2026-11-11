@@ -1,0 +1,13 @@
+{
+  "name": "泛微E10基础能力",
+  "installedAt": 1793188128275,
+  "source": "marketplace",
+  "version": "1.0.0",
+  "skillId": "skill_2091023977366581248",
+  "pay_mode": 0,
+  "description_zh": "泛微E10基础能力助手，封装登录、租户、应用、主题等基础功能支持，包括获取租户列表，人员身份切换等对接场景。",
+  "description_en": "Weaver E10 basic capabilities assistant. Covers login, tenant, application, theme and other basic function support, including getting tenant list and personnel identity switching scenarios.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/673fcf99-ac38-4a44-86e7-e7654dee6e75/avatar/skill/au_06c1594b-cc3.png",
+  "iconLocalPath": "C:\\Users\\MX20363\\.workbuddy\\skills\\weaver-e10-basic\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/673fcf99-ac38-4a44-86e7-e7654dee6e75/avatar/skill/au_06c1594b-cc3.png"
+}

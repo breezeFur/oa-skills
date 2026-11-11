@@ -22,6 +22,22 @@
 
 上述为此次配套工具的命令族示意，具体参数以当前 `--help` 为准。已有对象的资源 ID 类型与接口前缀不可混用。业务要求团队流程时检查 belongType/机构归属和团队列表入口；只有流程定义存在不等于已交付可发起菜单。
 
+## 应用菜单类型与台账入口
+
+菜单类型决定正文能否渲染，不能只看名称和 URL 是否“看起来对”。2026-11-10 在测试环境核实：台账菜单若建成 `LINK` 且 `pageId` 直接存 `/sp/ebdfpage/viewport/<viewId>`，点击后只显示菜单标题，正文容器 `.weapp-appbuilder-view-content` 为空；同应用的 `PAGE`/`SEARCH`/`VIEWPORT` 菜单正常，同一 `LINK` 类型指向 Ecode 自定义页（`/sp/custom/ecode/...`）也正常。
+
+| 菜单用途 | pageType | pageId | 关键字段 |
+| --- | --- | --- | --- |
+| E-Builder 表单台账 | `VIEWPORT` | 台账视图 ID（纯 ID，不是路径） | `menuType=1`、`tabs={"pageViewType":"NList","cusview":false}`、`menuUrl=/sp/ebdfpage/viewport/<viewId>` |
+| 流程发起（表单新建页） | `LAYOUT` | `1_<formObjId>` | 点开即触发绑定流程 |
+| 导航分组（只放子菜单） | `EMPTY` | 空 | `menuType=0`；分组不应挂台账视图冒充页面 |
+| Ecode 自定义页等真实 URL 页 | `LINK` | URL 路径 | 只用于确有独立页面地址的场景，不用于台账 |
+
+- 新建台账菜单用 `e10-cli menu add-table <appId> <objId>`（或 `form create --menu`），新建发起菜单用 `menu add-start`；`menu add` 建的是 URL 型 `LINK`，不要拿它挂台账。
+- 判空先分层：正文 DOM 为空但菜单标题在、且直接打开 `/sp/ebdfpage/viewport/<viewId>` 有数据，说明是菜单类型问题，不是数据、字段或权限缺失。此时查 `allMenus` 回读的 `pageType`/`pageId`，不要先去改表单、台账权限或重建页面。
+- 修正菜单类型时原地改，保留菜单 ID：重建菜单会丢角色授权。改后回读 `pageType`、`pageId`、`menuUrl`，并复核 `menu permission list` 的授权对象未变。
+- 验证以实际点击为准：从左侧菜单逐项打开，确认列表有数据、分组可展开；只回读配置或只测一个菜单不足以证明整组可用。
+
 ## 读需求、处理冲突和执行计划
 
 - 同时读取 Word 正文、表格、图示、批注、嵌入对象；Excel 需要工作表、合并布局、节点表和图形。文件名版本、文内日期、修订批注日期分别记录，不从“1016”推出 2026-10-16。

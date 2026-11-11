@@ -1,0 +1,13 @@
+{
+  "name": "泛微E10离线包功能比对",
+  "installedAt": 1793188053644,
+  "source": "marketplace",
+  "version": "1.2.0",
+  "skillId": "skill_2102228004575588352",
+  "pay_mode": 0,
+  "description_zh": "离线对比新旧迁出包，生成业务功能差异、明细差异、风险验证点及可视化报告。",
+  "description_en": "Compares Weaver E10 offline packages and generates business differences, detailed changes, risk validation points, and visual reports.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/673fcf99-ac38-4a44-86e7-e7654dee6e75/0d3667c1-ee3a-46bd-89a0-eedb27a28e85.png",
+  "iconLocalPath": "C:\\Users\\MX20363\\.workbuddy\\skills\\weaver-e10-package-comparison\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/673fcf99-ac38-4a44-86e7-e7654dee6e75/0d3667c1-ee3a-46bd-89a0-eedb27a28e85.png"
+}

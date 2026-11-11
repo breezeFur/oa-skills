@@ -1,0 +1,13 @@
+{
+  "name": "泛微E10eBuilder专项基础",
+  "installedAt": 1793188115607,
+  "source": "marketplace",
+  "version": "1.0.4",
+  "skillId": "skill_2091030027184971776",
+  "pay_mode": 0,
+  "description_zh": "根据稳定 Tag 定位 E10 eBuilder 应用与表单，通过自定义接口或 API 查询和维护表单数据，按名称解析人员、部门、分部及关联浏览字段，并按 Tag 查询按钮及动作。",
+  "description_en": "Locate E10 eBuilder apps and forms by stable tags, query and maintain form data via custom APIs or the eBuilder API, resolve people, departments, sub-companies and related browser fields by name, and query form buttons and their actions by tags.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/673fcf99-ac38-4a44-86e7-e7654dee6e75/avatar/skill/au_d4ce79a3-94a.png",
+  "iconLocalPath": "C:\\Users\\MX20363\\.workbuddy\\skills\\weaver-e10-ebuilder-data\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/673fcf99-ac38-4a44-86e7-e7654dee6e75/avatar/skill/au_d4ce79a3-94a.png"
+}

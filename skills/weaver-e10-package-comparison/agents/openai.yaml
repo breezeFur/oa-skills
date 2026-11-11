@@ -1,0 +1,4 @@
+interface:
+  display_name: "泛微E10离线包功能比对"
+  short_description: "离线识别新旧迁出包的同源对象和真实业务变化"
+  default_prompt: "使用 $weaver-e10-package-comparison V15.6 对比这两个泛微 E10 离线迁出包，复用单次完整解析结果；流程包同时比较属性联动、字段联动和函数联动，并生成客户可读的差异报告。"

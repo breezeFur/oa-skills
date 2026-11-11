@@ -12,6 +12,10 @@ agent_created: true
 
 # 泛微E10e-builder报表
 
+## CLI 自动安装与更新
+
+Agent 按 [CLI 自动准备](../cli-setup.md) 直接补齐 Node.js、`e10-login@1.5.0` 及当前完整技能的 `edc-report`。报表命令缺少、版本不匹配或脚本路径指向旧副本时，在本技能的 `edc-report/` 目录执行 `npm link`，验证 `--version`、`--help`、`scripts-path`；成功后继续本轮搭表。全局注册无权限时使用当前技能中 CLI 入口的绝对路径。不要要求用户自行安装，不为安装 CLI 触发登录，不为报表额外安装 e10-cli。此步骤先于下文冷启动命令；版本有效时直接复用。
+
 > Skill slug：`weaver-e10-edcreport` · 版本 **1.7.0**（+ **`verify query` 查询条件合规体检（Q1~Q10 判据总表，--fix 幂等修）+ doctor 守卫在位扫描**；+ **查询条件「默认值三件套」必须写**（漏写会让设计器弹窗默认值区炸开、后续整段行被顶出可视区；新增 `fix query-default` 补齐；`query save` 自动补缺失项）；+ **禁止静默注入查询条件样式字段 `advancedSearchType`**（新增 `fix query-style`：清「展开条件」回「默认样式」+ 删误插入重复行）；+ 冻结单元格 API 落库 `fix freeze`（`cell.tag.fixed` 是唯一持久化标记）；+ 关联浏览富对象改走 GET `browserBeanSearch`（旧 POST `getBrowserBean` 恒 500）；+ 重复坐标拦截；+ 空白行/表头合并指南；+ tableName 免浏览器重建；+ `doctor` 环境体检 / `pitfalls` 踩坑知识库 / `verify limit` 规模预检 / `render` 渲染守卫）
 
 ## 搭表完成即停（最高强制）

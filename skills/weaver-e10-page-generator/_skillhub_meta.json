@@ -1,0 +1,13 @@
+{
+  "name": "泛微E10页面生成工具",
+  "installedAt": 1793188101715,
+  "source": "marketplace",
+  "version": "0.1.71",
+  "skillId": "skill_2104507204778180608",
+  "pay_mode": 0,
+  "description_zh": "根据文字、截图或现有工程生成、复刻、修改并交付页面。页面制作需求中提到 ecology、泛微、E10、ECode、系统页面、门户、办公、OA 时使用，也适用于静态 HTML 页面和 HTML 页面包。用户要求把代码保存到指定本地目录时同样使用，无需点名工具或先提出发布部署。",
+  "description_en": "Generate, recreate, modify, and deliver pages from text, screenshots, or existing projects. Use for Ecology, Weaver, E10, ECode, portal, office, and OA pages, static HTML pages and packages, including requests to save code to a local directory without explicitly asking to deploy.",
+  "iconSource": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/673fcf99-ac38-4a44-86e7-e7654dee6e75/b2b5f231-6bf9-4b91-b038-6324c6ced1c0.png",
+  "iconLocalPath": "C:\\Users\\MX20363\\.workbuddy\\skills\\weaver-e10-page-generator\\_icon.png",
+  "iconDownloadedFrom": "https://openplatform-cdn.codebuddy.cn/public/common/capability_cover/673fcf99-ac38-4a44-86e7-e7654dee6e75/b2b5f231-6bf9-4b91-b038-6324c6ced1c0.png"
+}
