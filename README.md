@@ -28,16 +28,16 @@
 | weaver-e10-edcreport | [报表搭建](skills/oa-skill/weaver-e10-edcreport/SKILL.md) | 数据源、布局、查询条件及点名修改 |
 | weaver-e10-components | [组件搭建](skills/oa-skill/weaver-e10-components/SKILL.md) | 可复用指标卡、图表、表格、筛选器及设计器配置 |
 | max-workflow-standard | [MAX 规范](skills/max-workflow-standard/SKILL.md) | MAX 公司流程、泳道、表单及验收规范 |
-| weaver-e10-login | [登录认证](skills/weaver-e10-login/SKILL.md) | e10-login 安装、OAuth、登录状态及环境切换 |
-| weaver-e10-basic | [基础能力](skills/weaver-e10-basic/SKILL.md) | 租户、人员身份切换等基础操作 |
-| weaver-e10-ebuilder-data | [Tag 与数据](skills/weaver-e10-ebuilder-data/SKILL.md) | 按稳定 Tag 定位应用、表单、关联数据及动作 |
-| weaver-e10-ebuilder-form | [表单数据](skills/weaver-e10-ebuilder-form/SKILL.md) | 查询业务列表、填写并维护表单数据 |
-| weaver-e10-workflow | [流程办理](skills/weaver-e10-workflow/SKILL.md) | 待办、已办、发起、处理与流程详情 |
-| weaver-e10-shared | [流程共享规则](skills/weaver-e10-shared/SKILL.md) | weaver-work-cli 自动准备、认证及输出/写入契约 |
-| weaver-e10-page-generator | [页面生成](skills/weaver-e10-page-generator/SKILL.md) | 文字/截图生成、复刻、修改页面及自动准备 runtime |
-| weaver-e10-package-comparison | [离线包比对](skills/weaver-e10-package-comparison/SKILL.md) | 迁出包业务功能差异、验证点及离线可视化 |
+| weaver-e10-login | [登录认证](skills/oa-skill/weaver-e10-login/SKILL.md) | e10-login 安装、OAuth、登录状态及环境切换 |
+| weaver-e10-basic | [基础能力](skills/oa-skill/weaver-e10-basic/SKILL.md) | 租户、人员身份切换等基础操作 |
+| weaver-e10-ebuilder-data | [Tag 与数据](skills/oa-skill/weaver-e10-ebuilder-data/SKILL.md) | 按稳定 Tag 定位应用、表单、关联数据及动作 |
+| weaver-e10-ebuilder-form | [表单数据](skills/oa-skill/weaver-e10-ebuilder-form/SKILL.md) | 查询业务列表、填写并维护表单数据 |
+| weaver-e10-workflow | [流程办理](skills/oa-skill/weaver-e10-workflow/SKILL.md) | 待办、已办、发起、处理与流程详情 |
+| weaver-e10-shared | [流程共享规则](skills/oa-skill/weaver-e10-shared/SKILL.md) | weaver-work-cli 自动准备、认证及输出/写入契约 |
+| weaver-e10-page-generator | [页面生成](skills/oa-skill/weaver-e10-page-generator/SKILL.md) | 文字/截图生成、复刻、修改页面及自动准备 runtime |
+| weaver-e10-package-comparison | [离线包比对](skills/oa-skill/weaver-e10-package-comparison/SKILL.md) | 迁出包业务功能差异、验证点及离线可视化 |
 
-`oa-skill` 是 Builder、动作流、报表和组件四个技能所在的集合目录。`node-write` 是同级的文本工具技能，处理受控源码时按需读取。其他 weaver-e10-* 技能位于 skills/ 下同级目录；流程技能需要同级 weaver-e10-shared，登录/数据技能需要同级 weaver-e10-login。共同安装指南是 [CLI 自动准备](skills/oa-skill/cli-setup.md)，保留 oa-skill 集合及其相对引用。保留原有嵌套结构与全部 references、assets、scripts；报表 CLI 会引用同一技能内的相邻 scripts，不能只复制 CLI 子目录。
+`oa-skill` 统一收纳全部 `weaver-e10-*` 技能及 Builder 内的动作流技能。`node-write` 和 `max-workflow-standard` 保留在 skills/ 下同级目录；流程共享规则和登录技能在 oa-skill 内与相关业务技能同级。共同安装指南是 [CLI 自动准备](skills/oa-skill/cli-setup.md)，保留 oa-skill 集合及其相对引用。保留原有嵌套结构与全部 references、assets、scripts；报表 CLI 会引用同一技能内的相邻 scripts，不能只复制 CLI 子目录。
 
 ## 安装前确认位置
 
@@ -55,7 +55,7 @@ $oaRepoPath = Join-Path $env:USERPROFILE 'oa-skills'
 git clone https://github.com/breezeFur/oa-skills.git $oaRepoPath
 $oaSkillsPath = Join-Path $env:USERPROFILE '.agents\skills'
 New-Item -ItemType Directory -Force -Path $oaSkillsPath | Out-Null
-foreach ($oaSkillName in @('node-write', 'oa-skill', 'max-workflow-standard', 'weaver-e10-basic', 'weaver-e10-ebuilder-data', 'weaver-e10-ebuilder-form', 'weaver-e10-login', 'weaver-e10-package-comparison', 'weaver-e10-page-generator', 'weaver-e10-shared', 'weaver-e10-workflow')) {
+foreach ($oaSkillName in @('node-write', 'oa-skill', 'max-workflow-standard') {
     $oaLinkPath = Join-Path $oaSkillsPath $oaSkillName
     $oaTargetPath = Join-Path (Join-Path $oaRepoPath 'skills') $oaSkillName
     $oaExisting = Get-Item -LiteralPath $oaLinkPath -Force -ErrorAction SilentlyContinue
@@ -76,7 +76,7 @@ git clone https://github.com/breezeFur/oa-skills.git "$HOME/oa-skills"
 oa_repo_path="$HOME/oa-skills"
 oa_skills_path="$HOME/.agents/skills"
 mkdir -p "$oa_skills_path"
-for oa_skill_name in node-write oa-skill max-workflow-standard weaver-e10-basic weaver-e10-ebuilder-data weaver-e10-ebuilder-form weaver-e10-login weaver-e10-package-comparison weaver-e10-page-generator weaver-e10-shared weaver-e10-workflow; do
+for oa_skill_name in node-write oa-skill max-workflow-standard; do
   oa_link_path="$oa_skills_path/$oa_skill_name"
   if [ -e "$oa_link_path" ] || [ -L "$oa_link_path" ]; then
     printf '已有安装，先核对再处理：%s\n' "$oa_link_path"
@@ -85,6 +85,14 @@ for oa_skill_name in node-write oa-skill max-workflow-standard weaver-e10-basic 
   ln -s "$oa_repo_path/skills/$oa_skill_name" "$oa_link_path"
 done
 ```
+
+## 已有安装迁移到统一目录
+
+本次只调整仓库目录，技能名称与功能保持一致。全量安装现在只需保留三个顶层目录：`oa-skill`、`max-workflow-standard`、`node-write`。
+
+已有安装更新前，检查各目录是复制副本、符号链接还是 junction，备份用户修改到技能目录之外。旧顶层 weaver-e10-* 链接可能因仓库移动而失效，应将其目标改为仓库 skills/oa-skill 下的对应目录；已有复制副本先与新版逐项比较，再迁移或合并到 oa-skill，目标已经存在时不能覆盖。安装工具只发现直接子目录时，可保留指向集合内部的单技能链接，但不要同时保留旧内容副本造成同名技能冲突。
+
+按 docs/oa-agents.md 更新原 OA 标记块，回读全部14个 SKILL.md及相对引用。确认新会话识别后再处理明确属于旧安装的重复入口；不递归删除用户目录。仓库目录更新不会自动修改接收者的技能安装或全局规则。
 
 ## 安装后合并 AGENTS.md（必做）
 

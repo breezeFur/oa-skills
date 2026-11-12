@@ -5,7 +5,7 @@
 ## 给安装 AI 的要求
 
 1. 查明目标 AI、操作系统、真实技能目录和实际生效的规则文件；使用用户指定的位置。Codex 的当前默认技能目录与规则目录不同，详见 README。
-2. 保留 skills/ 下本次选定技能的完整目录及相对引用；全量安装时包含 node-write、oa-skill、max-workflow-standard 及所有 weaver-e10-* 目录。已有安装先比较来源、链接目标及内容，保留用户改动，避免重复安装同名技能。
+2. 保留 skills/ 下本次选定技能的完整目录及相对引用；全量安装时包含 node-write、max-workflow-standard 和统一收纳全部 weaver-e10-* 的 oa-skill 目录。已有安装先比较来源、链接目标及内容，保留用户改动，避免重复安装同名技能。
 3. 安装后读取 [docs/oa-agents.md](docs/oa-agents.md)，将 __OA_SKILLS_DIR__ 替换为本机技能目录的绝对路径，把 OA_SKILLS_START / OA_SKILLS_END 之间的整块内容合并到接收者实际生效的 AGENTS.md 或其 AI 使用的同类规则文件。保留原规则；已有该块时更新同一块，不重复追加。写入前备份已有文件。
 4. 仓库根 AGENTS.md 包含本仓库维护规则，不能整文件覆盖接收者的全局规则。只合并上述 OA 规则片段。只有克隆仓库，没有安装到技能目录、没有合并规则，不能算完成安装。
 5. 回读核对 14 个技能定义、规则中的真实路径和唯一标记块，并在接收者 AI 的新会话中确认技能及 OA 规则被识别。按技能依赖直接安装或更新所需 CLI 并验证，随后分别报告技能安装、规则合并、工具准备及认证状态；不要让用户自行安装工具。页面 runtime 按首次实际页面任务自动准备。
@@ -22,13 +22,13 @@
   - ESB 动作流：`skills/oa-skill/weaver-e10-builder/actionflows/SKILL.md`，技能名 generating-actionflows。
   - E-Builder 报表：`skills/oa-skill/weaver-e10-edcreport/SKILL.md`。
   - 自定义组件、指标卡、图表、表格、筛选器：`skills/oa-skill/weaver-e10-components/SKILL.md`。
-  - E10 登录和环境认证：`skills/weaver-e10-login/SKILL.md`。
-  - 租户、人员身份切换等基础操作：`skills/weaver-e10-basic/SKILL.md`。
-  - 按稳定 Tag 查询和维护表单数据：`skills/weaver-e10-ebuilder-data/SKILL.md`。
-  - 业务列表、表单数据填写与修改：`skills/weaver-e10-ebuilder-form/SKILL.md`。
-  - 待办、已办、发起和处理流程：`skills/weaver-e10-workflow/SKILL.md`；先读取配套 `skills/weaver-e10-shared/SKILL.md`，认证由 weaver-work-cli 托管。
-  - 页面生成、复刻和修改：`skills/weaver-e10-page-generator/SKILL.md`。
-  - 新旧迁出包离线比对：`skills/weaver-e10-package-comparison/SKILL.md`。
+  - E10 登录和环境认证：`skills/oa-skill/weaver-e10-login/SKILL.md`。
+  - 租户、人员身份切换等基础操作：`skills/oa-skill/weaver-e10-basic/SKILL.md`。
+  - 按稳定 Tag 查询和维护表单数据：`skills/oa-skill/weaver-e10-ebuilder-data/SKILL.md`。
+  - 业务列表、表单数据填写与修改：`skills/oa-skill/weaver-e10-ebuilder-form/SKILL.md`。
+  - 待办、已办、发起和处理流程：`skills/oa-skill/weaver-e10-workflow/SKILL.md`；先读取配套 `skills/oa-skill/weaver-e10-shared/SKILL.md`，认证由 weaver-work-cli 托管。
+  - 页面生成、复刻和修改：`skills/oa-skill/weaver-e10-page-generator/SKILL.md`。
+  - 新旧迁出包离线比对：`skills/oa-skill/weaver-e10-package-comparison/SKILL.md`。
   - MAX 创鑫公司流程、泳道或表单规范：额外读取 `skills/max-workflow-standard/SKILL.md`；其他公司的 OA 任务按其业务要求执行。
 - 用户要求安装/更新技能或执行需要 CLI 的任务时，按 `skills/oa-skill/cli-setup.md` 由 Agent 直接检查、安装或更新本轮所需工具，并验证真实路径、版本和启动。有效版本直接复用，不要求用户手动安装，也不另外设置安装确认步骤；用户明确要求只检查或不安装时遵从。
 - 页面工具通过自己的 bootstrap 和产品锁文件自动准备；XiaoE 客户端托管的流程 CLI 按共享技能由客户端准备，其他环境按官方 npm 来源自动安装/更新。不要安装猜测的包或无关 CLI。

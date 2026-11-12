@@ -45,7 +45,7 @@ SDK、数据接口或其他技术措辞本身都不触发 `e10-page`；未明确
 
 ## 固定入口
 
-Agent 先按 [CLI 自动准备](../oa-skill/cli-setup.md) 检查 Node.js >=22.5；缺少或版本不足时直接准备符合要求的 LTS 并验证。页面 CLI 与组件运行时仍只通过本技能 bootstrap 自动安装或更新到 `product.json` / `runtime-lock.json` 声明的版本，不要求用户手动安装、不额外确认安装。用户要求更新页面技能时，清单与锁文件一起更新后再执行 `ensure`，不单独改产品版本或全局安装 `ui-code-agent`。
+Agent 先按 [CLI 自动准备](../cli-setup.md) 检查 Node.js >=22.5；缺少或版本不足时直接准备符合要求的 LTS 并验证。页面 CLI 与组件运行时仍只通过本技能 bootstrap 自动安装或更新到 `product.json` / `runtime-lock.json` 声明的版本，不要求用户手动安装、不额外确认安装。用户要求更新页面技能时，清单与锁文件一起更新后再执行 `ensure`，不单独改产品版本或全局安装 `ui-code-agent`。
 
 处理任何页面任务前，先把本文件所在目录记为 `<SKILL_DIR>`，后台执行：
 

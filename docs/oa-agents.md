@@ -8,13 +8,13 @@
   - ESB 动作流：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-builder/actionflows/SKILL.md`，技能名 generating-actionflows。
   - E-Builder 报表：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-edcreport/SKILL.md`。
   - 自定义组件、指标卡、图表、表格、筛选器：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-components/SKILL.md`。
-  - E10 登录和环境认证：`__OA_SKILLS_DIR__/weaver-e10-login/SKILL.md`。
-  - 租户、人员身份切换等基础操作：`__OA_SKILLS_DIR__/weaver-e10-basic/SKILL.md`。
-  - 按稳定 Tag 查询和维护表单数据：`__OA_SKILLS_DIR__/weaver-e10-ebuilder-data/SKILL.md`。
-  - 业务列表、表单数据填写与修改：`__OA_SKILLS_DIR__/weaver-e10-ebuilder-form/SKILL.md`。
-  - 待办、已办、发起和处理流程：`__OA_SKILLS_DIR__/weaver-e10-workflow/SKILL.md`；先读取配套 `__OA_SKILLS_DIR__/weaver-e10-shared/SKILL.md`，认证由 weaver-work-cli 托管。
-  - 页面生成、复刻和修改：`__OA_SKILLS_DIR__/weaver-e10-page-generator/SKILL.md`。
-  - 新旧迁出包离线比对：`__OA_SKILLS_DIR__/weaver-e10-package-comparison/SKILL.md`。
+  - E10 登录和环境认证：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-login/SKILL.md`。
+  - 租户、人员身份切换等基础操作：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-basic/SKILL.md`。
+  - 按稳定 Tag 查询和维护表单数据：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-ebuilder-data/SKILL.md`。
+  - 业务列表、表单数据填写与修改：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-ebuilder-form/SKILL.md`。
+  - 待办、已办、发起和处理流程：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-workflow/SKILL.md`；先读取配套 `__OA_SKILLS_DIR__/oa-skill/weaver-e10-shared/SKILL.md`，认证由 weaver-work-cli 托管。
+  - 页面生成、复刻和修改：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-page-generator/SKILL.md`。
+  - 新旧迁出包离线比对：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-package-comparison/SKILL.md`。
   - MAX 创鑫公司流程、泳道或表单规范：额外读取 `__OA_SKILLS_DIR__/max-workflow-standard/SKILL.md`；其他公司的 OA 任务按其业务要求执行。
 - 用户要求安装/更新技能或执行需要 CLI 的任务时，按 `__OA_SKILLS_DIR__/oa-skill/cli-setup.md` 由 Agent 直接检查、安装或更新本轮所需工具，并验证真实路径、版本和启动。有效版本直接复用，不要求用户手动安装，也不另外设置安装确认步骤；用户明确要求只检查或不安装时遵从。
 - 页面工具通过自己的 bootstrap 和产品锁文件自动准备；XiaoE 客户端托管的流程 CLI 按共享技能由客户端准备，其他环境按官方 npm 来源自动安装/更新。不要安装猜测的包或无关 CLI。

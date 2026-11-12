@@ -41,7 +41,7 @@ XiaoE 中如果后续命令直接返回 `command not found`、退出码 127 或�
 
 ## 业务 Skill 安装前版本检查
 
-非 XiaoE 环境按 [CLI 自动准备](../oa-skill/cli-setup.md) 由 Agent 直接准备 CLI。先确认真实命令路径与版本；缺少、版本低于已核对基线 0.1.49、明确不兼容或用户要求更新时，执行 `npm install -g weaver-work-cli@latest --registry=https://registry.npmjs.org`，随后验证 `--version` 和本轮业务命令 `--help`，再继续原任务。普通业务任务已有匹配版本时不重复联网查更新。无需让用户选择安装来源或再次确认更新；用户明确指定本地源码时才按其来源构建。XiaoE 客户端托管的工具由客户端自动准备，保留上节宿主边界。
+非 XiaoE 环境按 [CLI 自动准备](../cli-setup.md) 由 Agent 直接准备 CLI。先确认真实命令路径与版本；缺少、版本低于已核对基线 0.1.49、明确不兼容或用户要求更新时，执行 `npm install -g weaver-work-cli@latest --registry=https://registry.npmjs.org`，随后验证 `--version` 和本轮业务命令 `--help`，再继续原任务。普通业务任务已有匹配版本时不重复联网查更新。无需让用户选择安装来源或再次确认更新；用户明确指定本地源码时才按其来源构建。XiaoE 客户端托管的工具由客户端自动准备，保留上节宿主边界。
 
 ## 最高优先级：XiaoE 统一登录
 

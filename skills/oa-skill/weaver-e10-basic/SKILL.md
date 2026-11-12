@@ -14,7 +14,7 @@ version: 1.0.0
 
 ### 前置依赖
 
-Agent 按 [CLI 自动准备](../oa-skill/cli-setup.md) 直接准备匹配的 `e10-login@1.5.0`，检查命令路径、版本与启动；登录技能已随本仓库收录，读取同级 `../weaver-e10-login/SKILL.md`。需要的 CLI 缺少或不匹配时自行安装/更新，成功后继续任务，不要求用户手动安装。此技能无需另装一个 basic CLI。
+Agent 按 [CLI 自动准备](../cli-setup.md) 直接准备匹配的 `e10-login@1.5.0`，检查命令路径、版本与启动；登录技能已随本仓库收录，读取同级 `../weaver-e10-login/SKILL.md`。需要的 CLI 缺少或不匹配时自行安装/更新，成功后继续任务，不要求用户手动安装。此技能无需另装一个 basic CLI。
 
 本 Skill 依赖以下外部 skill，使用前需确保已安装并可用：
 

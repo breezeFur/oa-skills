@@ -9,3 +9,5 @@ weaver-e10-shared 是流程技能明确要求的配套依赖，补自官方 npm 
 同步排除本机配置、数据库、缓存、日志、凭据、生成的报表调试 JSON 和 Python bytecode。会话与 secretKey 示例使用占位符；公开内容没有授予超出原来源的额外许可。
 
 2026-11-12 按维护者要求从 breezeFur/agent-skills 同步 node-write 及全部七个技能配套文件，接入 UTF-8/DGS 读写指南和 Windows Node 自动准备脚本。运行时、探针、观察器二进制、证据和本机盘点不随技能发布；Node 安装后仍需独立验证 DGS。
+
+2026-11-12 按维护者要求将原 skills/ 下八个 weaver-e10-* 目录迁入 skills/oa-skill，与 Builder、组件、报表统一收纳；技能名称、配套资源和产品锁文件保留。source-manifest.json 的 generatedTargets/targets 路径描述原上游生成位置，属于历史来源元数据，不作为本仓库当前安装路径；本仓库安装位置以 README 和实际目录为准。
