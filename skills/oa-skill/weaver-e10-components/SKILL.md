@@ -14,6 +14,7 @@ description: 创建、修改泛微 E10 E-Builder 自定义组件，重点实现�
 - 先读取相邻 `../weaver-e10-builder/SKILL.md`，复用它的认证、CLI、设计器及编译指导。登录态来自 e10-cli，技能和组件源码不保存凭据。
 - 创建前查询当前环境的同名组件、唯一标识、分类和代码树。修改已有组件保留原 ID 与配置键；创建新组件使用当前环境可用的唯一标识。
 - 根据组件用途读取 [配置设计](references/configuration.md)，形成配置清单，再实现配置面板和渲染代码。
+- 组件调用 SQL 准备或出现“管理员正常、普通用户暂无权限”时，读取 [SQL 取数与权限](../weaver-e10-builder/references/coding/guide-prepared-sql-access.md)。运行页使用原生 SQL SDK/接口，不能使用管理端 getModelDatasetData；授权回读后仍须验证普通用户实际访问。
 - 注册、编译、保存、导出时读取 [平台操作](references/platform.md)。[历史实例](references/examples.md)仅用于理解已验证的配置机制，不作为业务需求或跨环境 ID 来源。
 
 ## 核心交付要求

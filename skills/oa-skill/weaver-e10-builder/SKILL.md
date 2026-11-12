@@ -135,6 +135,7 @@ e10-cli --help
 | 函数联动、本表字段间公式赋值、赋值式公式、EXCEL 公式联动、字段自动计算、form formula-linkage、wf-form formula-linkage、流程表单函数联动、触发事件、模块字段不能作目标 | `references/form/guide-formula-linkage.md`（四套联动对比 + 赋值式语法 + 触发事件表 + 模块字段 + 流程表单那条路由 + 常见报错） |
 | 鉴权、登录、ETEAMSID、多环境、profile、切换环境 | `references/auth/guide-auth.md` |
 | 表单数据读写、getSimpleData、withDisplayNames、getFieldOptions、saveFormData、updateFormData | `references/coding/guide-form-crud.md`（前端代码） |
+| SQL准备、SQL取数、管理员能调用普通用户不能、暂无权限、getModelDatasetData | `references/coding/guide-prepared-sql-access.md`（运行端接口、使用权限与普通用户验收） |
 | form data add、form data list、form data delete、写入数据、查询数据、删除数据 | `references/form/guide-form-data.md` |
 | 编辑回显、handleEdit、getAllData、数据回填 | `references/coding/guide-edit-backfill.md`（前端代码） |
 | 字段联动、显隐联动、条件显示、form linkage、为空/不为空条件、NULL 算子 | `references/form/guide-form-linkage.md` |

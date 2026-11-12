@@ -8,6 +8,7 @@
 
 | 用户意图关键词 | 加载文档 |
 |---------------|---------|
+| SQL准备、SQL取数、管理员能调用普通用户不能、暂无权限、getModelDatasetData | `references/coding/guide-prepared-sql-access.md`（运行端接口、使用权限与普通用户验收） |
 | 表单CRUD、增删改查、getSimpleData、withDisplayNames、getFieldOptions、saveFormData、updateFormData、deleteFormData、字段类型 | `references/coding/guide-form-crud.md`（前端代码） |
 | 编辑、修改、回显、handleEdit、getAllData、rawData、selectedPerson、editForm、数据回填 | `references/coding/guide-edit-backfill.md`（前端代码） |
 | 显隐联动、条件显示、form linkage、为空/不为空条件、NULL 算子 | `references/form/guide-form-linkage.md` |
