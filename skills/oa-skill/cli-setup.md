@@ -17,7 +17,21 @@
 
 优先使用宿主已提供的可用 Node.js/npm 或 Python，检查真实路径和版本；不要把 Windows Store 的 `python.exe` 启动别名当作已安装的解释器。Node.js 缺少或版本不足时，直接通过当前系统可用的官方安装方式准备受支持的 LTS，页面生成需要 Node.js >=22.5，其他 CLI 至少需要 Node.js 18。Python 脚本需要 Python 3.10+。
 
-按实际操作系统选择已有包管理器，例如 Windows 的 `winget install --exact --id OpenJS.NodeJS.LTS` / `winget upgrade --exact --id OpenJS.NodeJS.LTS`、macOS 的 `brew install node` / `brew upgrade node`；Linux 先确认发行版和官方包源是否提供满足版本的包。不要把 Windows 命令用在其他系统，不执行来历不明的下载脚本。安装后刷新当前进程 PATH 或使用确认过的绝对路径，再核对 `node --version`、`npm --version`。Python 可使用 Windows 的 `winget install --exact --id Python.Python.3.13` / `winget upgrade --exact --id Python.Python.3.13` 或 macOS 的 `brew install python` / `brew upgrade python`；Linux 确认官方包源版本后安装 python3。已有满足要求的其他 Python 版本直接复用，安装后验证解释器能启动。
+Windows 缺少满足本轮要求的 Node 时，优先使用同级 [node-write](../node-write/SKILL.md) 提供的 `scripts/ensure-node.ps1`。先读取该技能，再由 Agent 运行实际绝对路径：
+
+```powershell
+$oaNodeJson = & '<技能根目录>/node-write/scripts/ensure-node.ps1' -MinimumVersion 22.5.0
+if ($LASTEXITCODE -ne 0) { throw $oaNodeJson }
+$oaNodeSetup = $oaNodeJson | ConvertFrom-Json
+$oaNodeExecutable = $oaNodeSetup.nodePath
+$env:PATH = (Split-Path -Parent $oaNodeExecutable) + [IO.Path]::PathSeparator + $env:PATH
+& $oaNodeExecutable --version
+& (Join-Path (Split-Path -Parent $oaNodeExecutable) 'npm.cmd') --version
+```
+
+示例满足页面 Node >=22.5 要求；只需普通文本工具时可省略 MinimumVersion，默认 >=22。已有满足当前 CLI 契约的运行时直接复用，不因提供该脚本强制升级。脚本从 nodejs.org 下载最新适用 LTS ZIP，核对官方 SHA-256，安装在用户目录，返回绝对路径；不修改永久 PATH。以上 PATH 仅供本次进程及其子进程使用。新 Node 的 DGS 能力仍须按 node-write 单独验证；OA CLI 使用其他运行时不构成 DGS 验证。
+
+其他平台或需要系统安装时，按实际操作系统选择已有包管理器，例如 Windows 的 `winget install --exact --id OpenJS.NodeJS.LTS` / `winget upgrade --exact --id OpenJS.NodeJS.LTS`、macOS 的 `brew install node` / `brew upgrade node`；Linux 先确认发行版和官方包源是否提供满足版本的包。不要把 Windows 命令用在其他系统，不执行来历不明的下载脚本。安装后刷新当前进程 PATH 或使用确认过的绝对路径，再核对 `node --version`、`npm --version`。Python 可使用 Windows 的 `winget install --exact --id Python.Python.3.13` / `winget upgrade --exact --id Python.Python.3.13` 或 macOS 的 `brew install python` / `brew upgrade python`；Linux 确认官方包源版本后安装 python3。已有满足要求的其他 Python 版本直接复用，安装后验证解释器能启动。
 
 若宿主已有可用包管理器，Agent 自行执行所需安装与更新；真实的系统权限阻断或浏览器授权由宿主工具处理。没有可用安装来源时，说明具体缺项，继续独立工作；不能把失败状态称为安装完成。
 

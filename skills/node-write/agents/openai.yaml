@@ -1,0 +1,4 @@
+interface:
+  display_name: "Node 文件读写"
+  short_description: "自动准备 Node 并读写 UTF-8 文本，检查基线与 DGS 独立密文视角"
+  default_prompt: "使用 $node-write 准备可用 Node，Windows 缺少时自动安装官方 LTS 便携版，再读取并修改 UTF-8 文本；保留 BOM 和换行，DGS 文件重新验证实际运行时与独立密文视角。"

@@ -1,0 +1,33 @@
+// Compile locally; this read-only observer never prints file contents.
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Web.Script.Serialization;
+
+class FileHeader {
+    static int Main(string[] args) {
+        try {
+            if (args.Length != 1 || !Path.IsPathRooted(args[0]))
+                throw new ArgumentException("Supply one absolute file path");
+            using (var stream = new FileStream(args[0], FileMode.Open, FileAccess.Read, FileShare.Read)) {
+                var header = new byte[16];
+                int count = stream.Read(header, 0, header.Length);
+                Array.Resize(ref header, count);
+                stream.Position = 0;
+                string digest;
+                using (var sha = SHA256.Create())
+                    digest = BitConverter.ToString(sha.ComputeHash(stream)).Replace("-", "").ToLowerInvariant();
+                Console.WriteLine(new JavaScriptSerializer().Serialize(new {
+                    bytes = stream.Length,
+                    headerHex = BitConverter.ToString(header).Replace("-", ""),
+                    sha256 = digest
+                }));
+            }
+            return 0;
+        } catch (Exception error) {
+            // Do not include paths, contents, or an exception payload.
+            Console.Error.WriteLine(error.GetType().Name);
+            return 1;
+        }
+    }
+}

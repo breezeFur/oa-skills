@@ -3,6 +3,7 @@
 
 - OA 技能安装根目录：`__OA_SKILLS_DIR__`。开始泛微 E10、E-Builder、OA 表单、流程、动作流、报表、权限、编号、页面或迁出包比对任务前，先读取对应技能的 SKILL.md 及本轮必要的参考资料。
 - 按任务选择；oa-skill 是集合目录：
+  - UTF-8 文本或 DGS 受控源码读写：`__OA_SKILLS_DIR__/node-write/SKILL.md`；Windows 缺少 Node 时按该技能自动安装，随后重新验证实际 DGS 能力。
   - 应用、表单设计、原生流程设计、权限、编号：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-builder/SKILL.md`。
   - ESB 动作流：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-builder/actionflows/SKILL.md`，技能名 generating-actionflows。
   - E-Builder 报表：`__OA_SKILLS_DIR__/oa-skill/weaver-e10-edcreport/SKILL.md`。
