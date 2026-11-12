@@ -5,32 +5,11 @@
 
 ---
 
-## 一、登录：只接受「用户提供的 ETEAMSID」，禁止自动登录
+## 一、登录：复用会话，缺失时由 Agent 推进官方 OAuth
 
-### 1.1 需要用户提供什么（缺凭证时**照此原样告诉用户**）
+未获取到可用的 E10 会话。本检查不触发登录。Agent 复用用户已提供的真实地址和账号密码，按 weaver-e10-login 发起官方 OAuth；账号密码在官方浏览器登录页使用，不作为 ETEAMSID 参数。缺少匹配 CLI 时自动准备 e10-login@1.5.0。仅在实际验证码、MFA、平台授权或回调不可达时说明具体阻碍；不默认索取 Cookie，不断言所有环境都不能 OAuth。登录完成后再执行一次 auth ready，避免循环检查。
 
-| 需要的东西 | 说明 |
-|---|---|
-| **ETEAMSID cookie 值** | 浏览器登录平台后，F12 → Application / 应用程序 → Storage → Cookies → 选中该站点 → 复制 `ETEAMSID` 的 Value，形如 `PCACCOUNT_EXAMPLE_SESSION_VALUE` |
-| **平台地址 baseUrl** | 例如 `https://itsm.hongjing-wh.com:5001` |
-
-拿到后**二选一**：
-
-```bash
-# A) 只对当前终端生效（最快，零等待）
-export EB_ETEAMSID="<粘贴 cookie>"
-export EB_HOST="<平台地址>"
-
-# B) 持久写入（之后所有脚本免配置）
-e10-login set --eteamsid "<粘贴 cookie>" --base-url "<平台地址>"
-```
-
-### 1.2 禁止事项（硬约束）
-
-1. **禁止用 `e10-login oidc` 兜底。** 部分环境的 SSO `authorize` 端点不发放授权码（`302 → /sp/intauthportal/logintip?code=80015`），本地回调 `127.0.0.1:19800` 永远等不到 → 命令一直卡住。缺凭证时应当**立即向用户索要 ETEAMSID**，而不是尝试 oidc。
-2. **禁止循环校验**：`auth ready` / `e10-login status` 一次即结论，不要 repeatedly 重试、不要 whoami 二次确认。
-3. **禁止为登录去 Glob/Grep 乱扫仓库**，也不要通读 `weaver-e10-login` 全文。
-4. 禁止把 cookie 写进代码、写进仓库或写进任何提交物。
+个别站点曾返回 SSO code=80015，这只说明该次授权失败。若实际回调不可达或站点拒绝授权，结束该次登录并报告实际原因，不无限等待；不能据此禁止其他环境的 OAuth。状态检查与业务脚本不自行登录，不打印凭证。
 
 ### 1.3 解析顺序（`eb_auth.js` 实现）
 

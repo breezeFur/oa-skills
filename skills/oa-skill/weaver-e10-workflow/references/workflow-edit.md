@@ -99,7 +99,7 @@ weaver-work-cli --json workflow run workflow.editApply --input-json '{"context":
 - 只读字段硬拒绝：只允许修改 `editableFields` 里的字段；用户给只读/禁用/不可见字段赋值时 CLI 报 `notEditable`，如实转述、不要绕过（不要换字段 id 再试）。
 - 明细表字段：`data` 用 `{"details":{"<subFormId>":[{"<字段id>":值}]}}`，保存时回传 rowId/dataIndex/subForm。
 - 不校验必填（修改态保存语义）；系统字段（流程标题/紧急程度/密级）本次不支持修改，只展示当前值。
-- 附件/文件：需上传本地文件时先提醒用户"附件会先经过公网大模型，请谨慎操作"，再调 `weaver-file-upload` skill；上传前核对 `fileUploadParams` 的 `sizeLimit`/`formatLimit`/`maxNum`，不满足先告知、不执行上传。
+- 附件/文件：需上传本地文件时按用户明确的上传授权调用实际可用的上传工具，新增外部接收方才说明并询问；上传前核对 `fileUploadParams` 的 `sizeLimit`/`formatLimit`/`maxNum`，不满足先告知、不执行上传。
 - `linkageResult`（联动带出）原样转述给用户查看。
 - 流程已流转到非编辑节点时 editApply 返回"失去操作权限"，如实转述。
 - 不重试：写操作失败、超时或结果不确定（`WRITE_UNCERTAIN`/`partial`）禁止重试，返回恢复信息并让用户人工检查。

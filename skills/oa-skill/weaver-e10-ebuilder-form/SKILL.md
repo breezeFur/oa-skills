@@ -39,7 +39,7 @@ dependencies:
 
 ## 先建立共享上下文
 
-每次执行先检查当前任务是否已有用户确认目标环境的有效认证会话；有则复用，没有则调用 `weaver-e10-login` 建立会话。然后读取 [references/session-and-routing.md](references/session-and-routing.md)，在任务上下文中维护字符串形式的 `origin`、`appId`、`apiPrefix`、`hostPageId`、`listId`、`listKind`、`objId` 和 `interfacePk`；未知值保持未知，不能用其他 ID 猜测。
+在线任务首次执行时核对是否已有匹配用户指定目标的有效会话；同一任务会话有效时直接沿用；有则复用，没有则调用 `weaver-e10-login` 建立会话。然后读取 [references/session-and-routing.md](references/session-and-routing.md)，在任务上下文中维护字符串形式的 `origin`、`appId`、`apiPrefix`、`hostPageId`、`listId`、`listKind`、`objId` 和 `interfacePk`；未知值保持未知，不能用其他 ID 猜测。
 
 ### 快速复用与最少交互
 

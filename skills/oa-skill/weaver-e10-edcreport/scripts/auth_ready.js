@@ -11,7 +11,7 @@
  *        → 最多一次 `e10-login status`（硬超时 EB_AUTH_TIMEOUT_MS，默认 8s）
  *   2. 已就绪时**不再额外跑 `e10-login --version`**（旧版固定 2 次 spawn → 现在 0 次）
  *   3. 版本探测改为**惰性**：只在凭证不可用时才做，仅用于提示文案
- *   4. 失败即输出 need / how_to / askUser，且**禁止 oidc 兜底**与循环重试
+ *   4. 失败只输出认证状态和实际支持的登录指引，不在门禁内登录、不循环重试
  */
 const A = require('./eb_auth.js');
 const { spawnSync } = require('child_process');
@@ -25,42 +25,6 @@ if (!status.ok) {
   const cliVersion = vm ? `${vm[1]}.${vm[2]}.${vm[3]}` : 'unknown';
   const legacy = !!vm && (+vm[1] < 1 || (+vm[1] === 1 && (+vm[2] < 5)));
 
-  const askUser = {
-    tool: 'AskUserQuestion',
-    title: '需要 E10 登录凭证（ETEAMSID）',
-    intro:
-      `本环境 SSO 无法回调 localhost，\`e10-login oidc\` 会一直等待到超时 —— 请改用「提供 ETEAMSID」方式。` +
-      `（当前 e10-login=${cliVersion}）`,
-    requiredFields: [
-      {
-        key: 'eteamsid',
-        label: 'ETEAMSID',
-        required: true,
-        what: '浏览器 Cookie 中名称为 ETEAMSID 的那一项的 Value（单值）',
-        how: '已登录目标环境网页 → F12 → Application / 应用程序 → Storage → Cookies → 选中站点 → 找到 Name=ETEAMSID → 复制 Value',
-        example: 'PCACCOUNT_EXAMPLE_SESSION_VALUE',
-        not: [
-          '不要整段 Cookie 请求头（不要 langType=...; ETEAMSID=...; ...）',
-          '不要其它 cookie 名（langType / LOGIN_TYPE / JSESSIONID 等）',
-        ],
-      },
-      {
-        key: 'baseUrl',
-        label: '平台 base-url',
-        required: true,
-        what: '环境根地址（与浏览器地址栏主机一致）',
-        example: 'https://<your-e10-host>',
-        not: ['不要带 /sp/edc/... 路径'],
-      },
-    ],
-    agentRules: [
-      '禁止因凭证缺失就拒绝报表搭建 —— 先向用户索要 ETEAMSID',
-      '未拿到 eteamsid + baseUrl 前不要瞎猜 token',
-      '禁止用 e10-login oidc 兜底（本环境不返回授权码，会一直卡住）',
-      '禁止循环重试 auth ready / status',
-    ],
-  };
-
   console.log(
     JSON.stringify(
       {
@@ -73,14 +37,17 @@ if (!status.ok) {
         cliVersion,
         legacyCli: legacy,
         message: status.message,
-        need: '浏览器登录后，从 DevTools 复制名为 ETEAMSID 的 cookie 值（另需平台 baseUrl）',
+        need: '目标环境的有效会话；复用用户已提供的地址与登录授权',
         how_to: [
-          '方式 A（最快，零等待）：export EB_ETEAMSID="<粘贴 cookie>"  且  export EB_HOST="<平台地址>"',
-          '方式 B（持久）：e10-login set --eteamsid "<粘贴 cookie>" --base-url "<平台地址>"',
-          '写入后重新执行：edc-report auth ready（一次即结论，不要循环）',
+          'Agent 按 weaver-e10-login 准备匹配 CLI，再发起官方 OAuth，在官方页面使用已提供账号密码',
+          '仅目标未知时询问地址；验证码、MFA、平台授权或工具障碍才交接用户',
+          '完成登录后重新执行一次 edc-report auth ready，不循环重试',
         ],
-        forbid: '禁止 e10-login oidc 兜底：本环境 SSO 不返回授权码，命令会一直等待',
-        askUser,
+        authentication: {
+          preferredMethod: 'official_oauth',
+          reuseProvidedCredentials: true,
+          manualSession: '仅用户主动提供 ETEAMSID 并指定此方式时使用 set',
+        },
       },
       null,
       2

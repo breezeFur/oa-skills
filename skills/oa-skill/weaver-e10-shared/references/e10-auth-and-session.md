@@ -5,6 +5,10 @@
 用户需要登录、切换 profile、诊断 E10 连接、处理登录失效，或任务涉及 `base-url`、auth 文件、Keychain、`WEAVER_*` 环境变量时读取本文件。
 当宿主或任务上下文明确说明当前智能体为 XiaoE，且认证流程涉及 `XIAOE_*` 环境变量或 `xiaoeUserData/tokens.py` 时也读取本文件。桌面客户端可根据“智能小 e 客户端”“小 E”、`XiaoE`、`xiaoe-client` 等明确上下文判断，并给 CLI 传 `--runtime-agent xiaoe`；传入 CLI 的环境中存在任意 `XIAOE_*` 变量时也直接判断为 XiaoE。工作目录、客户端文件、内置 Node.js 或已安装 CLI 本身不能单独判定宿主身份。
 
+## 执行原则
+
+用户已经提供的目标地址、账号密码和登录授权直接沿用，不再次询问是否允许登录或重复索取。已有匹配环境的有效会话直接复用；新会话由 Agent 发起官方 OAuth 登录。CLI 没有账号密码直登参数时，在可控的官方浏览器登录页使用用户提供的账号密码；不把密码作为 ETEAMSID，不猜测登录接口或参数。只有验证码、MFA、平台授权按钮或当前工具无法操作的页面需要用户参与时，说明具体阻碍并交接该步骤。CLI 与浏览器能否访问同一本地回调由 Agent 根据实际运行环境判断，无需用户口头确认同机。不要把凭证或带凭证的工具结果打印到对话、日志或提交中。
+
 ## 基本检查
 
 ```text
@@ -42,7 +46,7 @@ XiaoE 认证错误日志；日志不包含 Cookie、ETEAMSID、Token 或原始�
 此时**禁止**：
 
 - 使用示例占位域名（如 `https://weapp.xxx.cn`）或自行猜测域名执行登录
-- 未向用户确认登录域名前，反复重试业务命令
+- 目标域名未知或会话失效时，反复重试业务命令
 - 要求用户提供 Cookie、ETEAMSID、业务 Token（见安全边界）
 - 读取、列出、打印或解析用户主目录下的旧 `.e10-cli`、`e10-login` / `e10-cli` 的历史 auth、config 或 Keychain 数据
 
@@ -55,9 +59,7 @@ XiaoE 认证错误日志；日志不包含 Cookie、ETEAMSID、Token 或原始�
    本机存在 `xiaoeUserData/tokens.py`、XiaoE 客户端目录、工作目录或历史登录，都不能作为宿主身份依据。桌面客户端可由 `--runtime-agent xiaoe` 标识；命令进程中存在任意 `XIAOE_*` 变量时也直接标识为 XiaoE。未命中这两类判断的 WorkBuddy、Codex 及其他智能体必须跳过此步，进入下方浏览器 OAuth 流程。
    CLI 会按“显式 `--base-url` → 专用 `WEAVER_XIAOE_*` E10 配置/映射 → 当前 profile `config.baseUrl` → CLI 内置默认值”解析 E10 登录域名；`XIAOE_DOMAIN` 只作为 XiaoE/erpa 换票服务地址。已识别为 XiaoE 的业务命令缺少本地会话时会静默尝试统一登录；已有会话被接口明确拒绝为失效时，公共请求层根据会话内 `agentType=XiaoE` 或 `loginSource=xiaoe-unified` 静默恢复并重放一次，不要求 Agent 添加 `--runtime-agent xiaoe`。恢复失败或重放后仍失效时，Agent 只反馈最终错误并停止，不再运行登录或业务命令。
 
-1. **仅非 XiaoE 环境进入本步**。禁止先执行 `auth xiaoe` 或调用其他登录 Skill。先调用宿主提供的提问 / 弹框能力询问用户，让用户二选一：
-   - 输入本次要登录的 E10 登录域名（base URL），形如 `https://<企业域名>`；或
-   - 从已有 profile 中选择一个已登录环境：先运行 `weaver-work-cli auth profile list` 列出候选，让用户选择。
+1. **仅非 XiaoE 环境进入本步**。复用用户已提供或明确选定的真实登录域名；已有匹配且有效的 profile 直接复用。仅目标未知或多个环境无法区分时，列出必要候选并一次询问。不执行 `auth xiaoe`，不借其他 CLI 的认证缓存充当流程会话。
 2. 用户提供了**新域名**时，用真实域名执行浏览器 OAuth 登录：
    ```text
    weaver-work-cli auth login --base-url "<用户输入的域名>" --agent_type "<当前智能体名称>"
@@ -78,13 +80,13 @@ XiaoE 认证错误日志；日志不包含 Cookie、ETEAMSID、Token 或原始�
 `auth login` 会在本机 `127.0.0.1:19800` 监听浏览器回调，最长等待 5 分钟。Agent 沙箱/托管环境中的外部浏览器无法回调容器内地址。`auth xiaoe` 不会进入这条浏览器流程。执行规则：
 
 1. 任意系统运行 `auth xiaoe` 时，收到 `xiaoe_credential_unavailable` 即反馈并停止；不要自动改跑 `auth login`。收到 `xiaoe_network_unavailable` 同样是停止，但按「暂时无法连接 E10」反馈并建议稍后重试。
-2. 仅非 XiaoE 环境在用户确认真实 E10 域名且确认 CLI 与浏览器同机后执行 `auth login`；仍须限时等待，超时未完成即终止并反馈。
+2. 仅非 XiaoE 环境在目标 E10 域名已由用户提供或明确选定，且 Agent 判断本地回调可达后执行 `auth login`；仍须限时等待，超时未完成即终止并反馈。
 3. 仅非 XiaoE 环境在用户无法完成浏览器登录、且明确要求并同意人工录入时，才可使用保底方式 `weaver-work-cli auth set --eteamsid "<ETEAMSID>" --base-url "<用户确认的登录域名>"`；它不是业务认证错误的默认恢复路径。ETEAMSID 由用户从已登录浏览器主动提供，Agent 不得索取、展示或转述该值。
 4. 严禁不加限制地前台运行 `auth xiaoe` / `auth login` 并等待 OAuth 回调。
 
 ## 登录
 
-先取得用户确认的登录域名（见上节流程），再让用户通过浏览器 OAuth 登录：
+复用已知目标域名，Agent 发起并推进官方浏览器 OAuth；使用已提供账号密码，实际需要验证码、MFA 或平台授权时再交接：
 
 ```text
 weaver-work-cli auth login --base-url "<用户确认的登录域名>" --agent_type "<当前智能体名称>"

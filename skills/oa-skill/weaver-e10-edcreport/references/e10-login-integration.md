@@ -25,7 +25,7 @@
 | 场景 | 动作 |
 |------|------|
 | **新会话报表搭建（默认）** | **仅** `edc-report auth ready` 或 `e10-login status`；已登录 → **直接搭建** |
-| 缺凭证 / 凭证过期 | **立即向用户索要 ETEAMSID cookie**（F12 → Application → Cookies）；**禁止 oidc 兜底**、禁止循环重试 |
+| 缺凭证 / 凭证过期 | Agent 按登录技能发起官方 OAuth，使用已提供账号密码；实际回调不可达时说明阻碍，不循环重试 |
 | 用户说「登录」「鉴权」「ETEAMSID 失效」 | 同上 |
 | 切换测试/生产环境 | `e10-login profile use <name>` |
 
@@ -34,8 +34,8 @@
 ```
 edc-report auth ready
   ├─ ok:true  → 立刻进入找表/建表（禁止再 whoami / 通读登录 SKILL / 扫任何文件）
-  └─ ok:false → 立即按输出的 need/how_to 向用户索要 ETEAMSID → 注入 EB_ETEAMSID/EB_HOST 后继续
-                ❌ 禁止 e10-login oidc 兜底；❌ 禁止循环重试 auth ready
+  └─ ok:false → 按登录技能推进官方 OAuth，使用已有目标地址与账号密码
+                不在 auth ready 内登录；登录完成后再检查一次，不循环重试
 ```
 
 **禁止**：登录阶段 `Glob`/`Grep`/`Read` 乱扫 Skill 树或其它文件。
@@ -51,9 +51,9 @@ edc-report auth ready
 │ 0. 快速鉴权（默认）                                           │
 │  edc-report auth ready  /  e10-login status                  │
 │    ├─ ✅ 已登录 → 跳到找表/搭建                                │
-│    └─ ❌ 缺凭证 → 向用户索要 ETEAMSID；禁 oidc、禁重试          │
+│    └─ ❌ 缺凭证 → Agent 推进官方 OAuth；不循环重试          │
 ├─────────────────────────────────────────────────────────────┤
-│ （仅失败时）加载 weaver-e10-login · whoami --json           │
+│ （仅缺会话时）加载 weaver-e10-login 推进认证           │
 │  Cookie.raw + eteamsid + AgentType 三项请求头                │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -75,13 +75,7 @@ e10-login status
 
 ### Python 脚本鉴权
 
-```bash
-python scripts/e10_auth.py creds --appid <appId>
-# 或
-eval "$(python scripts/e10_auth.py env)"
-```
-
-`ensure_creds()` 写入的 creds 含：`cookie`（raw）、`eteamsid`、`agent_type`。
+由报表脚本内部消费现有会话并生成请求头；Agent 不运行凭证导出命令，也不打印凭证 JSON 或 eval 到当前 shell。
 
 ---
 
@@ -103,9 +97,9 @@ eval "$(python scripts/e10_auth.py env)"
 
 | 现象 | 处理 |
 |------|------|
-| `token为空或失效` / `cookie 已过期` | 优先 `oidc`；失败则 `set` |
-| **CLI 1.1.x oidc 无法获取 eteamsId** | **不要因版本阻断**。`auth ready` → `login_required_legacy_set` → **AskUserQuestion**：① 建议升到 1.5.0+ 再 oidc；② 请用户提供 **ETEAMSID（Cookie 单项 Value）+ base-url** 后 `set` → `auth ready`。详见 `edc-report policy login` |
-| OIDC localhost 回调被拦 | 换 `--port` 或改用手动 `e10-login set` |
+| `token为空或失效` / `cookie 已过期` | 按登录技能走 `oidc`；失败时诊断实际原因，用户主动指定会话值时才 `set` |
+| 低版本协议导致未登录 | Agent 自动准备匹配 e10-login 后走 OAuth；已有有效会话复用，用户主动指定会话值时才 set |
+| OIDC localhost 回调被拦 | 端口冲突才换 `--port`；回调不可达时说明实际阻碍，用户主动指定会话值时才 `set` |
 | 脚本环境与 profile 不一致 | `e10-login profile current` 对齐后 `e10_auth.py creds --refresh` |
 | 硬编码 ETEAMSID 仍失败 | 删除脚本内写死的 ID，改用 `e10_auth.py` + cookies.raw |
 | API 401 但 status 显示已登录 | 检查 Cookie 是否被重拼；须用 cookies.raw 完整串 |
@@ -128,15 +122,10 @@ edc-report auth ready
 |------|------|------|
 | ≥1.5.0 | 推荐 | oidc 新协议完整 |
 | 1.3～1.4 | 可用 | status/set/oidc |
-| **1.1.x** | **须兼容** | oidc 常失败 → **建议升级或索要 ETEAMSID+base-url 后 set**；`auth ready` 已登录即放行，**禁止**「必须先升到 1.5」挡搭表 |
+| **1.1.x** | **须兼容** | 未登录且协议不兼容 → Agent 自动准备匹配 CLI 后 OAuth；`auth ready` 已登录即放行，**禁止**「必须先升到 1.5」挡搭表 |
 
-### 低版本 Agent 流程（强制）
+### 低版本 Agent 流程
 
-1. `edc-report auth ready`
-2. 若 `ok:false` 且 `legacyCli` / `action=login_required_legacy_set`：
-   - 向用户说明：**建议升级**，或**提供必要信息**继续搭表
-   - AskUserQuestion 收集：`eteamsid` + `baseUrl`（及可选 `agentType`）
-   - `e10-login set --eteamsid "<用户值>" --base-url "<用户值>"` → 再 `auth ready`
-3. 未拿到用户提供的 ETEAMSID 前，**禁止**编造 token
+已有有效会话直接复用。确因低版本缺少协议而未登录时，Agent 按 CLI 自动准备安装匹配的 `e10-login@1.5.0`，核对路径与帮助后发起 OAuth，使用用户已提供的真实地址和账号密码。不让用户在升级与复制 Cookie 之间反复选择。升级被实际权限或网络阻断时报告具体原因；用户主动提供 ETEAMSID 并指定此方式时才运行 set，不编造凭证。
 
 本报表 Skill **不内置** e10-cli；搭表只用 e10-login + edc-report。

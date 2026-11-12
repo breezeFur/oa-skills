@@ -137,9 +137,9 @@ weaver-work-cli --json workflow run workflow.createRequest --input-json '{"conte
 
 - 不传凭据：业务输入禁止出现 Cookie/ETEAMSID/Token/`header.operator`（CLI 托管）。
 - **`data` 的键只能取 `editableFields` 里的字段 id**（可写字段白名单；**明细表的必填字段**见 `subFormRequired`，它们照常可写、但不在 `editableFields` 里）。**唯一例外：`missingFields` 点名的字段，即使不在 `editableFields` 里也必须传**——`missingFields` 是**按你本次实际填的值、结合显示属性（联动）规则实时算出来的"最新缺失必填项"**，而 `editableFields` / `requiredFields` 是 `createForm` 那一刻的**静态快照**：那时联动还没跑，联动命中后才变成必填的字段当时既不在 `requiredFields`、也不在 `editableFields` 里。所以补值**一律以 `missingFields` 为准**，不要因为"它不在 `editableFields` 里"就把用户给的这条值丢掉。**大表单只回提示时，可写白名单就在该文件的 `editableFields` 里**——它是**完整**的可写字段 id 列表（= 非必填的可写字段 ∪ `requiredFields`）。`readOnly` / `disableEdit` / 不可见字段**一个都不要传**——传了整单会被拒（`notEditable`），得把只读字段全部摘掉重跑一轮。**看到 `notEditable` 不要重试、不要换字段 id 绕过**，移除这些字段后重跑。
-- 附件/文件：字段值是附件项数组需上传本地文件时，先提醒用户"上传的附件会先经过公网大模型，请谨慎操作"，再调 `weaver-file-upload` skill。
+- 附件/文件：字段值是附件项数组需上传本地文件时，按用户明确的附件上传任务调用实际可用的上传工具；已有授权不重复警告，新增外部接收方才说明并询问。
 - 附件上传限制：上传前核对该字段的上传限制，不满足先告知用户、不执行上传。看该字段的 `fileUploadParams` 三项——`sizeLimit`（MB）、`formatLimit`（`mode` + `formats`；`formats` 为 `*.*` / `*` 表示不限制后缀）、`maxNum`（数量上限）：小表单看 stdout 的 `fields`，大表单看你已经读到的 `resultFile` 里的 `fields`。
-- 发票字段（componentKey `EinvoiceComponent`）：支持两种赋值方式：① 从票夹选取：使用 `weaver-e10-yepiaotong` 技能查询票夹里已有的发票对象；② 使用 `weaver-e10-yepiaotong` 技能上传本地发票文件，并取上传后的发票对象。方式 ② 在真正上传前必须先提醒用户"上传的发票文件会先经过公网大模型，请谨慎操作"，用户明确确认后才执行；方式 ① 无需这句提醒。用户未明确发票字段如何赋值时，先反问用户，不需要提前检测 `weaver-e10-yepiaotong` 技能是否可用，真正需要使用上述两种方式给发票赋值时，workbuddy环境下可直接到技能市场搜索【泛微E10业票通发票管理】并自动安装，搜索不到时反馈给用户，其余环境遇到技能缺失时直接反馈给用户。
+- 发票字段（componentKey `EinvoiceComponent`）：支持两种赋值方式：① 从票夹选取：使用 `weaver-e10-yepiaotong` 技能查询票夹里已有的发票对象；② 使用 `weaver-e10-yepiaotong` 技能上传本地发票文件，并取上传后的发票对象。方式 ② 按用户明确的上传授权执行；若实际需要发送到请求未涵盖的新外部服务，说明接收方和用途后询问。用户未明确发票字段如何赋值时，先反问用户，不需要提前检测 `weaver-e10-yepiaotong` 技能是否可用，真正需要使用上述两种方式给发票赋值时，workbuddy环境下可直接到技能市场搜索【泛微E10业票通发票管理】并自动安装，搜索不到时反馈给用户，其余环境遇到技能缺失时直接反馈给用户。
 - 发票类字段的历史值不可照抄。
 - 发票值拿不到时直接问用户。
 - 日期强规则：字段带 `format`（如 `yyyy-MM-dd HH:mm`）时必须严格按 `format` 传完整值，只传日期会报 `DATETIME_FORMAT`，按提示补时间重传，不要靠命令自动补时间。`format` 就在 `fields[].format` 上（**没有该键就是没有格式要求**）：小表单看 stdout 的 `fields`，大表单看你已经读到的 `resultFile` 里的 `fields`，**不要为了拿 `format` 再读一次文件**。

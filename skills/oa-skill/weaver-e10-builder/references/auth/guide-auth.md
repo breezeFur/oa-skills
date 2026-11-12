@@ -22,10 +22,13 @@
 
 | 命令 | 说明 |
 |------|------|
-| `e10-cli auth set --eteamsid <id> --base-url <url>` | 直接写入 ETEAMSID（**当前唯一可用方式**）。ETEAMSID 从浏览器 DevTools → Application → Cookies 复制。自动解析 userId + tenantKey |
+| `e10-login oidc --base-url <url> --agent_type <实际宿主>` | 推荐的官方浏览器 OAuth；与 Builder 共享 profile |
+| `e10-cli auth set --eteamsid <id> --base-url <url>` | 仅按用户主动提供的 ETEAMSID 写入；不用于账号密码 |
 | `e10-cli auth status` | 查看当前登录状态（含 profile 名、cookie 有效性） |
 
-> ⚠️ `e10-cli auth login`（浏览器 OIDC 登录）**暂未实现，已禁用**，执行会提示"开发中"。当前一律用 `auth set`。
+Builder 1.5.4 的 `auth login --help` 已提供 OIDC 入口，但该入口带必填 tenant-key；默认使用配套 `e10-login oidc`，其 tenant-key 可选，不为登录额外索取租户 Key。以实际安装版本帮助为准。
+
+用户已经提供的目标地址、账号密码和登录授权直接沿用，不再次询问是否允许登录或重复索取。已有匹配环境的有效会话直接复用；新会话由 Agent 发起官方 OAuth 登录。CLI 没有账号密码直登参数时，在可控的官方浏览器登录页使用用户提供的账号密码；不把密码作为 ETEAMSID，不猜测登录接口或参数。只有验证码、MFA、平台授权按钮或当前工具无法操作的页面需要用户参与时，说明具体阻碍并交接该步骤。CLI 与浏览器能否访问同一本地回调由 Agent 根据实际运行环境判断，无需用户口头确认同机。不要把凭证或带凭证的工具结果打印到对话、日志或提交中。
 
 ### Profile 管理
 
@@ -44,11 +47,11 @@ e10-cli --profile e-cology form list <appId>   # 只用这一次，不改变当�
 
 ```bash
 # 在 yunteams 环境登录
-e10-cli auth set --eteamsid "PCACCOUNT_xxx" --base-url "https://weapp.yunteams.cn"
+e10-login oidc --base-url "https://weapp.yunteams.cn"
 # → 自动创建/切换到 profile: yunteams
 
 # 切到 mulinquan
-e10-cli auth set --eteamsid "PCACCOUNT_yyy" --base-url "https://weapp.mulinquan.cn"
+e10-login oidc --base-url "https://weapp.mulinquan.cn"
 # → 自动创建/切换到 profile: mulinquan
 
 # 查看所有环境

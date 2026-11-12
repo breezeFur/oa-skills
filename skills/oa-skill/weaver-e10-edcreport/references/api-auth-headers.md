@@ -9,7 +9,7 @@
 
 | 允许 | 禁止 |
 |------|------|
-| `export EB_ETEAMSID=... EB_HOST=...` / `e10-login set --eteamsid ...` | 在脚本/对话中硬编码 ETEAMSID；`e10-login oidc` 兜底（部分环境 SSO 不返回授权码会一直卡住） |
+| `export EB_ETEAMSID=... EB_HOST=...` / `e10-login set --eteamsid ...` | 在脚本/对话中硬编码 ETEAMSID；无限等待 OAuth 回调；实际失败应说明具体阻碍 |
 | `e10-login set --eteamsid "PCACCOUNT_xxx" --base-url <url>` | 仅把裸 token 当 Cookie 发请求 |
 | `e10-login status` / `whoami --json` 确认会话 | 跳过 e10-login，直接 curl 拼 Cookie |
 | `scripts/e10_auth.py` 从 profile 读取 | 裁剪/去重/改写 cookies.raw |
@@ -17,8 +17,8 @@
 **Agent 执行顺序**：
 
 1. 加载 `weaver-e10-login`
-2. 执行 `edc-report auth ready`（一次即结论）；缺凭证 → **立即向用户索要 ETEAMSID cookie**（禁 oidc 兜底）
-3. 通过 `e10-login whoami --json` 或 `scripts/e10_auth.py creds` 取得完整鉴权三元组
+2. 执行 `edc-report auth ready`（一次即结论）；缺凭证 → 按登录技能推进官方 OAuth，使用已提供账号密码
+3. 由脚本内部消费现有会话生成鉴权三元组，不向 Agent 导出或打印凭证
 4. 再调用报表 API / 运行搭建脚本
 
 ---

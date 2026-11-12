@@ -6,7 +6,7 @@ description: E10 平台独立登录认证 —— OAuth2.0 浏览器授权 / ETEA
 description_zh: E10 平台的登录认证工具，支持 OAuth2.0 浏览器授权登录、ETEAMSID 手动写入、登录状态查询与多环境（Profile）切换。
 description_en: E10 login & auth tool — OAuth2.0 browser authorization, manual ETEAMSID set, status check and multi-environment profile switching.
 category: coding
-version: 1.5.1
+version: 1.5.2
 author: 泛微网络科技股份有限公司
 ---
 
@@ -29,13 +29,11 @@ e10-login --help
 
 > Node.js ≥ 18（用到原生 fetch、ESM）。安装后 `e10-login` 命令全局可用。
 
-> ⚠️ **使用前务必确认版本号**：跑 `e10-login --version` 看实际装的版本，确保是预期版本（旧版本可能缺新字段/新协议支持）。淘宝镜像约 10 分钟同步官方源，急用最新版加 `--registry https://registry.npmjs.org`。
->
-> 本 Skill 配套 **e10-login@1.5.0** 使用；按匹配版本安装，安装成功后核对真实路径、版本和 `--help`，再继续当前认证任务。
+安装或运行时变化后核对一次实际路径、版本和 `--help`；同一任务使用已核对的匹配版本，不反复检查。
 
-## 首次登录
+## 登录执行
 
-触发登陆之前，必须使用你的 AskUserQuestion 工具询问用户“请确认：数据会经过大模型，敏感数据请谨慎操作使用 Yes / No ”
+用户已经提供的目标地址、账号密码和登录授权直接沿用，不再次询问是否允许登录或重复索取。已有匹配环境的有效会话直接复用；新会话由 Agent 发起官方 OAuth 登录。CLI 没有账号密码直登参数时，在可控的官方浏览器登录页使用用户提供的账号密码；不把密码作为 ETEAMSID，不猜测登录接口或参数。只有验证码、MFA、平台授权按钮或当前工具无法操作的页面需要用户参与时，说明具体阻碍并交接该步骤。CLI 与浏览器能否访问同一本地回调由 Agent 根据实际运行环境判断，无需用户口头确认同机。不要把凭证或带凭证的工具结果打印到对话、日志或提交中。
 
 OAuth2.0 浏览器授权登录（推荐）：
 
@@ -61,7 +59,7 @@ e10-login oidc --base-url https://weapp.xxx.cn --agent_type WorkBuddy
 e10-login set --eteamsid "PCACCOUNT_xxx" --base-url https://weapp.xxx.cn
 ```
 
-从浏览器 DevTools → Application → Cookies 复制 ETEAMSID 值，跳过浏览器登录直接写入。
+仅在用户主动提供 ETEAMSID 并要求使用时写入；账号密码不属于此参数。默认走官方 OAuth，不要求用户先去开发者工具复制 Cookie。
 
 ## 命令
 
@@ -70,7 +68,7 @@ e10-login set --eteamsid "PCACCOUNT_xxx" --base-url https://weapp.xxx.cn
 | `e10-login oidc --base-url <url> [--agent_type <type>]` | OAuth2.0 浏览器授权登录（首次登录用这个；--agent_type 指定代理类型，默认 workbuddy） |
 | `e10-login set --eteamsid <id> --base-url <url>` | 手动写入 ETEAMSID |
 | `e10-login status` | 查看当前登录状态（含 cookie 是否过期） |
-| `e10-login whoami` | 获取当前登录用户信息（调后端 teamsCheck，发完整 cookie） |
+| `e10-login whoami` | 读取本地缓存的用户信息；需要实时校验时加 `--live` |
 | `e10-login whoami --json` | 输出后端原始 JSON |
 | `e10-login profile list` | 列出所有环境 |
 | `e10-login profile use <name>` | 切换环境 |
@@ -85,7 +83,7 @@ e10-login oidc --base-url https://weapp.xxx.cn
 # 查看登录状态
 e10-login status
 
-# 查看当前用户信息（含完整 cookie 串）
+# 查看当前用户信息（按需调用，只向用户报告必要的身份信息）
 e10-login whoami
 
 # 切换环境

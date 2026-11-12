@@ -17,14 +17,9 @@ const text = `
 
 1) 登录（只走 e10-login · 兼容低版本）
    edc-report auth ready  → 已登录则直接搭建（与 CLI 大版本无关）
-   未登录 + CLI <1.5 → action=login_required_legacy_set
-   Agent 须 AskUserQuestion 二选一：
-     A. 建议升级：npm i -g e10-login@1.5.0 → oidc
-     B. 请用户提供必要信息后 set：
-        · eteamsid（必填）= Cookie 中 Name=ETEAMSID 的 Value（单值，勿整段 Cookie）
-        · baseUrl（必填）= 平台根地址，如 https://<your-e10-host>
-        · agentType（可选，默认 WorkBuddy）
-   禁止「必须升到 1.5」阻断搭表；细则：edc-report policy login
+   未登录时 Agent 自动准备匹配 e10-login，发起官方 OAuth。
+   使用已提供真实地址与账号密码；验证码、MFA、平台授权或工具障碍才交接。
+   用户主动指定会话值时才 set，不默认索取 Cookie；细则：edc-report policy login
 
 2) 找表（已给 app 时）
    只允许：edc-report find form <appId> <表单名>

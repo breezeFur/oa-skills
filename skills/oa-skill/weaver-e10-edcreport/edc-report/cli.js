@@ -92,7 +92,7 @@ function printHelp() {
   edc-report policy ask
     细则: Skill references/spec-build-schema.md §1.1/§2.1
 
-登录 / 低版本兼容（建议升级或索要 ETEAMSID）:
+登录 / 低版本兼容（Agent 自动准备 CLI 并走官方 OAuth）:
   edc-report policy login
   edc-report auth ready
 

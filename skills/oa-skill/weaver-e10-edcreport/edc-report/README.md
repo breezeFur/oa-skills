@@ -40,7 +40,7 @@ edc-report scripts-path
 edc-report auth status
 edc-report policy scope
 edc-report policy build
-edc-report policy login     # 低版本：建议升级或索要 ETEAMSID
+edc-report policy login     # 低版本未登录：自动准备匹配 CLI 后官方 OAuth
 edc-report auth ready
 # 环境体检 / 踩坑知识库（动手前先跑）
 edc-report doctor                     # 全量体检（env/scripts/install/trees/perf），FAIL → exit 1

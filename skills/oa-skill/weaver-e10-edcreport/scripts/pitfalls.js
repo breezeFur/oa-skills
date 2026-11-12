@@ -45,9 +45,9 @@ const PITFALLS = [
     area: 'auth',
     title: 'e10-login oidc 永远等不到授权码（会卡死）',
     symptom: '执行 oidc 登录后进程一直挂着；authorize 回调 127.0.0.1:19800 永远不返回。',
-    cause: '本环境 SSO 的 authorize 端点不发放授权码：302 → /sp/intauthserver/logintip?code=80015。',
-    fix: '禁 oidc 兜底；改为向用户索要浏览器 ETEAMSID cookie + baseUrl（AskUserQuestion）。',
-    cli: 'edc-report policy login  /  edc-report auth ready（缺凭证时输出 need/how_to/askUser）',
+    cause: '历史个别环境 SSO 的 authorize 端点不发放授权码：302 → /sp/intauthserver/logintip?code=80015。',
+    fix: '仅在实际出现此 SSO 错误或回调不可达时停止该次 OAuth 并说明原因；不能推广为所有环境禁用 OAuth。默认按登录技能使用已提供账号密码，用户主动指定会话值时才 set。',
+    cli: 'edc-report policy login  /  edc-report auth ready（缺凭证时输出认证状态和官方登录指引）',
   },
   {
     id: 'AUTH-3',

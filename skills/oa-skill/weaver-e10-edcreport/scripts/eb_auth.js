@@ -48,39 +48,7 @@ class EbAuthError extends Error {
   }
 }
 
-const LOGIN_HELP = [
-  '',
-  '════════════════════════════════════════════════════════════════',
-  '未获取到 E10 登录凭证（ETEAMSID）—— 请手动提供，本工具不会自动登录',
-  '════════════════════════════════════════════════════════════════',
-  '',
-  '【需要获取的东西】浏览器里该平台的 ETEAMSID cookie 值',
-  '',
-  '  1. 用浏览器打开平台地址并完成登录（能正常看到首页即可）',
-  '  2. 按 F12 → Application / 应用程序 → Storage → Cookies → 选中该站点',
-  '  3. 复制名为 ETEAMSID 的那一行 Value',
-  '     形如：PCACCOUNT_EXAMPLE_SESSION_VALUE',
-  '     （也可在 DevTools → Network 里任一请求的 Cookie 头中找 ETEAMSID=... ）',
-  '',
-  '【拿到后二选一】',
-  '',
-  '  A) 只对当前终端生效 —— 最快，零等待（推荐）',
-  '       export EB_ETEAMSID="<粘贴 cookie>"',
-  '       export EB_HOST="<平台地址，如 https://itsm.hongjing-wh.com:5001>"',
-  '     已在 D:/Workspace/WorkBuddy/.workbuddy 下准备好 e10env.sh，可直接：',
-  '       source ./e10env.sh            # 有 env 直接用；没有则读一次 e10-login',
-  '',
-  '  B) 持久写入 —— 之后所有脚本免配置',
-  '       e10-login set --eteamsid "<粘贴 cookie>" --base-url "<平台地址>"',
-  '',
-  '【为什么不能自动登录】',
-  '  本环境 SSO 的 authorize 端点不发放授权码（302 → logintip?code=80015），',
-  '  `e10-login oidc` 的本地回调永远等不到 → 会一直卡住。所以禁止用 oidc 兜底。',
-  '',
-  '【安全】cookie 等同账号会话，不要写进代码、不要提交仓库。',
-  '════════════════════════════════════════════════════════════════',
-  '',
-].join('\n');
+const LOGIN_HELP = "未获取到可用的 E10 会话。本检查不触发登录。Agent 复用用户已提供的真实地址和账号密码，按 weaver-e10-login 发起官方 OAuth；账号密码在官方浏览器登录页使用，不作为 ETEAMSID 参数。缺少匹配 CLI 时自动准备 e10-login@1.5.0。仅在实际验证码、MFA、平台授权或回调不可达时说明具体阻碍；不默认索取 Cookie，不断言所有环境都不能 OAuth。登录完成后再执行一次 auth ready，避免循环检查。";
 
 // ── 本地 profile / config（明文，零 spawn） ──────────────────
 

@@ -4,13 +4,17 @@
 
 准备执行新增、导入、更新、删除、确认写入，或看到 `confirmation.required`、`partial.write_uncertain`、网络中断、回查失败时读取本文件。
 
+## 授权判断
+
+用户已明确指定目标、操作、字段值/接收人和范围时，其请求即为本次授权；先检查实际目标和预览，匹配后继续执行。只在目标不唯一、范围或数量超出请求、预览出现新的实质变更、不可逆选择缺失或平台强制要求时提问，一次问齐已知缺项。CLI 的 prepare、continuation、confirm=true/--yes 和写后回查必须保留；确认参数是执行校验，不能代替用户授权，也不要求对已授权的相同操作再口头确认。用户明确要求先看方案或逐步确认时遵从。
+
 ## 固定流程
 
 高风险业务能力必须由 CLI 的 `prepare -> apply` 流程承载：
 
 1. 调用 `.prepare` 获取 `preview`、`continuation`、`expiresInSeconds` 和 `workflow`。
-2. 把 `preview` 中的目标对象、变更内容、风险和关键参数展示给用户。
-3. 用户明确确认后，调用对应 `.apply`，传入 prepare 返回的 `continuation` 和 `confirm=true`，或使用命令行 `--yes`。
+2. 核对 `preview` 中的目标对象、变更内容和关键参数是否与用户授权一致；出现未授权差异时展示具体差异并提问。
+3. 已有明确授权且预览一致，或补充确认已取得后，调用对应 `.apply`，传入 prepare 返回的 `continuation` 和 `confirm=true`，或使用命令行 `--yes`。
 4. `.apply` 成功后以 CLI 回查结果为准报告结果。
 
 `continuation` 由 CLI 生成并验证，可能绑定当前 `baseUrl`、profile、userId、目标对象指纹、本地文件 SHA-256 和业务选项。不要修改、解码、复用或手工构造 continuation。
@@ -30,7 +34,7 @@
 
 ## 不允许的做法
 
-- 在用户未确认前补 `confirm=true` 或 `--yes`
+- 在用户未授权该操作或预览超出授权时补 `confirm=true` 或 `--yes`
 - 将失败的 `.apply` 静默重跑
 - 用当前输入重新拼一个 apply payload 代替 prepare 结果
 - 猜测 CLI 未暴露的接口路径、Token、Cookie、内部控制字段或写后回查语义

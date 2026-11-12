@@ -21,7 +21,7 @@ cliHelp: "weaver-work-cli workflow --help"
 认证和登录态只能按共享规则通过 `weaver-work-cli auth ...` 命令判断；禁止直接读取、列出、打印或解析用户主目录下的旧 `.e10-cli`、auth、config 或 Keychain 数据。
 所有命令通过 `weaver-work-cli --json workflow run <operation>` 执行：**统一用 `--input-json '<json>'` 内联传入**——`planJson`、`filterFields` 这类嵌套结构也一样内联（总量通常只有几百字符，内联完全够用；**不要因为"看着复杂"就去写 JSON 文件**，那会白白多出一次文件写入与一次工具往返）。仅当 JSON 确实很大（几十 KB 级，如超长消息列表）或含难以在 shell 里转义的单引号时，才改写 UTF-8 文件配 `--input <path>`；只有确认当前 shell 能稳定传管道时才用 `--input -`。调用前先按需读取 references 下对应的文件，查参数结构，不要猜字段；**references 是第一信息源**，`weaver-work-cli workflow schema` 是 operation、字段和风险等级的合约来源。
 生成或改写的 docs、reference、提示词和命令示例必须同时兼容 Windows 和 macOS/Linux。凡涉及 JSON 输入、用户目录、路径分隔符、文件删除、目录查看或文件比对，必须同时给出 Windows PowerShell 与 macOS/Linux（bash/zsh）两套示例；Agent 先根据当前系统和 shell 选择对应示例，不确定时用 `node -p "process.platform"` 判断。Windows/PowerShell 示例不要使用 `printf`、`$HOME/...`、`~/...`、bash 反斜杠续行、`rm/ls/diff/python3` 等 Unix-only 写法。
-涉及附件、图片、本地文件、远程 URL 文件或文件内容解析的 operation，执行前必须提醒用户：文件内容可能被上传到业务系统、OCR/解析服务，并可能进入当前大模型上下文用于理解和处理；必须等待用户明确确认后才继续。
+用户明确要求读取、解析、上传或复用指定附件时，按该任务直接执行，不额外添加通用数据风险警告或 Yes/No 弹框。仅提供路径而没有操作意图时先明确任务；需要把文件发送到任务未涵盖的新外部服务时，先说明实际接收方、用途并取得授权。按实际数据路径描述处理过程，不断言所有附件都会先经过公网大模型。
 
 # 泛微E10流程智能助手
 
@@ -121,14 +121,14 @@ cliHelp: "weaver-work-cli workflow --help"
 - 记忆前置：新一轮对话或距上次成功读取记忆超过 6 小时 -> 先执行 `workflow.memoryPrompt`，顺带拿到 `oaContext`（OA 版本 + 当前用户身份），不要单独再查组织信息。
 - 查询类意图 -> `workflow.search`。泛化待办查询**先看 `oaContext.smartGrouping`**（`memoryPrompt` 已给）：`false`（低版本）直接 `workflow.search` 原样渲染（CLI 自带分组统计，闭环，**不要带 `planJson`/`subCategory`**）；`true` 再 `workflow.todoStat` 统计分组，并**严格按 [`workflow-query.md`](references/workflow-query.md) 的「汇报式分组骨架」+「参与身份 → 分组去向表」划组**，把分组计划打包为一次带 `planJson` 的 `workflow.search`（不要自创分组体系）。
 - 查看类意图 -> 优先用列表返回的 `requestId`；只有用户明确指向"第 N 条"时才用 `index`（分组场景加 `group`）定位。
-- 单条操作 -> `workflow.operatePrepare` -> 用户确认 -> `workflow.operateApply`。
+- 单条操作 -> `workflow.operatePrepare` -> 核对预览与已有授权（存在差异才询问） -> `workflow.operateApply`。
 - 批量处理（提交/置已读/催办/共享/转发/退回）-> **6 个都是单命令**（`workflow.batchSubmit` / `workflow.batchRead` / `workflow.batchSupervise` / `workflow.batchShare` / `workflow.batchForward` / `workflow.batchReject`）：`confirm: true` 与 `requestIds` 在**同一次调用**里传，**不需要先跑 Prepare，也没有 continuation**。三条路径按**目标的来源**选：
     - **目标是上一轮查询结果里的具体几条**（"前两条/刚才那些"、或点名条目）→ 直接把 `requestIds`（+ `confirm:true`）传给对应批量命令，**一次调用完成**，不要再多发一轮确认摘要。
     - **目标是一个范围（没有准确 `requestId`）** → **必须先数条数再执行**：先用 `scopeCondition`（与 `workflow.search` 同形的条件）+ `action:"total"` **只查条数**（`action` 在给了 `scopeCondition` 时**必填**，漏写报 `batch_action_required`），把「范围 + 条数」报给用户确认（`total=0` 但 `scopeTotal>0` 时要说明"有 N 条但不适用本次操作"，不能说成没有数据）。
     - **目标是一个范围、用户已确认条数** → 再用同一条 `scopeCondition` 配 `action:"execute"`；**循环由 CLI 内部完成**（查一页→执行→排除已处理/失败的 ID→再查，直到取完或触达上限），**不要自己写"查一页→数 ID→再执行"的多轮流程**。返回里给的是成功/失败条数、失败清单与 `stoppedReason`（**不含批次数等内部细节**），照它汇报即可——`scope_not_batch_eligible` 表示"范围内有数据但本次操作一条都取不到"（**不是**"没有数据"），要说明原因并给替代操作（如改 `workflow.batchRead`）。
-- 单条共享 -> `workflow.sharePrepare` -> 用户确认 -> `workflow.shareApply`。
+- 单条共享 -> `workflow.sharePrepare` -> 核对预览与已有授权（存在差异才询问） -> `workflow.shareApply`。
 - 发起流程 -> `workflow.createForm`（传 `workflow`，**目标写法优先用 `名称(ID)`**：自带显式 ID 时不查可发起列表、少一次往返，纯名称才走可发起列表模糊匹配；解析可发起的工作流并拿到 `continuation`；返回 `NEEDS_CLARIFICATION` 时按 `candidates` 与用户确认后用 `名称(ID)` 重发）-> 按用户意图填 `data` -> `workflow.createRequest`（`context` 传上一步的 `continuation`，`action` 取 `draft`/`submit`）。**必填是否齐不用模型判断**：`action:"submit"` 缺必填时命令不会创建流程，返回 `NEEDS_INPUT` + `missingFields`，一次问齐后带同一 `context` 重发；`action:"draft"` 则照常建草稿、缺失项只作提醒。
-- 修改表单 -> `workflow.editLoad` 拿 `context` -> `workflow.editPrepare` -> 用户确认 -> `workflow.editApply`。
+- 修改表单 -> `workflow.editLoad` 拿 `context` -> `workflow.editPrepare` -> 核对预览与已有授权（存在差异才询问） -> `workflow.editApply`。
 
 ## 执行原则（减少误路由、误重试和无效消耗）
 
@@ -163,7 +163,7 @@ cliHelp: "weaver-work-cli workflow --help"
 
 ### 4) 附件、图片和文件解析确认
 
-- 命中发起流程上传附件、读取本地文件、使用远程 URL 文件或复用已上传文件对象时，必须先提醒数据处理风险并等待用户明确确认。
+- 用户明确要求读取、解析、上传或复用指定附件时，按该任务直接执行，不额外添加通用数据风险警告或 Yes/No 弹框。仅提供路径而没有操作意图时先明确任务；需要把文件发送到任务未涵盖的新外部服务时，先说明实际接收方、用途并取得授权。按实际数据路径描述处理过程，不断言所有附件都会先经过公网大模型。
 - 风险提醒必须说明文件内容可能进入大模型上下文，也可能被发送到业务系统或解析服务。
 - 上传前先按表单返回的 `fileUploadParams` 核对文件大小、扩展名格式和数量限制；不满足时先告知用户、不执行上传。
 - 用户未确认前，不要运行会读取、上传或解析该文件的命令。

@@ -87,8 +87,8 @@ CLI 和业务 Skill 在返回 `authentication` / `session_expired` 时，只能�
 
 1. 已有 XiaoE 会话出现 `session_expired` 时，CLI 已在公共请求层自动取凭据、校验同一环境/用户并重放一次；若该错误最终仍返回，Agent 只反馈错误并停止，不执行 `auth xiaoe`、其他登录 Skill 或原业务命令。
 2. 仅首次无会话或明确的 `auth not found` 才由 Agent 重用任务开始时的宿主判定；明确为 XiaoE 时执行一次 `weaver-work-cli auth xiaoe`，不得改用 `auth login`。返回 `authentication/xiaoe_credential_unavailable` 时停止并反馈宿主凭据不可用。
-3. 首次认证缺失且非 XiaoE 时，不得执行 `auth xiaoe`；取得用户确认的真实 E10 登录域名后，执行 `weaver-work-cli auth login --base-url "<用户确认的 E10 登录域名>" --agent_type "<当前智能体名称>"`。已有可用 profile 时也可按用户选择切换并验证。
-4. 显式登录后读操作可以重新执行；写操作不得复用旧 continuation，必须重新 prepare 并重新确认。已返回 `partial` / `write_uncertain` 时先只读回查，禁止直接重放写入。
+3. 首次认证缺失且非 XiaoE 时，不得执行 `auth xiaoe`；复用用户已提供或明确选定的真实 E10 登录域名后，执行 `weaver-work-cli auth login --base-url "<用户确认的 E10 登录域名>" --agent_type "<当前智能体名称>"`。已有匹配且有效的 profile 直接复用；切换到用户指定环境后由 Agent 核对。
+4. 显式登录后读操作可以重新执行；写操作不得复用旧 continuation，必须重新 prepare 并核对新预览；只有目标或变更超出已有授权时重新询问。已返回 `partial` / `write_uncertain` 时先只读回查，禁止直接重放写入。
 
 `auth xiaoe` 的 preflight 会输出不含凭证的 `authMode=xiaoe`、`credentialSourceDetected`、`attempted`、`platformCredentialDetected`、`tokenScriptDetected`、`clientSettingsDetected`、`environmentCredentialDetected` 和 `baseUrl`；命中脚本分支时会出现 `Trying XiaoE token script credential...`，命中内置 Node 会话分支时会出现 `Trying built-in XiaoE client session credential...`。成功后登录结果和 `auth status` 中的 `credentialSourceStep`、`credentialSourceType`、`credentialSourceLabel` 用于确认实际来源；`2 / token_script / xiaoeUserData/tokens.py` 表示宿主脚本换票成功，`3 / xiaoe_client / XiaoE client settings` 表示不依赖 `tokens.py`、由 Node 直接换票成功。
 
@@ -99,9 +99,15 @@ CLI 和业务 Skill 在返回 `authentication` / `session_expired` 时，只能�
 `auth login` 会在本机 `127.0.0.1:19800` 监听浏览器回调，最长等待 5 分钟。在 Agent 沙箱/托管环境中，外部浏览器无法回调容器内 `127.0.0.1:19800`，因此：
 
 1. 任意系统运行 `auth xiaoe` 时，收到 `xiaoe_credential_unavailable` 即反馈宿主登录态/凭据注入异常，不要自动切换 `auth login`，也不要要求用户去本地终端重复执行命令。
-2. 仅非 XiaoE 环境在用户确认真实 E10 域名且确认 CLI 与浏览器同机后运行 `auth login`；仍须限时等待，超时未完成即终止并反馈。
+2. 仅非 XiaoE 环境在目标 E10 域名已由用户提供或明确选定，且 Agent 判断本地回调可达后运行 `auth login`；仍须限时等待，超时未完成即终止并反馈。
 3. 仅非 XiaoE 环境在用户无法完成浏览器登录、且明确要求并同意人工录入时，才可使用保底方式 `weaver-work-cli auth set --eteamsid "<ETEAMSID>" --base-url "<用户确认的登录域名>"`；它不是业务认证错误的默认恢复路径。ETEAMSID 由用户从已登录浏览器主动提供，Agent 不得索取、展示或转述该值。
 4. 严禁不加限制地前台运行 `auth xiaoe` / `auth login` 并等待 OAuth 回调。
+
+## 任务授权与登录执行
+
+用户已明确指定目标、操作、字段值/接收人和范围时，其请求即为本次授权；先检查实际目标和预览，匹配后继续执行。只在目标不唯一、范围或数量超出请求、预览出现新的实质变更、不可逆选择缺失或平台强制要求时提问，一次问齐已知缺项。CLI 的 prepare、continuation、confirm=true/--yes 和写后回查必须保留；确认参数是执行校验，不能代替用户授权，也不要求对已授权的相同操作再口头确认。用户明确要求先看方案或逐步确认时遵从。
+
+用户已经提供的目标地址、账号密码和登录授权直接沿用，不再次询问是否允许登录或重复索取。已有匹配环境的有效会话直接复用；新会话由 Agent 发起官方 OAuth 登录。CLI 没有账号密码直登参数时，在可控的官方浏览器登录页使用用户提供的账号密码；不把密码作为 ETEAMSID，不猜测登录接口或参数。只有验证码、MFA、平台授权按钮或当前工具无法操作的页面需要用户参与时，说明具体阻碍并交接该步骤。CLI 与浏览器能否访问同一本地回调由 Agent 根据实际运行环境判断，无需用户口头确认同机。不要把凭证或带凭证的工具结果打印到对话、日志或提交中。
 
 ## 通用准则
 
@@ -128,7 +134,7 @@ weaver-work-cli doctor --e10
 
 4. 认证诊断只能通过 `weaver-work-cli auth root/status/profile list/profile current`、`weaver-work-cli doctor --e10` 和业务命令 JSON 错误完成。禁止直接列目录、打印、复制或解析用户态认证目录和认证文件。
 
-5. 涉及附件、图片、本地文件、远程 URL 文件或文件内容解析的操作，执行前必须先向用户说明：文件内容可能会被上传到业务系统、OCR/解析服务，并可能进入当前大模型上下文用于理解和处理。必须等待用户明确确认后，才继续上传、读取、解析、OCR、导入或复用已上传文件对象；用户未确认时只说明风险和所需确认，不执行相关命令。
+5. 用户明确要求读取、解析、上传或复用指定附件时，按该任务直接执行，不额外添加通用数据风险警告或 Yes/No 弹框。仅提供路径而没有操作意图时先明确任务；需要把文件发送到任务未涵盖的新外部服务时，先说明实际接收方、用途并取得授权。按实际数据路径描述处理过程，不断言所有附件都会先经过公网大模型。
 
 6. **同名不同包不要混用**：环境中可能并存另一个独立的 E10 登录 CLI（例如 `e10-login`，版本号可能带 `xiaoe` 后缀），它提供登录与状态查询，但其登录态**不会**被 `weaver-work-cli` 复用。非 XiaoE 环境的 CLI 可用性以 `weaver-work-cli --version` 为凭；XiaoE 环境跳过版本检查，以 `doctor --e10` 或实际业务命令的结果为凭。登录态一律以 `weaver-work-cli auth status --no-check` / `doctor --e10` 为凭；不得因为另一个 CLI 显示已登录就判定本 CLI 可用，也不要用另一个 CLI 的输出替代本 CLI 的认证结论。
 
@@ -192,14 +198,14 @@ User-Agent: AgentType=<agentType>,IsAgent=true
 
 2. 禁止读取、列出、打印、复制或解析任何 `e10-login` / `e10-cli` 历史认证目录，例如用户主目录下的旧 `.e10-cli`；也禁止直接读取 `auth`、`config.json` 或 Keychain 项来推断登录态。
 
-3. 禁止绕过 `weaver-work-cli` 直接 `curl`、`fetch`、浏览器自动化或访问 E10 业务接口。
+3. 禁止绕过 `weaver-work-cli` 直接 `curl`、`fetch`、浏览器自动化或访问 E10 业务接口。官方 OAuth 登录页的账号密码填写按上面的登录执行规则处理，不属于业务接口操作。
 
-4. 写入、删除、导入、更新等高风险操作必须使用 CLI 提供的确认流程；业务 Skill 要求 `prepare -> apply` 时，必须把 prepare 返回的 continuation 原样传给 apply，并在 apply 前取得用户明确确认。
+4. 用户已明确指定目标、操作、字段值/接收人和范围时，其请求即为本次授权；先检查实际目标和预览，匹配后继续执行。只在目标不唯一、范围或数量超出请求、预览出现新的实质变更、不可逆选择缺失或平台强制要求时提问，一次问齐已知缺项。CLI 的 prepare、continuation、confirm=true/--yes 和写后回查必须保留；确认参数是执行校验，不能代替用户授权，也不要求对已授权的相同操作再口头确认。用户明确要求先看方案或逐步确认时遵从。
 
 5. 不能猜测 CLI 未暴露的内部字段、接口路径、ID 解析逻辑或回查语义。
 
-6. 已有 XiaoE 会话的 `session_expired` 由 CLI 底层自动处理，Agent 不运行任何登录命令或重试业务命令；最终仍返回该错误时只反馈并停止。首次未登录或 `auth status` 未登录时，Agent 若已判定为 XiaoE，可运行一次 `weaver-work-cli auth xiaoe`；统一登录不可用时反馈 CLI 原因并停止。任意系统都不得把 `xiaoe_credential_unavailable` 改成浏览器 OAuth、本地终端操作或其他登录 Skill。仅首次认证缺失且非 XiaoE 环境在用户确认真实 E10 域名后运行 `auth login`，并传入 `--agent_type "<当前智能体名称>"`。具体流程读取 [`e10-auth-and-session.md`](references/e10-auth-and-session.md)。
+6. 已有 XiaoE 会话的 `session_expired` 由 CLI 底层自动处理，Agent 不运行任何登录命令或重试业务命令；最终仍返回该错误时只反馈并停止。首次未登录或 `auth status` 未登录时，Agent 若已判定为 XiaoE，可运行一次 `weaver-work-cli auth xiaoe`；统一登录不可用时反馈 CLI 原因并停止。任意系统都不得把 `xiaoe_credential_unavailable` 改成浏览器 OAuth、本地终端操作或其他登录 Skill。仅首次认证缺失且非 XiaoE 环境复用用户已提供或明确选定的真实 E10 域名运行 `auth login`，并传入 `--agent_type "<当前智能体名称>"`。具体流程读取 [`e10-auth-and-session.md`](references/e10-auth-and-session.md)。
 
-7. 附件、图片上传或文件解析属于敏感数据处理。即便 operation 风险等级不是高风险写入，也必须先取得用户对“文件内容可能进入大模型/外部解析服务”的明确确认；不能把用户仅提供文件路径或文件名视为同意解析或上传。
+7. 文件处理按上述任务授权执行；仅提供文件路径或文件名而无操作意图时先明确任务。
 
 8. Agent 明确选择 `auth xiaoe` 后，或业务命令在已识别的 XiaoE 运行时发现本地会话缺失时，CLI 按顺序从平台注入凭证（Node 换票后由 CLI npm 包自带 `xiaoe_env.py` 兼容回退）、宿主 `xiaoeUserData/tokens.py`、内置原生实现读取的桌面 XiaoE 客户端会话（宿主注入路径优先、默认 `XiaoE/Robots/<id>/user_settings.json` 回退）、`WEAVER_XIAOE_*` 环境映射读取支持统一登录的凭证。已有会话被接口明确拒绝时会根据持久化会话的 `agentType` / `loginSource` 静默恢复 1 次，不要求 Agent 添加 `--runtime-agent xiaoe`。不要要求用户提供、展示或手动设置这些凭证。任意系统失败时都反馈结构化错误，不自动降级浏览器。

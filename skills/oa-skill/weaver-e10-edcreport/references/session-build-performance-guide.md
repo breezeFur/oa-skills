@@ -14,7 +14,7 @@
 | **1** | **仅** `e10-login status` 或 `edc-report auth ready`（秒级） | — |
 | **2a** | 输出含「已登录」且有 ETEAMSID → **立刻进入搭建** | 再跑 `oidc` / `whoami` / 二次确认 |
 | **2b** | 未登录 + CLI ≥1.5 → **一次** `oidc`（或 `set`）后再 `auth ready` | 循环登录校验、固定 sleep |
-| **2c** | 未登录 + CLI &lt;1.5（`login_required_legacy_set`）→ **AskUserQuestion**：① 建议升级 1.5+ 再 oidc；② 请用户提供 **ETEAMSID + base-url** 后 `set`（见 `policy login` / `auth ready` 的 `askUser`） | 「必须先升级才能搭表」；未索要就编造 token |
+| **2c** | 低版本协议导致未登录时由 Agent 自动准备匹配 CLI 后走 OAuth；已有会话复用 | 不默认索取 Cookie |
 
 **登录扫描禁令（强制）**：
 
@@ -22,7 +22,7 @@
 - **禁止**为登录去 `Glob`/`Grep`/`Read` 乱扫仓库、`e10-cli*`、profile 明文、无关 md  
 - **禁止**开场通读完整 `weaver-e10-login`（仅 `auth ready` 失败需登录时再读最短段落 / `policy login`）  
 - 已登录 → **0 文件扫描**，直接搭表  
-- **低版本**：建议升级，或提示用户提供 ETEAMSID 等必要信息；**禁止因版本阻断搭表**
+- **低版本**：有效会话复用；协议不兼容且未登录时由 Agent 自动准备匹配 CLI 后 OAuth；**禁止因版本阻断搭表**
 
 细则：`e10-login-integration.md` §「快速路径」· `edc-report policy login`。
 
@@ -41,7 +41,7 @@
 | **搭表进行中** | 按任务点名再加载单篇（找表/落库/条件格式…） | 「先把文档目录扫一遍再干活」；扫 `.workbuddy/` |
 | **API 建表** | `api-report-build-fast-path.md` 轻量清单 | 开场需求分析模板 + 知识库第九节 |
 
-**冷启动顺序（强制）**：`auth ready` →（缺凭证则立即向用户索要 ETEAMSID；禁 oidc）→ `find form` / 定点 patch → 仅那时再读对应 guide。
+**冷启动顺序（强制）**：`auth ready` →（缺凭证则按登录技能推进官方 OAuth，使用已提供账号密码）→ `find form` / 定点 patch → 仅那时再读对应 guide。
 
 ---
 

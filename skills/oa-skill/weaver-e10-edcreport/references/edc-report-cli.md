@@ -23,7 +23,7 @@
 |---------------------|------------|--------------|
 | **§A0 仅改用户点名项（最高）** | 改配置前自检范围；禁止擅自删改 | **`edc-report policy scope`**；破坏性命令须用户点名：`lifecycle delete` / `cleanup shells` / `restore` |
 | **§A0.1 / 冷启动扫描** | 开场只读 cold-start 一页；禁通读知识库；交链即停 | **`policy build`** / `auth ready`；`cold-start-scan-guide.md` |
-| **登录低版本兼容** | &lt;1.5 未登录：建议升级或索要 ETEAMSID+base-url 后 set | **`edc-report auth ready`**（`askUser`）/ **`policy login`** |
+| **登录低版本兼容** | &lt;1.5 未登录且协议不兼容：Agent 自动准备匹配 CLI 后 OAuth | **`edc-report auth ready`**（认证状态）/ **`policy login`** |
 | **新建报表三模式** | 空白 / 模版创建 / 快速构建-列表式 | **`edc-report create models|blank|template|quick`**；指南 `report-create-modes-guide.md` |
 | **默认表头样式** | 未指定样式且无效果图 → 蓝标题+灰列头；用户指定/效果图优先 | `validate style`；`build spec`；`default-header-style-guide.md` |
 | **找表 / 未给表名** | **仅当前应用** getList；未给准确表名或模糊命中 → 候选 + **二次确认**；禁静默 addDataset | `find form` / `--list` / `--suggest`（exit 3=须确认） |
@@ -243,7 +243,7 @@ edc-report doctor trees scripts
 - [ ] **未查找 e10-cli*（本包无）？只加载点名 guide？**（§A0.2）
 - [ ] **未建 `__build_*` 空壳？** 目标名一次落库；模糊表 exit 3 确认前不建表
 - [ ] 找表：exact 才可 autoBind；**模糊 / 未命中 → 确认**（禁静默绑表、禁跨报表 datasetId）
-- [ ] **低版本未登录：已建议升级或 AskUser 索要 ETEAMSID+base-url？未因版本阻断？**（`policy login`）
+- [ ] 低版本协议导致未登录时由 Agent 自动准备匹配 e10-login 并走 OAuth，不默认索要 Cookie。
 - [ ] 本任务确定性步骤是否都能对应到 §一 CLI？
 - [ ] 多表未写关联 → `join suggest` + 用户确认话术
 - [ ] 查询 → `query save`（默认高级搜索 + updateQueryType；失败提示后继续）；用户点名筛选才 `--show-where 筛选`
