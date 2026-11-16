@@ -11,3 +11,5 @@ weaver-e10-shared 是流程技能明确要求的配套依赖，补自官方 npm 
 2026-11-12 按维护者要求从 breezeFur/agent-skills 同步 node-write 及全部七个技能配套文件，接入 UTF-8/DGS 读写指南和 Windows Node 自动准备脚本。运行时、探针、观察器二进制、证据和本机盘点不随技能发布；Node 安装后仍需独立验证 DGS。
 
 2026-11-12 按维护者要求将原 skills/ 下八个 weaver-e10-* 目录迁入 skills/oa-skill，与 Builder、组件、报表统一收纳；技能名称、配套资源和产品锁文件保留。source-manifest.json 的 generatedTargets/targets 路径描述原上游生成位置，属于历史来源元数据，不作为本仓库当前安装路径；本仓库安装位置以 README 和实际目录为准。
+
+2026-11-16 按维护者明确要求，新增本机已安装的 archify 3.2.0 和 ppt-master 6.9.0，分别放在 skills/archify 与 skills/ppt-master；未同步其他本地技能或修改本机安装。archify 原来源为 https://github.com/tt-a1i/archify，保留 Apache-2.0 主许可、LICENSE-MIT、NOTICE、THIRD_PARTY_NOTICES 和原更新元数据。ppt-master 原来源为 https://github.com/hugohe3/ppt-master，保留 MIT 许可、作者元数据、SPONSORS.md / SPONSORS_CN.md、第三方声明和归属校验机制。其图标、字体/音效等配套资源继续按各自来源声明使用。本次排除 Python bytecode 缓存；包内示例、模板、脚本、锁文件和要求的归属文件保留原字节，未打包运行时依赖或真实 API 密钥。

@@ -1,19 +1,19 @@
 # OA Skills
 
-泛微 E10 / E-Builder 的技能与配套资源，包含 MAX 公司流程规范。仓库按用户要求公开。
+泛微 E10 / E-Builder 的技能与配套资源，包含 MAX 公司流程规范，以及 archify 图解和 ppt-master 演示文稿工具。仓库按用户要求公开。
 
 ## 直接交给你的 AI 安装
 
 将下面这段话发给接收者的 AI。也可以转发本仓库的 [AGENTS.md](AGENTS.md) 链接，并明确要求“按 README 安装”：
 
 ```text
-请安装 https://github.com/breezeFur/oa-skills 中已发布的 OA 技能。
+请安装 https://github.com/breezeFur/oa-skills 中已发布的全部 16 个技能，包括 OA、archify 和 ppt-master。
 先读取仓库 README.md 和 AGENTS.md，确认你所用 AI 的真实技能目录和规则文件，保留完整技能及配套资源。
 按选定技能直接帮我安装或更新需要的 CLI 和解释器，核对命令路径、版本、启动结果后继续任务；不要让我手动执行安装命令。页面 runtime 在首次实际页面任务时通过自身 bootstrap 自动准备。
 安装完成后，把 docs/oa-agents.md 中的 OA 规则片段合并到我实际生效的 AGENTS.md；将 __OA_SKILLS_DIR__ 换成本机技能目录的绝对路径。
 保留我已有的规则，先备份；已有 OA 标记块就更新同一块，不要重复追加，也不要用仓库 AGENTS.md 覆盖整个文件。
 之后处理 OA 相关任务时，先检查并读取已安装的对应 OA 技能，再按技能要求检查工具、版本和认证环境。
-验证 14 个技能定义、规则中的真实路径及新会话加载情况，最后报告安装路径、规则文件路径和仍需准备的外部依赖。
+验证 16 个技能定义、规则中的真实路径及新会话加载情况，最后报告安装路径、规则文件路径和仍需准备的外部依赖。
 ```
 
 安装包含三个步骤：**安装技能目录 → 合并 OA 规则到接收者的规则文件 → 验证新会话识别**。只克隆仓库或只阅读本仓库的 AGENTS.md 不会替接收者的其他项目配置规则。
@@ -40,8 +40,16 @@
 | weaver-e10-shared | [流程共享规则](skills/oa-skill/weaver-e10-shared/SKILL.md) | weaver-work-cli 自动准备、认证及输出/写入契约 |
 | weaver-e10-page-generator | [页面生成](skills/oa-skill/weaver-e10-page-generator/SKILL.md) | 文字/截图生成、复刻、修改页面及自动准备 runtime |
 | weaver-e10-package-comparison | [离线包比对](skills/oa-skill/weaver-e10-package-comparison/SKILL.md) | 迁出包业务功能差异、验证点及离线可视化 |
+| archify | [图解与一页解释](skills/archify/SKILL.md) | 架构、流程、时序、数据流、ERD 等交互 HTML 图解及解释页面 |
+| ppt-master | [演示文稿](skills/ppt-master/SKILL.md) | 可编辑 PPTX 生成、重构、美化、模板和原生编辑 |
 
-`oa-skill` 统一收纳全部 `weaver-e10-*` 技能及 Builder 内的动作流技能。`node-write` 和 `max-workflow-standard` 保留在 skills/ 下同级目录；流程共享规则和登录技能在 oa-skill 内与相关业务技能同级。共同安装指南是 [CLI 自动准备](skills/oa-skill/cli-setup.md)，保留 oa-skill 集合及其相对引用。保留原有嵌套结构与全部 references、assets、scripts；报表 CLI 会引用同一技能内的相邻 scripts，不能只复制 CLI 子目录。
+`oa-skill` 统一收纳全部 `weaver-e10-*` 技能及 Builder 内的动作流技能。`node-write`、`max-workflow-standard`、`archify` 和 `ppt-master` 保留在 skills/ 下同级目录；流程共享规则和登录技能在 oa-skill 内与相关业务技能同级。共同安装指南是 [CLI 自动准备](skills/oa-skill/cli-setup.md)，保留 oa-skill 集合及其相对引用。保留原有嵌套结构与全部 references、assets、scripts；报表 CLI 会引用同一技能内的相邻 scripts，不能只复制 CLI 子目录。
+
+## 图解与演示文稿配套资源
+
+archify 3.2.0 和 ppt-master 6.9.0 来自维护者已安装的完整技能目录，来源及许可见 [技能来源](docs/skill-sources.md)。保留两者的 LICENSE、第三方声明、版本元数据；ppt-master 的 SPONSORS、归属校验脚本和模板图标也完整保留。Python 缓存和本机密钥不随包发布，`.env.example` 仅为配置占位示例。
+
+archify 使用其包内 `bin/archify.mjs`，要求 Node >=18，技能运行不需要在包内 npm install。PPT Master 首先用实际 Python 解释器运行包内 `scripts/attribution_guard.py`，再按入口路由读取对应流程；用到转换、渲染等能力时，Agent 按其 requirements.txt 和所选脚本文档准备必要依赖。图解和演示文稿不依赖 OA 登录，不为它们安装在线 OA CLI。图解仅按图解或解释页面需求调用，PPT Master 按演示文稿需求调用；不设置每次 OA 对话都自动生成页面或 PPT 的模式。
 
 ## 安装前确认位置
 
@@ -59,7 +67,7 @@ $oaRepoPath = Join-Path $env:USERPROFILE 'oa-skills'
 git clone https://github.com/breezeFur/oa-skills.git $oaRepoPath
 $oaSkillsPath = Join-Path $env:USERPROFILE '.agents\skills'
 New-Item -ItemType Directory -Force -Path $oaSkillsPath | Out-Null
-foreach ($oaSkillName in @('node-write', 'oa-skill', 'max-workflow-standard') {
+foreach ($oaSkillName in @('node-write', 'oa-skill', 'max-workflow-standard', 'archify', 'ppt-master')) {
     $oaLinkPath = Join-Path $oaSkillsPath $oaSkillName
     $oaTargetPath = Join-Path (Join-Path $oaRepoPath 'skills') $oaSkillName
     $oaExisting = Get-Item -LiteralPath $oaLinkPath -Force -ErrorAction SilentlyContinue
@@ -80,7 +88,7 @@ git clone https://github.com/breezeFur/oa-skills.git "$HOME/oa-skills"
 oa_repo_path="$HOME/oa-skills"
 oa_skills_path="$HOME/.agents/skills"
 mkdir -p "$oa_skills_path"
-for oa_skill_name in node-write oa-skill max-workflow-standard; do
+for oa_skill_name in node-write oa-skill max-workflow-standard archify ppt-master; do
   oa_link_path="$oa_skills_path/$oa_skill_name"
   if [ -e "$oa_link_path" ] || [ -L "$oa_link_path" ]; then
     printf '已有安装，先核对再处理：%s\n' "$oa_link_path"
@@ -92,11 +100,11 @@ done
 
 ## 已有安装迁移到统一目录
 
-本次只调整仓库目录，技能名称与功能保持一致。全量安装现在只需保留三个顶层目录：`oa-skill`、`max-workflow-standard`、`node-write`。
+此前 Weaver 技能已统一到 oa-skill，原技能名称保留。本次新增 archify 与 ppt-master。全量安装现在包含五个顶层目录：`oa-skill`、`max-workflow-standard`、`node-write`、`archify`、`ppt-master`。
 
 已有安装更新前，检查各目录是复制副本、符号链接还是 junction，备份用户修改到技能目录之外。旧顶层 weaver-e10-* 链接可能因仓库移动而失效，应将其目标改为仓库 skills/oa-skill 下的对应目录；已有复制副本先与新版逐项比较，再迁移或合并到 oa-skill，目标已经存在时不能覆盖。安装工具只发现直接子目录时，可保留指向集合内部的单技能链接，但不要同时保留旧内容副本造成同名技能冲突。
 
-按 docs/oa-agents.md 更新原 OA 标记块，回读全部14个 SKILL.md及相对引用。确认新会话识别后再处理明确属于旧安装的重复入口；不递归删除用户目录。仓库目录更新不会自动修改接收者的技能安装或全局规则。
+按 docs/oa-agents.md 更新原 OA 标记块，回读全部16个 SKILL.md及相对引用。确认新会话识别后再处理明确属于旧安装的重复入口；不递归删除用户目录。仓库目录更新不会自动修改接收者的技能安装或全局规则。
 
 ## 安装后合并 AGENTS.md（必做）
 
@@ -137,16 +145,16 @@ CLI 安装验证不触发登录。实际在线操作前才核对目标环境及�
 
 | 检查项 | 完成依据 |
 | --- | --- |
-| 技能文件 | 实际技能目录中的 14 个 SKILL.md 都可读取，链接目标正确，配套文件完整 |
+| 技能文件 | 实际技能目录中的 16 个 SKILL.md 都可读取，链接目标正确，配套文件完整 |
 | OA 规则合并 | 接收者实际规则文件已回读；OA 标记块唯一、路径真实、原规则保留 |
-| AI 已识别 | 新会话或重新加载后，AI 能列出 14 个技能并说明 OA 操作前读取对应技能；尚未执行新会话验证时标为待验证 |
+| AI 已识别 | 新会话或重新加载后，AI 能列出 16 个技能并说明 OA 操作前读取对应技能；尚未执行新会话验证时标为待验证 |
 | 工具准备 | 按所选技能直接安装/更新必要 CLI，报告实际路径、版本和启动验证；真实阻断说明原因 |
 | 平台认证 | 作为独立准备项报告，缺少登录态不伪装成工具或技能安装失败 |
 
 可在接收者 AI 的新会话发送：
 
 ```text
-请先不要操作 OA 平台。列出你读取到的 OA 操作前检查规则、规则文件路径和已安装的 14 个 OA 技能路径，并说明创建表单、修改动作流、搭建报表、创建自定义组件、审阅 MAX 流程分别应先读哪个技能。
+请先不要操作 OA 平台。列出你读取到的 OA 操作前检查规则、规则文件路径和已安装的 16 个技能路径（包括 archify 和 ppt-master），并说明创建表单、修改动作流、搭建报表、创建自定义组件、审阅 MAX 流程、画架构图、制作 PPT 分别应先读哪个技能。
 ```
 
 若新会话不能识别，检查真实技能目录、嵌套技能发现、规则覆盖及加载长度。目标工具若只识别直接子目录，按其支持方式登记这些已有 SKILL.md 路径，或为尚未发现的技能创建目录链接；保留源目录结构和相对引用，并确认没有重复同名技能。按目标 AI 的方式重新加载，Codex 未检测到更新时可重启；不要把未验证状态报告为完成。
