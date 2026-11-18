@@ -27,12 +27,12 @@ export function inspect(observer, target) {
   if (result.error || result.status !== 0) throw new Error('独立观察器不可用或读取失败');
   let physical;
   try { physical = JSON.parse(result.stdout.trim()); } catch { throw new Error('观察器输出不是有效 JSON'); }
-  if (!/^(?:[a-f0-9]{2}){0,16}$/i.test(physical.headerHex)
-      || !/^[a-f0-9]{64}$/i.test(physical.sha256)
+  if (typeof physical?.headerHex !== 'string' || !/^(?:[a-f0-9]{2}){0,16}$/i.test(physical.headerHex)
+      || typeof physical.sha256 !== 'string' || !/^[a-f0-9]{64}$/i.test(physical.sha256)
       || !Number.isSafeInteger(physical.bytes) || physical.bytes < 0) {
     throw new Error('观察器输出缺少有效文件头、长度或 SHA-256');
   }
-  return physical;
+  return { bytes: physical.bytes, headerHex: physical.headerHex.toUpperCase(), sha256: physical.sha256.toLowerCase() };
 }
 function cipherPrefix(value) {
   if (!/^(?:[a-f0-9]{2}){4,16}$/i.test(value ?? '')) throw new Error('密文标识须为已验证的 4–16 字节十六进制前缀');
@@ -40,13 +40,13 @@ function cipherPrefix(value) {
 }
 export function verifyCipher(observer, target, prefix, plaintext) {
   const expected = cipherPrefix(prefix);
-  let physical;
+  const plaintextSha256 = sha256(plaintext);
   for (let attempt = 0; attempt < 4; attempt++) {
-    physical = inspect(observer, target);
-    if (physical.headerHex.toUpperCase().startsWith(expected) && physical.sha256 !== sha256(plaintext)) return physical;
+    const physical = inspect(observer, target);
+    if (physical.headerHex.startsWith(expected) && physical.sha256 !== plaintextSha256) return physical;
     if (attempt < 3) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 100);
   }
-  throw new Error('独立视角未确认预期密文；检查目标实际状态，不能认定已加密或已回滚');
+  throw new Error('独立视角未确认预期密文');
 }
 export function validateEvidence(evidencePath, observer, target) {
   if (!path.isAbsolute(evidencePath)) throw new Error('DGS 证据必须使用绝对路径');
@@ -75,36 +75,46 @@ function probe(options) {
   const prefix = cipherPrefix(options['--cipher-prefix']);
   const runtime = fingerprint(process.execPath), watcher = fingerprint(observer);
   const resolvedDirectory = fs.realpathSync(directory);
+  const out = options['--out'];
+  if (out && (!path.isAbsolute(out) || path.extname(out).toLowerCase() !== '.txt')) {
+    throw new Error('证据输出须为绝对 .txt 路径');
+  }
   const target = path.join(resolvedDirectory, `codex-dgs-probe-${randomUUID()}${suffix}`);
   const payload = Buffer.from('Codex DGS probe\r\nUTF-8 中文验证\r\nNo business data\r\n');
+  let physical;
   let created = false;
   try {
-    fs.writeFileSync(target, payload, { flag: 'wx' });
+    const fd = fs.openSync(target, 'wx');
     created = true;
-    if (!fs.readFileSync(target).equals(payload)) throw new Error('探针明文读回不一致');
-    const physical = verifyCipher(observer, target, prefix, payload);
-    const evidence = {
-      version: 1, verified: 'node-readback+independent-cipher', createdAt: new Date().toISOString(),
-      runtime, observer: watcher, directory: resolvedDirectory, extension: extension(target), cipherPrefix: prefix,
-      plaintextSha256: sha256(payload), physical,
-    };
-    if (options['--out']) {
-      const out = options['--out'];
-      if (!path.isAbsolute(out) || path.extname(out).toLowerCase() !== '.txt') throw new Error('证据输出须为绝对 .txt 路径');
-      const serialized = Buffer.from(`${JSON.stringify(evidence, null, 2)}\n`);
-      fs.writeFileSync(out, serialized, { flag: 'wx' });
-      if (!fs.readFileSync(out).equals(serialized)) throw new Error('证据读回失败');
+    try {
+      fs.writeFileSync(fd, payload);
+    } finally {
+      fs.closeSync(fd);
     }
-    console.log(JSON.stringify({ ok: true, ...evidence, evidenceFile: options['--out'] ?? null }));
+    if (!fs.readFileSync(target).equals(payload)) throw new Error('探针明文读回不一致');
+    physical = verifyCipher(observer, target, prefix, payload);
   } finally {
-    // Remove only the exact random probe successfully created by this invocation.
+    // Only this run's exclusively created probe is eligible for cleanup.
     if (created) fs.unlinkSync(target);
   }
+  const evidence = {
+    version: 1, verified: 'node-readback+independent-cipher', createdAt: new Date().toISOString(),
+    runtime, observer: watcher, directory: resolvedDirectory, extension: extension(target), cipherPrefix: prefix,
+    plaintextSha256: sha256(payload), physical,
+  };
+  if (out) {
+    const serialized = Buffer.from(`${JSON.stringify(evidence, null, 2)}\n`);
+    fs.writeFileSync(out, serialized, { flag: 'wx' });
+    if (!fs.readFileSync(out).equals(serialized)) throw new Error('证据读回失败');
+  }
+  console.log(JSON.stringify({ ok: true, ...evidence, evidenceFile: out ?? null }));
 }
 
 const usage = 'node dgs-check.mjs probe --directory <absolute-dir> --extension .ts '
   + '--observer <absolute-executable> --cipher-prefix <verified-hex> [--out <absolute.txt>]';
-if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
+// Node resolves the module through junctions and symlinks while argv retains the invocation path.
+if (process.argv[1] && fs.existsSync(process.argv[1])
+    && canonical(fs.realpathSync(fileURLToPath(import.meta.url))) === canonical(fs.realpathSync(process.argv[1]))) {
   try {
     const [command, ...args] = process.argv.slice(2);
     if (command === '--help' && !args.length) console.log(usage);
