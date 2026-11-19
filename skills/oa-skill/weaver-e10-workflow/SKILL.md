@@ -15,7 +15,7 @@ dependencies:
 cliHelp: "weaver-work-cli workflow --help"
 ---
 
-**开始前先读取 [`../weaver-e10-shared/SKILL.md`](../weaver-e10-shared/SKILL.md)。CLI 缺少、版本不匹配或用户要求更新时，按 [CLI 自动准备](../cli-setup.md) 直接执行 `npm install -g weaver-work-cli@latest --registry=https://registry.npmjs.org` 并核对版本与 `workflow --help`；XiaoE 客户端托管的 CLI 按共享规则由客户端自动准备，不另装全局副本。共享技能已随本仓库收录，缺少时直接执行 `weaver-work-cli skills install shared --target-dir "<SKILLS_ROOT>"`，`<SKILLS_ROOT>` 是本技能上一级的绝对目录；已有共享技能需要更新时先比较并备份用户修改，再按 CLI 帮助更新同一位置。安装不另设确认弹框、不要求用户手动执行；完成后回读共享规则并继续原任务。认证、JSON 输出、业务写入确认仍按共享规则执行；安装失败或共享规则仍不可读时停止依赖它的平台操作，如实说明结果。**
+**开始前读取 [`../weaver-e10-shared/SKILL.md`](../weaver-e10-shared/SKILL.md)；依赖缺失时由 Agent 自动补齐，无需安装确认弹框，不要求用户手动执行。非 XiaoE 环境先检查 CLI 实际路径；已安装但不在 PATH 时恢复当前进程 PATH，确实缺少、版本不匹配或用户要求更新时，执行 `npm install -g weaver-work-cli@latest --registry=https://registry.npmjs.org`，验证版本和 `workflow --help`。CLI 可用后，若共享技能不存在，执行 `weaver-work-cli skills install shared --target-dir "<SKILLS_ROOT>"`；`<SKILLS_ROOT>` 必须是本 SKILL.md 上一级的绝对目录，不能省略。共享文件存在但读取失败时先检查路径、权限和编码，保留现有用户修改，不直接覆盖。已有共享技能需要更新时先比较并备份用户修改，保留本仓库的自动安装约定。安装命令各执行一次，失败时报告实际错误，不盲目重装；成功后回读共享规则并继续原任务。详细工具准备见 [CLI 自动准备](../cli-setup.md)。XiaoE 客户端托管 CLI 时由客户端准备，不另装全局副本。认证、JSON 输出和业务写入契约仍按共享规则执行；仅停止依赖未恢复能力的平台操作，继续可独立完成的工作。**
 **`--is-connector` 判据**：用户明确使用连接器、或上下文要求用连接器完成任务 → 传 `true`；本次任务或上下文直接选择单独技能 → 不传；用户没有明确说明时，按**正在运行的这份 Skill 是哪一级**定——**用户级（条目标 `(user)`）不传，连接器级（标 `(connector)`）传**（同名 Skill 只会运行用户级那一份）。传 `true` 时不要再写 `--profile` / `--base-url`。完整规则见 [`../weaver-e10-shared/SKILL.md`](../weaver-e10-shared/SKILL.md)。
 
 认证和登录态只能按共享规则通过 `weaver-work-cli auth ...` 命令判断；禁止直接读取、列出、打印或解析用户主目录下的旧 `.e10-cli`、auth、config 或 Keychain 数据。
